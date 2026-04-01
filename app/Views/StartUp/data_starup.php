@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Data Startup - SIMIK</title>
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/sweetalert2.min.css') ?>">
     <script src="<?= base_url('js/sweetalert2.min.js') ?>"></script>
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }</style>
 </head>
@@ -190,6 +191,14 @@
                 confirmButtonText: 'YA, HAPUS!',
                 cancelButtonText: 'BATAL',
                 reverseButtons: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',
@@ -213,6 +222,14 @@
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',
@@ -229,6 +246,14 @@
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',

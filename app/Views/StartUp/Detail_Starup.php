@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Startup - SIMIK</title>
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/sweetalert2.min.css') ?>">
     <script src="<?= base_url('js/sweetalert2.min.js') ?>"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
+        #scroll-area { overflow-y: auto; }
         .sidebar-card { background: white; border: 1.5px solid #f1f5f9; border-radius: 0; padding: 40px; }
         .main-card { background: white; border: 1.5px solid #f1f5f9; border-radius: 0; overflow: hidden; }
         .info-header { background: #f8fafc; border-bottom: 1.5px solid #f1f5f9; padding: 20px 40px; }
         .label-text { font-size: 9px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 8px; display: block; }
         .value-text { font-size: 11.5px; font-weight: 400; color: #1e293b; line-height: 1.5; text-transform: none; }
         .badge { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
+        .swal2-container { z-index: 99999 !important; }
     </style>
 </head>
 <body class="bg-white text-slate-800 antialiased uppercase">
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen overflow-hidden" id="app-wrapper">
         
         <!-- SIDEBAR UTAMA -->
         <?= view('Partials/sidebar') ?>
@@ -28,7 +31,7 @@
             <?= view('Partials/topbar') ?>
 
             <!-- CONTENT AREA -->
-            <div class="flex-1 overflow-y-auto overflow-x-hidden px-10 py-12 bg-slate-50/30">
+    <div class="flex-1 overflow-y-auto overflow-x-hidden px-10 py-12 bg-slate-50/30" id="scroll-area">
                 
                 <div class="max-w-full mx-auto">
                     
@@ -451,6 +454,12 @@
     </div>
 
     <script>
+        // Pindahkan semua modal ke body agar tidak terpotong overflow
+        ['modal-edit-startup','modal-tambah-anggota','modal-edit-tim'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) document.body.appendChild(el);
+        });
+
         function openTambahAnggotaModal() {
             const modal = document.getElementById('modal-tambah-anggota');
             modal.classList.remove('hidden');
@@ -468,6 +477,14 @@
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',
@@ -484,6 +501,14 @@
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',
@@ -503,6 +528,14 @@
                 confirmButtonText: 'YA, HAPUS!',
                 cancelButtonText: 'BATAL',
                 reverseButtons: true,
+                showClass: {
+                    popup: 'swal2-show',
+                    backdrop: 'swal2-backdrop-show'
+                },
+                hideClass: {
+                    popup: 'swal2-hide',
+                    backdrop: 'swal2-backdrop-hide'
+                },
                 customClass: {
                     popup: 'rounded-[20px] p-10',
                     title: 'text-sm font-black text-slate-900 tracking-[0.2em]',
