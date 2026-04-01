@@ -161,7 +161,7 @@
                                             <tbody>
                                                 <?php if (!empty($tim)): ?>
                                                     <?php foreach($tim as $i => $t): ?>
-                                                    <tr>
+                                                    <tr id="tim-row-<?= $t['id_tim'] ?>">
                                                         <td class="text-xs fw-bold text-slate-400"><?= $i + 1 ?></td>
                                                         <td class="text-xs text-slate-700" style="font-weight:400;text-transform:none"><?= $t['nama_lengkap'] ?></td>
                                                         <td>
@@ -210,7 +210,7 @@
 
     <!-- MODAL EDIT STARTUP (Bootstrap Modal) -->
     <div class="modal fade modal-custom" id="modal-edit-startup" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">Edit Data Startup</h3>
@@ -220,7 +220,7 @@
                         </svg>
                     </button>
                 </div>
-                <form action="<?= base_url('update-startup') ?>" method="post" enctype="multipart/form-data">
+                <form id="form-edit-startup" action="<?= base_url('update-startup') ?>" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <input type="hidden" name="id_startup" value="<?= $startup['id_startup'] ?>">
                         <div class="mb-3">
@@ -338,7 +338,7 @@
 
     <!-- MODAL TAMBAH ANGGOTA (Bootstrap Modal) -->
     <div class="modal fade modal-custom" id="modal-tambah-anggota" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:420px">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
@@ -409,7 +409,7 @@
 
     <!-- MODAL EDIT ANGGOTA TIM (Bootstrap Modal) -->
     <div class="modal fade modal-custom" id="modal-edit-tim" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:420px">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
@@ -504,7 +504,7 @@
                 title: 'BERHASIL!',
                 text: '<?= session()->getFlashdata('success') ?>',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 1000,
                 timerProgressBar: true,
                 showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
                 hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' },
@@ -522,7 +522,7 @@
                 title: 'GAGAL!',
                 text: '<?= session()->getFlashdata('error') ?>',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 2000,
                 timerProgressBar: true,
                 showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
                 hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' },
@@ -556,11 +556,79 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "<?= base_url('delete-tim') ?>/" + id;
+                    $.ajax({
+                        url: "<?= base_url('delete-tim') ?>/" + id,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(response) {
+                            if(response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'BERHASIL!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                    customClass: { popup: 'rounded-4 p-4', title: 'fw-black text-uppercase', htmlContainer: 'text-muted text-uppercase small' }
+                                });
+                                // Hapus baris dari tabel
+                                $('#tim-row-' + id).fadeOut(400, function(){ $(this).remove(); });
+                            } else {
+                                Swal.fire('Error', response.message || 'Gagal menghapus data', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan server.', 'error');
+                        }
+                    });
                 }
             })
         }
-    </script>
 
+        // JQUERY AJAX UNTUK SEMUA FORM (Tambah Tim, Edit Tim, Edit Startup)
+        $(document).ready(function() {
+            function handleAjaxForm(formId, modalId) {
+                $(formId).on('submit', function(e) {
+                    e.preventDefault();
+                    let formData = new FormData(this);
+                    let actionUrl = $(this).attr('action');
+
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                $(modalId).modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'BERHASIL!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                    customClass: { popup: 'rounded-4 p-4', title: 'fw-black text-uppercase', htmlContainer: 'text-muted text-uppercase small' }
+                                }).then(() => {
+                                    location.reload(); // Reload halaman untuk memuat data terbaru
+                                });
+                            } else {
+                                Swal.fire('Error', response.message || 'Gagal menyimpan data', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                        }
+                    });
+                });
+            }
+
+            // Terapkan ke semua form modal
+            handleAjaxForm('#form-tambah-anggota', '#modal-tambah-anggota');
+            handleAjaxForm('#form-edit-tim', '#modal-edit-tim');
+            handleAjaxForm('#form-edit-startup', '#modal-edit-startup');
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
 </html>

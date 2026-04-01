@@ -69,7 +69,7 @@
                         <tbody>
                             <?php if(!empty($startups)): ?>
                                 <?php foreach($startups as $i => $row): ?>
-                                <tr>
+                                <tr id="row-<?= $row['uuid_startup'] ?>">
                                     <td class="text-xs fw-black text-slate-300"><?= $i + 1 ?></td>
                                     <td>
                                         <span class="company-name"><?= $row['nama_perusahaan'] ?></span>
@@ -196,7 +196,36 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '<?= base_url('delete-startup') ?>/' + id;
+                    // MENGGUNAKAN JQUERY AJAX
+                    $.ajax({
+                        url: '<?= base_url('delete-startup') ?>/' + id,
+                        type: 'GET', // Aturannya GET seperti route sekarang
+                        dataType: 'json',
+                        success: function(response) {
+                            if(response.status === 'success') {
+                                // Tampilkan notifikasi
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'BERHASIL!',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                    customClass: {
+                                        popup: 'rounded-4 p-4',
+                                        title: 'fw-black text-uppercase',
+                                        htmlContainer: 'text-muted text-uppercase small'
+                                    }
+                                });
+                                // Hapus baris dari tabel agar tidak perlu reload
+                                $('#row-' + id).fadeOut(500, function(){ $(this).remove(); });
+                            } else {
+                                Swal.fire('Error', 'Gagal menghapus data', 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                        }
+                    });
                 }
             })
         }
@@ -208,7 +237,7 @@
                 title: 'BERHASIL!',
                 text: '<?= session()->getFlashdata('success') ?>',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 1000,
                 timerProgressBar: true,
                 showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
                 hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' },
@@ -226,7 +255,7 @@
                 title: 'GAGAL!',
                 text: '<?= session()->getFlashdata('error') ?>',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 2000,
                 timerProgressBar: true,
                 showClass: { popup: 'swal2-show', backdrop: 'swal2-backdrop-show' },
                 hideClass: { popup: 'swal2-hide', backdrop: 'swal2-backdrop-hide' },
@@ -238,5 +267,6 @@
             });
         <?php endif; ?>
     </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
 </html>

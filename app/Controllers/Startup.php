@@ -94,6 +94,14 @@ class Startup extends BaseController
 
         $tim     = $model->find($id_tim);
         $startup = (new Startups_Model())->find($tim['id_startup']);
+        
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Data Anggota Berhasil Diperbarui!'
+            ]);
+        }
+
         return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Data Anggota Berhasil Diperbarui!');
     }
 
@@ -113,6 +121,14 @@ class Startup extends BaseController
         ]);
 
         $startup = (new Startups_Model())->find($this->request->getPost('id_startup'));
+        
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Anggota Tim Berhasil Ditambahkan!'
+            ]);
+        }
+
         return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Anggota Tim Berhasil Ditambahkan!');
     }
 
@@ -120,6 +136,14 @@ class Startup extends BaseController
     {
         $model = new Startups_Model();
         $model->where('uuid_startup', $uuid)->delete();
+        
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Satu berkas data telah berhasil dihapus!'
+            ]);
+        }
+        
         return redirect()->to(base_url('data-startup'))->with('success', 'Satu berkas data telah berhasil dihapus!');
     }
 
@@ -202,6 +226,13 @@ class Startup extends BaseController
             }
         }
 
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Data Startup Berhasil Diperbaharui!'
+            ]);
+        }
+
         return redirect()->to(base_url('data-startup'))->with('success', 'Data Startup Berhasil Diperbaharui!');
     }
 
@@ -254,9 +285,24 @@ class Startup extends BaseController
             $id_startup = $tim['id_startup'];
             $startup = (new Startups_Model())->find($id_startup);
             $model->delete($id_tim);
+            
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'success',
+                    'message' => 'Data anggota tim berhasil dihapus!'
+                ]);
+            }
+            
             return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Data anggota tim berhasil dihapus!');
         }
         
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Data tidak ditemukan!'
+            ]);
+        }
+
         return redirect()->back()->with('error', 'Data tidak ditemukan!');
     }
 }
