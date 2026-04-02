@@ -10,7 +10,7 @@
 <body>
     
     <!-- TOPBAR SAJA (TANPA SIDEBAR) -->
-    <?= view('Partials/topbar') ?>
+    <?= view('Partials/v_topbar') ?>
 
     <main style="max-width:995px; margin:0 auto; padding: 0 1.5rem 8rem; margin-top:3rem;">
         
@@ -175,7 +175,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>
-                        Simpan Data Startup
+                        Simpan Data
                     </button>
                 </div>
 
@@ -183,7 +183,7 @@
 
             <!-- FOOTER -->
             <div class="mt-5 pt-4 border-top" style="border-color: var(--slate-100) !important">
-                <?= view('Partials/footer') ?>
+                <?= view('Partials/v_footer') ?>
             </div>
         </div>
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Programs_Model extends Model
+class M_Program extends Model
 {
     protected $table            = 'programs';
     protected $primaryKey       = 'id_program';
@@ -13,11 +13,9 @@ class Programs_Model extends Model
     protected $protectFields    = true;
     protected $allowedFields    = ['uuid_program', 'nama_program', 'tahun_pelaksanaan'];
 
-    // Dates
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-
     protected $beforeInsert  = ['generateUuid'];
 
     protected function generateUuid(array $data)

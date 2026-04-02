@@ -13,12 +13,12 @@
     <div class="app-wrapper">
         
         <!-- SIDEBAR -->
-        <?= view('Partials/sidebar') ?>
+        <?= view('Partials/v_sidebar') ?>
 
         <main class="app-main">
             
             <!-- TOPBAR -->
-            <?= view('Partials/topbar') ?>
+            <?= view('Partials/v_topbar') ?>
 
             <!-- CONTENT -->
             <div class="app-content">
@@ -118,7 +118,7 @@
                     </table>
                 </div>
             </div>
-            <?= view('Partials/footer') ?>
+            <?= view('Partials/v_footer') ?>
         </main>
     </div>
 

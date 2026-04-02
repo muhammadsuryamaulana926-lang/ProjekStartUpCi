@@ -10,10 +10,6 @@
     <div class="footer-links">
         <a href="#">Bantuan</a>
         <a href="#">Kebijakan</a>
-        <div class="status-badge">
-            <div class="pulse-dot"></div>
-            <span>Sistem Normal</span>
-        </div>
     </div>
 
 </footer>

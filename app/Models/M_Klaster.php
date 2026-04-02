@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Klasters_Model extends Model
+class M_Klaster extends Model
 {
     protected $table            = 'klasters';
     protected $primaryKey       = 'id_klaster';
@@ -13,11 +13,9 @@ class Klasters_Model extends Model
     protected $protectFields    = true;
     protected $allowedFields    = ['uuid_klaster', 'nama_klaster'];
 
-    // Dates
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-
     protected $beforeInsert  = ['generateUuid'];
 
     protected function generateUuid(array $data)

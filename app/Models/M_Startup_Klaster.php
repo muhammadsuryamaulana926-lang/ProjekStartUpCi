@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class StartupKlaster_Model extends Model
+class M_Startup_Klaster extends Model
 {
     protected $table            = 'startup_klaster';
     protected $primaryKey       = 'id_startup_klaster';
@@ -13,6 +13,5 @@ class StartupKlaster_Model extends Model
     protected $protectFields    = true;
     protected $allowedFields    = ['id_startup', 'id_klaster'];
 
-    // Pivot tables in our schema do not have timestamps or uuids.
     protected $useTimestamps = false;
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class DosenPembinas_Model extends Model
+class M_Dosen_Pembina extends Model
 {
     protected $table            = 'dosen_pembinas';
     protected $primaryKey       = 'id_dosen_pembina';
@@ -13,11 +13,9 @@ class DosenPembinas_Model extends Model
     protected $protectFields    = true;
     protected $allowedFields    = ['uuid_dosen_pembina', 'nama_lengkap', 'nip', 'fakultas', 'kontak'];
 
-    // Dates
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-
     protected $beforeInsert  = ['generateUuid'];
 
     protected function generateUuid(array $data)

@@ -10,7 +10,7 @@
 <body>
     
     <!-- TOPBAR SAJA -->
-    <?= view('Partials/topbar') ?>
+    <?= view('Partials/v_topbar') ?>
 
     <main style="max-width:995px; margin:0 auto; padding: 0 1.5rem 8rem; margin-top:3rem;">
         
@@ -178,21 +178,21 @@
                 <!-- Buttons -->
                 <div class="d-flex align-items-center justify-content-end gap-3 pt-5">
                     <a href="<?= base_url('data-startup') ?>" class="btn btn-light px-4 py-2 text-slate-400 fw-black text-xxs tracking-widest text-uppercase">
-                        Batal Perubahan
+                        Batal 
                     </a>
                     <button type="submit" class="btn-submit-primary d-flex align-items-center gap-2 text-uppercase tracking-wider" style="font-size:10px;font-weight:900;box-shadow:0 10px 25px rgba(0,97,255,0.2)">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                             <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
                         </svg>
-                        Simpan Perubahan Data
+                        Simpan 
                     </button>
                 </div>
 
             </form>
 
             <div class="mt-5 pt-4 border-top text-uppercase" style="border-color: var(--slate-100) !important">
-                <?= view('Partials/footer') ?>
+                <?= view('Partials/v_footer') ?>
             </div>
         </div>
 

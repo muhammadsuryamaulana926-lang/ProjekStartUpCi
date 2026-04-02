@@ -13,12 +13,12 @@
     <div class="app-wrapper" id="app-wrapper">
         
         <!-- SIDEBAR -->
-        <?= view('Partials/sidebar') ?>
+        <?= view('Partials/v_sidebar') ?>
 
         <main class="app-main">
             
             <!-- TOPBAR -->
-            <?= view('Partials/topbar') ?>
+            <?= view('Partials/v_topbar') ?>
 
             <!-- CONTENT AREA -->
             <div class="app-content" style="background: rgba(248,250,252,0.3); overflow-x:hidden;" id="scroll-area">
@@ -204,7 +204,7 @@
                     </div>
                 </div>
             </div>
-            <?= view('Partials/footer') ?>
+            <?= view('Partials/v_footer') ?>
         </main>
     </div>
 
@@ -373,11 +373,11 @@
                             </div>
                             <div class="col-6">
                                 <label class="modal-form-label">WhatsApp</label>
-                                <input type="text" name="no_whatsapp" class="modal-form-control" placeholder="08XX..">
+                                <input type="text" name="no_whatsapp" class="modal-form-control" placeholder="08XXXXXXXXXX">
                             </div>
                             <div class="col-6">
                                 <label class="modal-form-label">Email</label>
-                                <input type="email" name="email" class="modal-form-control" placeholder="e@mail.com" style="text-transform:lowercase">
+                                <input type="email" name="email" class="modal-form-control" placeholder="contoh@gmail.com" style="text-transform:lowercase">
                             </div>
                             <div class="col-6">
                                 <label class="modal-form-label">LinkedIn</label>
@@ -385,11 +385,11 @@
                             </div>
                             <div class="col-6">
                                 <label class="modal-form-label">Instagram</label>
-                                <input type="text" name="instagram" class="modal-form-control" placeholder="@..">
+                                <input type="text" name="instagram" class="modal-form-control" placeholder="@username">
                             </div>
                             <div class="col-12">
                                 <label class="modal-form-label">Perguruan Tinggi</label>
-                                <input type="text" name="nama_perguruan_tinggi" class="modal-form-control" placeholder="...">
+                                <input type="text" name="nama_perguruan_tinggi" class="modal-form-control">
                             </div>
                         </div>
                     </form>

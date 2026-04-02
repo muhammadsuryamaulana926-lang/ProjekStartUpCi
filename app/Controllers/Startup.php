@@ -2,36 +2,36 @@
 
 namespace App\Controllers;
 
-use App\Models\Startups_Model;
-use App\Models\Klasters_Model;
-use App\Models\DosenPembinas_Model;
-use App\Models\Programs_Model;
+use App\Models\M_Startup;
+use App\Models\M_Klaster;
+use App\Models\M_Dosen_Pembina;
+use App\Models\M_Program;
 
 class Startup extends BaseController
 {
     public function index()
     {
-        return view('Startup/dashbord');
+        return view('StartUp/v_dashboard');
     }
 
     public function data_startup()
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
         $data['startups'] = $model->findAll();
-        return view('Startup/data_starup', $data);
+        return view('StartUp/v_data_startup', $data);
     }
 
     public function tambah_startup()
     {
-        $data['klasters'] = (new Klasters_Model())->findAll();
-        $data['dosens']   = (new DosenPembinas_Model())->findAll();
-        $data['programs'] = (new Programs_Model())->findAll();
-        return view('Startup/Tambah_Startup', $data);
+        $data['klasters'] = (new M_Klaster())->findAll();
+        $data['dosens']   = (new M_Dosen_Pembina())->findAll();
+        $data['programs'] = (new M_Program())->findAll();
+        return view('StartUp/v_tambah_startup', $data);
     }
 
     public function save_startup()
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
 
         $data = [
             'id_dosen_pembina'       => $this->request->getPost('id_dosen_pembina') ?: null,
@@ -93,7 +93,7 @@ class Startup extends BaseController
         ]);
 
         $tim     = $model->find($id_tim);
-        $startup = (new Startups_Model())->find($tim['id_startup']);
+        $startup = (new M_Startup())->find($tim['id_startup']);
         
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
@@ -120,7 +120,7 @@ class Startup extends BaseController
             'nama_perguruan_tinggi' => $this->request->getPost('nama_perguruan_tinggi'),
         ]);
 
-        $startup = (new Startups_Model())->find($this->request->getPost('id_startup'));
+        $startup = (new M_Startup())->find($this->request->getPost('id_startup'));
         
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
@@ -134,7 +134,7 @@ class Startup extends BaseController
 
     public function delete_startup($uuid)
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
         $model->where('uuid_startup', $uuid)->delete();
         
         if ($this->request->isAJAX()) {
@@ -149,7 +149,7 @@ class Startup extends BaseController
 
     public function edit_startup($uuid = null)
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
         $id_startup = $this->request->getPost('id_startup') ?: null;
 
         $data['klasters'] = (new \App\Models\Klasters_Model())->findAll();
@@ -176,12 +176,12 @@ class Startup extends BaseController
         $startup['selected_klasters'] = array_column($selected_klasters, 'id_klaster');
         $data['startup'] = $startup;
 
-        return view('Startup/Edit_StarUp', $data);
+        return view('StartUp/v_edit_startup', $data);
     }
 
     public function update_startup()
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
         $id_startup = $this->request->getPost('id_startup');
 
         $data = [
@@ -238,7 +238,7 @@ class Startup extends BaseController
 
     public function detail($uuid)
     {
-        $model = new Startups_Model();
+        $model = new M_Startup();
         $timModel = new \App\Models\TimStartups_Model();
         
         // Ambil data startup berdasarkan UUID dengan join
@@ -268,13 +268,13 @@ class Startup extends BaseController
             'id_klaster'
         );
 
-        $data['dosens']   = (new DosenPembinas_Model())->findAll();
-        $data['programs'] = (new Programs_Model())->findAll();
-        $data['klasters'] = (new Klasters_Model())->findAll();
+        $data['dosens']   = (new M_Dosen_Pembina())->findAll();
+        $data['programs'] = (new M_Program())->findAll();
+        $data['klasters'] = (new M_Klaster())->findAll();
         $data['tim']      = $timModel->where('id_startup', $id)->findAll();
         $data['startup']  = $startup;
 
-        return view('Startup/Detail_Starup', $data);
+        return view('StartUp/v_detail_startup', $data);
     }
     public function delete_tim($id_tim)
     {
@@ -283,7 +283,7 @@ class Startup extends BaseController
         
         if ($tim) {
             $id_startup = $tim['id_startup'];
-            $startup = (new Startups_Model())->find($id_startup);
+            $startup = (new M_Startup())->find($id_startup);
             $model->delete($id_tim);
             
             if ($this->request->isAJAX()) {
