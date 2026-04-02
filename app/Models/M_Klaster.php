@@ -28,4 +28,38 @@ class M_Klaster extends Model
         }
         return $data;
     }
+
+    // Ambil semua klaster
+    public function semuaKlaster()
+    {
+        return $this->db->query("
+            SELECT id_klaster, nama_klaster
+            FROM klasters
+            ORDER BY nama_klaster ASC
+        ")->getResultArray();
+    }
+
+    // Ambil klaster by ID
+    public function klasterById($id)
+    {
+        return $this->db->query("
+            SELECT id_klaster, nama_klaster
+            FROM klasters
+            WHERE id_klaster = ?
+        ", [$id])->getRowArray();
+    }
+
+    // Ambil klaster beserta jumlah startup
+    public function klasterDenganJumlahStartup()
+    {
+        return $this->db->query("
+            SELECT k.id_klaster,
+                   k.nama_klaster,
+                   COUNT(sk.id_startup) as jumlah_startup
+            FROM klasters k
+            LEFT JOIN startup_klaster sk ON sk.id_klaster = k.id_klaster
+            GROUP BY k.id_klaster
+            ORDER BY jumlah_startup DESC
+        ")->getResultArray();
+    }
 }

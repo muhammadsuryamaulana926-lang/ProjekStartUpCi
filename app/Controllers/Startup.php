@@ -6,6 +6,8 @@ use App\Models\M_Startup;
 use App\Models\M_Klaster;
 use App\Models\M_Dosen_Pembina;
 use App\Models\M_Program;
+use App\Models\M_Tim_Startup;
+use App\Models\M_Startup_Klaster;
 
 class Startup extends BaseController
 {
@@ -16,16 +18,15 @@ class Startup extends BaseController
 
     public function data_startup()
     {
-        $model = new M_Startup();
-        $data['startups'] = $model->findAll();
+        $data['startups'] = (new M_Startup())->semuaStartup();
         return view('StartUp/v_data_startup', $data);
     }
 
     public function tambah_startup()
     {
-        $data['klasters'] = (new M_Klaster())->findAll();
-        $data['dosens']   = (new M_Dosen_Pembina())->findAll();
-        $data['programs'] = (new M_Program())->findAll();
+        $data['klasters'] = (new M_Klaster())->semuaKlaster();
+        $data['dosens']   = (new M_Dosen_Pembina())->semuaDosen();
+        $data['programs'] = (new M_Program())->semuaProgram();
         return view('StartUp/v_tambah_startup', $data);
     }
 
@@ -62,16 +63,9 @@ class Startup extends BaseController
         $model->save($data);
         $id_startup = $model->getInsertID();
 
-        // Simpan relasi kluster ke tabel startup_klaster
         $klasters = $this->request->getPost('kluster');
         if ($klasters) {
-            $db = \Config\Database::connect();
-            foreach ($klasters as $id_klaster) {
-                $db->table('startup_klaster')->insert([
-                    'id_startup' => $id_startup,
-                    'id_klaster' => $id_klaster,
-                ]);
-            }
+            (new M_Startup_Klaster())->simpanKlaster($id_startup, $klasters);
         }
 
         return redirect()->to(base_url('data-startup'))->with('success', 'Data Startup Berhasil Ditambahkan!');
@@ -79,8 +73,9 @@ class Startup extends BaseController
 
     public function updateTim()
     {
-        $model  = new \App\Models\TimStartups_Model();
+        $model  = new M_Tim_Startup();
         $id_tim = $this->request->getPost('id_tim');
+
         $model->update($id_tim, [
             'nama_lengkap'          => $this->request->getPost('nama_lengkap'),
             'jabatan'               => $this->request->getPost('jabatan'),
@@ -92,14 +87,11 @@ class Startup extends BaseController
             'nama_perguruan_tinggi' => $this->request->getPost('nama_perguruan_tinggi'),
         ]);
 
-        $tim     = $model->find($id_tim);
+        $tim     = $model->timById($id_tim);
         $startup = (new M_Startup())->find($tim['id_startup']);
-        
+
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Data Anggota Berhasil Diperbarui!'
-            ]);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data Anggota Berhasil Diperbarui!']);
         }
 
         return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Data Anggota Berhasil Diperbarui!');
@@ -107,26 +99,23 @@ class Startup extends BaseController
 
     public function tambahTim()
     {
-        $model = new \App\Models\TimStartups_Model();
+        $model = new M_Tim_Startup();
         $model->save([
-            'id_startup'           => $this->request->getPost('id_startup'),
-            'nama_lengkap'         => $this->request->getPost('nama_lengkap'),
-            'jabatan'              => $this->request->getPost('jabatan'),
-            'jenis_kelamin'        => $this->request->getPost('jenis_kelamin'),
-            'no_whatsapp'          => $this->request->getPost('no_whatsapp'),
-            'email'                => $this->request->getPost('email'),
-            'linkedin'             => $this->request->getPost('linkedin'),
-            'instagram'            => $this->request->getPost('instagram'),
+            'id_startup'            => $this->request->getPost('id_startup'),
+            'nama_lengkap'          => $this->request->getPost('nama_lengkap'),
+            'jabatan'               => $this->request->getPost('jabatan'),
+            'jenis_kelamin'         => $this->request->getPost('jenis_kelamin'),
+            'no_whatsapp'           => $this->request->getPost('no_whatsapp'),
+            'email'                 => $this->request->getPost('email'),
+            'linkedin'              => $this->request->getPost('linkedin'),
+            'instagram'             => $this->request->getPost('instagram'),
             'nama_perguruan_tinggi' => $this->request->getPost('nama_perguruan_tinggi'),
         ]);
 
         $startup = (new M_Startup())->find($this->request->getPost('id_startup'));
-        
+
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Anggota Tim Berhasil Ditambahkan!'
-            ]);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Anggota Tim Berhasil Ditambahkan!']);
         }
 
         return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Anggota Tim Berhasil Ditambahkan!');
@@ -134,46 +123,31 @@ class Startup extends BaseController
 
     public function delete_startup($uuid)
     {
-        $model = new M_Startup();
-        $model->where('uuid_startup', $uuid)->delete();
-        
+        (new M_Startup())->hapusStartup($uuid);
+
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Satu berkas data telah berhasil dihapus!'
-            ]);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Satu berkas data telah berhasil dihapus!']);
         }
-        
+
         return redirect()->to(base_url('data-startup'))->with('success', 'Satu berkas data telah berhasil dihapus!');
     }
 
     public function edit_startup($uuid = null)
     {
-        $model = new M_Startup();
+        $model      = new M_Startup();
         $id_startup = $this->request->getPost('id_startup') ?: null;
 
-        $data['klasters'] = (new \App\Models\Klasters_Model())->findAll();
-        $data['dosens']   = (new \App\Models\DosenPembinas_Model())->findAll();
-        $data['programs'] = (new \App\Models\Programs_Model())->findAll();
-        
-        if ($id_startup) {
-            $startup = $model->find($id_startup);
-        } else {
-            $startup = $model->where('uuid_startup', $uuid)->first();
-        }
+        $data['klasters'] = (new M_Klaster())->semuaKlaster();
+        $data['dosens']   = (new M_Dosen_Pembina())->semuaDosen();
+        $data['programs'] = (new M_Program())->semuaProgram();
+
+        $startup = $id_startup ? $model->find($id_startup) : $model->where('uuid_startup', $uuid)->first();
 
         if (!$startup) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // Ambil ID klaster yang sudah terpilih sebelumnya
-        $db = \Config\Database::connect();
-        $selected_klasters = $db->table('startup_klaster')
-            ->select('id_klaster')
-            ->where('id_startup', $startup['id_startup'])
-            ->get()->getResultArray();
-        
-        $startup['selected_klasters'] = array_column($selected_klasters, 'id_klaster');
+        $startup['selected_klasters'] = (new M_Startup_Klaster())->idKlasterByStartup($startup['id_startup']);
         $data['startup'] = $startup;
 
         return view('StartUp/v_edit_startup', $data);
@@ -181,7 +155,7 @@ class Startup extends BaseController
 
     public function update_startup()
     {
-        $model = new M_Startup();
+        $model      = new M_Startup();
         $id_startup = $this->request->getPost('id_startup');
 
         $data = [
@@ -202,7 +176,6 @@ class Startup extends BaseController
             'status_startup'         => $this->request->getPost('status_startup'),
         ];
 
-        // Handle Logo Update
         $file = $this->request->getFile('logo_perusahaan');
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $newName = $file->getRandomName();
@@ -212,25 +185,16 @@ class Startup extends BaseController
 
         $model->update($id_startup, $data);
 
-        // Update relasi kluster
-        $klasters = $this->request->getPost('kluster');
-        $db = \Config\Database::connect();
-        $db->table('startup_klaster')->where('id_startup', $id_startup)->delete();
+        $klasterModel = new M_Startup_Klaster();
+        $klasterModel->hapusKlasterByStartup($id_startup);
 
+        $klasters = $this->request->getPost('kluster');
         if ($klasters) {
-            foreach ($klasters as $id_klaster) {
-                $db->table('startup_klaster')->insert([
-                    'id_startup' => $id_startup,
-                    'id_klaster' => $id_klaster,
-                ]);
-            }
+            $klasterModel->simpanKlaster($id_startup, $klasters);
         }
 
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Data Startup Berhasil Diperbaharui!'
-            ]);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data Startup Berhasil Diperbaharui!']);
         }
 
         return redirect()->to(base_url('data-startup'))->with('success', 'Data Startup Berhasil Diperbaharui!');
@@ -238,69 +202,44 @@ class Startup extends BaseController
 
     public function detail($uuid)
     {
-        $model = new M_Startup();
-        $timModel = new \App\Models\TimStartups_Model();
-        
-        // Ambil data startup berdasarkan UUID dengan join
-        $startup = $model->select('startups.*, dosen_pembinas.nama_lengkap as nama_dosen, programs.nama_program')
-            ->join('dosen_pembinas', 'dosen_pembinas.id_dosen_pembina = startups.id_dosen_pembina', 'left')
-            ->join('programs', 'programs.id_program = startups.id_program', 'left')
-            ->where('uuid_startup', $uuid)
-            ->first();
+        $startup = (new M_Startup())->startupByUuid($uuid);
 
         if (!$startup) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $id = $startup['id_startup'];
+        $id                           = $startup['id_startup'];
+        $klasterModel                 = new M_Startup_Klaster();
+        $startup['klasters']          = array_column($klasterModel->klasterByStartup($id), 'nama_klaster');
+        $startup['selected_klasters'] = $klasterModel->idKlasterByStartup($id);
 
-        // Ambil data klaster (many-to-many)
-        $db = \Config\Database::connect();
-        $klasters = $db->table('startup_klaster')
-            ->select('klasters.nama_klaster')
-            ->join('klasters', 'klasters.id_klaster = startup_klaster.id_klaster')
-            ->where('id_startup', $id)
-            ->get()->getResultArray();
-
-        $startup['klasters'] = array_column($klasters, 'nama_klaster');
-        $startup['selected_klasters'] = array_column(
-            $db->table('startup_klaster')->select('id_klaster')->where('id_startup', $id)->get()->getResultArray(),
-            'id_klaster'
-        );
-
-        $data['dosens']   = (new M_Dosen_Pembina())->findAll();
-        $data['programs'] = (new M_Program())->findAll();
-        $data['klasters'] = (new M_Klaster())->findAll();
-        $data['tim']      = $timModel->where('id_startup', $id)->findAll();
+        $data['dosens']   = (new M_Dosen_Pembina())->semuaDosen();
+        $data['programs'] = (new M_Program())->semuaProgram();
+        $data['klasters'] = (new M_Klaster())->semuaKlaster();
+        $data['tim']      = (new M_Tim_Startup())->timByStartup($id);
         $data['startup']  = $startup;
 
         return view('StartUp/v_detail_startup', $data);
     }
+
     public function delete_tim($id_tim)
     {
-        $model = new \App\Models\TimStartups_Model();
-        $tim = $model->find($id_tim);
-        
+        $timModel = new M_Tim_Startup();
+        $tim      = $timModel->timById($id_tim);
+
         if ($tim) {
-            $id_startup = $tim['id_startup'];
-            $startup = (new M_Startup())->find($id_startup);
-            $model->delete($id_tim);
-            
+            $startup = (new M_Startup())->find($tim['id_startup']);
+            $timModel->hapusTim($id_tim);
+
             if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'success',
-                    'message' => 'Data anggota tim berhasil dihapus!'
-                ]);
+                return $this->response->setJSON(['status' => 'success', 'message' => 'Data anggota tim berhasil dihapus!']);
             }
-            
+
             return redirect()->to(base_url('detail/' . $startup['uuid_startup']))->with('success', 'Data anggota tim berhasil dihapus!');
         }
-        
+
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Data tidak ditemukan!'
-            ]);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Data tidak ditemukan!']);
         }
 
         return redirect()->back()->with('error', 'Data tidak ditemukan!');

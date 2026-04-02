@@ -31,4 +31,35 @@ class M_Tim_Startup extends Model
         }
         return $data;
     }
+
+    // Ambil semua tim by id_startup
+    public function timByStartup($id_startup)
+    {
+        return $this->db->query("
+            SELECT id_tim, nama_lengkap, jabatan, jenis_kelamin,
+                   no_whatsapp, email, linkedin, instagram, nama_perguruan_tinggi
+            FROM tim_startups
+            WHERE id_startup = ?
+            ORDER BY nama_lengkap ASC
+        ", [$id_startup])->getResultArray();
+    }
+
+    // Ambil anggota tim by ID
+    public function timById($id)
+    {
+        return $this->db->query("
+            SELECT id_tim, id_startup, nama_lengkap, jabatan, jenis_kelamin,
+                   no_whatsapp, email, linkedin, instagram, nama_perguruan_tinggi
+            FROM tim_startups
+            WHERE id_tim = ?
+        ", [$id])->getRowArray();
+    }
+
+    // Hapus anggota tim
+    public function hapusTim($id)
+    {
+        return $this->db->query("
+            DELETE FROM tim_startups WHERE id_tim = ?
+        ", [$id]);
+    }
 }

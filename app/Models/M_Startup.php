@@ -33,4 +33,53 @@ class M_Startup extends Model
         }
         return $data;
     }
+
+    // Ambil semua startup dengan join dosen dan program
+    public function semuaStartup()
+    {
+        return $this->db->query("
+            SELECT s.*,
+                   SUBSTRING(s.nama_perusahaan, 1, 50) as nama_perusahaan,
+                   d.nama_lengkap as nama_dosen,
+                   p.nama_program
+            FROM startups s
+            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+            LEFT JOIN programs p ON p.id_program = s.id_program
+            ORDER BY s.created_at DESC
+        ")->getResultArray();
+    }
+
+    // Ambil startup by UUID
+    public function startupByUuid($uuid)
+    {
+        return $this->db->query("
+            SELECT s.*,
+                   d.nama_lengkap as nama_dosen,
+                   p.nama_program
+            FROM startups s
+            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+            LEFT JOIN programs p ON p.id_program = s.id_program
+            WHERE s.uuid_startup = ?
+        ", [$uuid])->getRowArray();
+    }
+
+    // Ambil startup by status
+    public function startupByStatus($status)
+    {
+        return $this->db->query("
+            SELECT s.*, d.nama_lengkap as nama_dosen
+            FROM startups s
+            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+            WHERE s.status_startup = ?
+            ORDER BY s.nama_perusahaan ASC
+        ", [$status])->getResultArray();
+    }
+
+    // Hapus startup by UUID
+    public function hapusStartup($uuid)
+    {
+        return $this->db->query("
+            DELETE FROM startups WHERE uuid_startup = ?
+        ", [$uuid]);
+    }
 }

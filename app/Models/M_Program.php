@@ -28,4 +28,39 @@ class M_Program extends Model
         }
         return $data;
     }
+
+    // Ambil semua program
+    public function semuaProgram()
+    {
+        return $this->db->query("
+            SELECT id_program, nama_program, tahun_pelaksanaan
+            FROM programs
+            ORDER BY tahun_pelaksanaan DESC
+        ")->getResultArray();
+    }
+
+    // Ambil program by ID
+    public function programById($id)
+    {
+        return $this->db->query("
+            SELECT id_program, nama_program, tahun_pelaksanaan
+            FROM programs
+            WHERE id_program = ?
+        ", [$id])->getRowArray();
+    }
+
+    // Ambil program beserta jumlah startup
+    public function programDenganJumlahStartup()
+    {
+        return $this->db->query("
+            SELECT p.id_program,
+                   p.nama_program,
+                   p.tahun_pelaksanaan,
+                   COUNT(s.id_startup) as jumlah_startup
+            FROM programs p
+            LEFT JOIN startups s ON s.id_program = p.id_program
+            GROUP BY p.id_program
+            ORDER BY p.tahun_pelaksanaan DESC
+        ")->getResultArray();
+    }
 }
