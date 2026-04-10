@@ -4,51 +4,35 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class M_Startup_Klaster extends Model
+// Model untuk mengelola relasi many-to-many antara startup dan klaster
+class M_startup_klaster extends Model
 {
-    protected $table            = 'startup_klaster';
-    protected $primaryKey       = 'id_startup_klaster';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $protectFields    = true;
-    protected $allowedFields    = ['id_startup', 'id_klaster'];
-
-    protected $useTimestamps = false;
-
-    // Ambil klaster by id_startup
-    public function klasterByStartup($id_startup)
+    // Mengambil semua klaster yang dimiliki oleh satu startup berdasarkan id_startup
+    public function klaster_by_startup($data)
     {
-        return $this->db->query("
-            SELECT k.id_klaster, k.nama_klaster
-            FROM startup_klaster sk
-            JOIN klasters k ON k.id_klaster = sk.id_klaster
-            WHERE sk.id_startup = ?
-        ", [$id_startup])->getResultArray();
+        $query = "SELECT k.id_klaster, k.nama_klaster
+                  FROM startup_klaster sk
+                  JOIN klasters k ON k.id_klaster = sk.id_klaster
+                  WHERE sk.id_startup = '" . $data['id_startup'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil id_klaster saja by id_startup
-    public function idKlasterByStartup($id_startup)
+    // Mengambil hanya id_klaster dari startup tertentu (digunakan untuk pre-select form edit)
+    public function id_klaster_by_startup($data)
     {
-        return array_column($this->db->query("
-            SELECT id_klaster FROM startup_klaster WHERE id_startup = ?
-        ", [$id_startup])->getResultArray(), 'id_klaster');
+        $query = "SELECT id_klaster FROM startup_klaster WHERE id_startup = '" . $data['id_startup'] . "'";
+        return $this->db->query($query);
     }
 
-    // Simpan relasi kluster
-    public function simpanKlaster($id_startup, array $id_klasters)
+    // Menyimpan relasi baru antara startup dan klaster
+    public function simpan_klaster($data)
     {
-        foreach ($id_klasters as $id_klaster) {
-            $this->db->query("
-                INSERT INTO startup_klaster (id_startup, id_klaster) VALUES (?, ?)
-            ", [$id_startup, $id_klaster]);
-        }
+        return $this->db->table('startup_klaster')->insert($data);
     }
 
-    // Hapus semua klaster by id_startup
-    public function hapusKlasterByStartup($id_startup)
+    // Menghapus semua relasi klaster milik satu startup (digunakan sebelum menyimpan ulang klaster)
+    public function hapus_klaster_by_startup($data)
     {
-        return $this->db->query("
-            DELETE FROM startup_klaster WHERE id_startup = ?
-        ", [$id_startup]);
+        return $this->db->table('startup_klaster')->where('id_startup', $data['id_startup'])->delete();
     }
 }

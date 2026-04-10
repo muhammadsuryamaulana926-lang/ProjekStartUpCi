@@ -30,6 +30,7 @@ class Filters extends BaseFilters
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
+        'auth' => \App\Filters\AuthFilter::class,
         'cors'          => Cors::class,
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
@@ -51,7 +52,7 @@ class Filters extends BaseFilters
      */
     public array $required = [
         'before' => [
-            'forcehttps', // Force Global Secure Requests
+            // 'forcehttps', // Disabled: running on HTTP localhost
             'pagecache',  // Web Page Caching
         ],
         'after' => [
@@ -73,7 +74,18 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf' => ['except' => [
+                'authenticate', 'keep-alive',
+                'v_simpan_startup', 'v_hapus_startup', 'v_update_startup', 'v_edit_startup',
+                'startup/*',
+                'get_startup_tim', 'proses_tambah_informasi_tim', 'proses_ubah_informasi_tim', 'proses_hapus_informasi_tim',
+                'get_startup_produk', 'proses_tambah_informasi_produk', 'proses_ubah_informasi_produk', 'proses_hapus_informasi_produk',
+                'get_startup_pendanaan_itb', 'proses_tambah_informasi_pendanaan_itb', 'proses_ubah_informasi_pendanaan_itb', 'proses_hapus_informasi_pendanaan_itb',
+                'get_startup_pendanaan_non_itb', 'proses_tambah_informasi_pendanaan_non_itb', 'proses_ubah_informasi_pendanaan_non_itb', 'proses_hapus_informasi_pendanaan_non_itb',
+                'get_startup_prestasi', 'proses_tambah_informasi_prestasi', 'proses_ubah_informasi_prestasi', 'proses_hapus_informasi_prestasi',
+                'proses_tambah_informasi_mentor', 'proses_hapus_informasi_mentor',
+                'proses_verifikasi_startup', 'proses_tolak_startup',
+            ]],
             // 'invalidchars',
         ],
         'after' => [

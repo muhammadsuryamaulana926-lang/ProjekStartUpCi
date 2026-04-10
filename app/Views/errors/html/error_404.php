@@ -49,7 +49,7 @@
 
             <!-- Action Buttons Full Width on small screens -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-5 uppercase">
-                <a href="<?= base_url('dashboard') ?>" class="w-full sm:w-auto px-12 py-5 bg-[#0061FF] text-white text-[11px] font-black tracking-widest rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-3">
+                <a href="<?= base_url('v_dashboard') ?>" class="w-full sm:w-auto px-12 py-5 bg-[#0061FF] text-white text-[11px] font-black tracking-widest rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>

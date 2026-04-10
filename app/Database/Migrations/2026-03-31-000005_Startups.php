@@ -27,7 +27,7 @@ class Startups extends Migration
             'instagram_perusahaan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'logo_perusahaan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'status_startup' => ['type' => 'ENUM', 'constraint' => ['Aktif', 'Tidak Aktif', 'Lulus'], 'default' => 'Aktif'],
-            'status_ajuan' => ['type' => 'ENUM', 'constraint' => ['Verified', 'Pending', 'Rejected'], 'default' => 'Pending'],
+            'status_ajuan' => ['type' => 'ENUM', 'constraint' => ['Pending', 'Verified', 'Rejected'], 'default' => 'Pending'],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],
         ]);

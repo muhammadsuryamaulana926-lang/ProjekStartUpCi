@@ -1,5 +1,7 @@
+<?php /* View: Halaman Login — form autentikasi user dengan animasi split panel dan video background */ ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +9,59 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url('css/custom.css') ?>">
     <style>
-        body { overflow: hidden; }
-        @keyframes fadeCycle {
-            0% { opacity: 0; transform: translateY(10px); }
-            5% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(10px); }
+        body {
+            overflow: hidden;
         }
-        .animate-fade-custom { animation: fadeCycle 20s ease-in-out forwards; }
-        .glass-line { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent); }
+
+        @keyframes fadeCycle {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            5% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        .animate-fade-custom {
+            animation: fadeCycle 20s ease-in-out forwards;
+        }
+
+        .glass-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
 
         /* ANIMASI SPLIT LOGIN */
-        .login-panel-left { transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1); }
-        .login-panel-right { transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1); }
-        
-        .is-logging-in .login-panel-left { transform: translateX(-100%); }
-        .is-logging-in .login-panel-right { transform: translateX(100%); }
-        
+        .login-panel-left {
+            transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .login-panel-right {
+            transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .is-logging-in .login-panel-left {
+            transform: translateX(-100%);
+        }
+
+        .is-logging-in .login-panel-right {
+            transform: translateX(100%);
+        }
+
         /* Overlay Transisi Halus */
         .transition-overlay {
             position: fixed;
@@ -32,10 +70,14 @@
             z-index: 50;
             transform: scaleX(0);
             transform-origin: center;
-            transition: transform 0.6s cubic-bezier(0.7, 0, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
             pointer-events: none;
         }
-        .is-logging-in .transition-overlay { transform: scaleX(1); transition-delay: 0.4s; }
+
+        .is-logging-in .transition-overlay {
+            transform: scaleX(1);
+            transition-delay: 0.5s;
+        }
 
         /* Login Form Styles */
         .login-wrapper {
@@ -53,12 +95,19 @@
             background: #fff;
             position: relative;
             z-index: 30;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
         @media (min-width: 992px) {
-            .login-left { width: 41.666%; padding: 2rem 5rem; }
-            .login-right { display: block !important; width: 58.333%; }
+            .login-left {
+                width: 41.666%;
+                padding: 2rem 5rem;
+            }
+
+            .login-right {
+                display: block !important;
+                width: 58.333%;
+            }
         }
 
         .login-right {
@@ -97,7 +146,7 @@
             align-items: center;
             justify-content: center;
             gap: 3rem;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .input-group-login {
@@ -168,15 +217,16 @@
         }
     </style>
 </head>
+
 <body id="loginBody">
 
     <div class="transition-overlay"></div>
 
     <div class="login-wrapper">
-        
-        <!-- BAGIAN KIRI: Form Login -->
+
+        <!-- Bagian kiri: form login dengan input email, password, dan tombol masuk -->
         <div id="leftPanel" class="login-panel-left login-left">
-            
+
             <div style="max-width:448px;width:100%;margin:0 auto;text-align:center">
                 <!-- LOGO -->
                 <div class="mb-4 d-flex justify-content-center">
@@ -195,7 +245,10 @@
                 </div>
 
                 <!-- FORM INPUT -->
-                <form action="#" method="POST" class="text-start" onsubmit="return false;">
+                <!-- Form login: dikirim ke endpoint authenticate dengan metode POST -->
+                <form id="form-login" action="<?= base_url('authenticate') ?>" method="POST" class="text-start">
+                    <?= csrf_field() ?>
+
                     <div class="mb-3">
                         <div class="input-group-login">
                             <input type="email" name="email" placeholder="contoh@gmail.com">
@@ -225,13 +278,21 @@
                         </div>
                         <a href="#" class="fw-bold text-decoration-none" style="font-size:14px;color:var(--primary)">Lupa Password?</a>
                     </div>
+                    
+                    <!-- Tampilkan pesan error jika login gagal (dari flashdata session) -->
+                    <?php if (session()->getFlashdata('error')): ?>
+                        <div class="mb-3 p-3 rounded-3 text-center" style="background:#fff1f2;border:1px solid #fecdd3">
+                            <span class="fw-bold text-uppercase" style="font-size:12px;color:#e11d48">
+                                <?= session()->getFlashdata('error') ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
 
-                    <!-- Tombol Masuk -->
-                    <button type="button" id="loginButton" onclick="startLoginProcess()" class="btn-login">
-                        Masuk
-                    </button>
 
-                    <!-- Tautan Daftar -->
+                    <!-- Tombol submit form login -->
+                    <button type="submit" class="btn-login">Masuk</button>
+
+                    <!-- Tautan pendaftaran akun baru -->
                     <div class="text-center mt-4">
                         <p class="text-slate-400 fw-bold" style="font-size:14px">
                             Belum punya akun? <a href="#" class="fw-bold text-decoration-none" style="color:var(--primary)">Daftar Sekarang</a>
@@ -239,7 +300,7 @@
                     </div>
                 </form>
 
-                <div class="mt-5 pt-4 border-top" style="border-color:var(--slate-50) !important">
+                <div class="mt-5 pt-4 border-top" style="border-color:#e2e8f0 !important">
                     <p class="text-slate-400 fw-bold text-uppercase tracking-widest mb-0" style="font-size:10px">
                         Hak Cipta &copy; 2026 SIMIK DKST
                     </p>
@@ -247,16 +308,15 @@
             </div>
         </div>
 
-        <!-- BAGIAN KANAN: Video Background -->
+        <!-- Bagian kanan: video background dengan teks motivasi -->
         <div id="rightPanel" class="login-panel-right login-right">
             <video autoplay muted loop playsinline>
                 <source src="<?= base_url('vidio/WhatsApp Video 2026-03-31 at 18.53.37.mp4') ?>" type="video/mp4">
             </video>
-            
+
             <div class="overlay-content">
                 <div class="animate-fade-custom p-5 text-center" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6));">
-                    <h2 class="fw-black mb-3 text-uppercase text-white tracking-tight" style="font-size:5rem">StartUp</h2>
-                    <div class="mx-auto rounded-pill mb-4" style="width:96px;height:8px;background:var(--primary);box-shadow:0 4px 12px rgba(0,97,255,0.5)"></div>
+                    <h2 class="fw-black mb-4 text-uppercase text-white tracking-tight" style="font-size:5rem">StartUp</h2>
                     <p class="fw-bold text-white" style="font-size:1.5rem;line-height:1.6;max-width:500px">
                         Wujudkan ide brilian Anda menjadi kenyataan bersama sistem manajemen inkubasi bisnis masa depan.
                     </p>
@@ -282,22 +342,21 @@
     </div>
 
     <script>
-        function startLoginProcess() {
-            sessionStorage.setItem('isFirstLogin', 'true');
+        // Jalankan animasi split panel saat form login disubmit, lalu submit setelah animasi selesai
+        document.getElementById('form-login').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
             document.body.classList.add('is-logging-in');
-            setTimeout(() => {
-                window.location.href = '<?= base_url('dashboard') ?>';
-            }, 900);
-        }
+            // Submit setelah animasi split + overlay biru selesai (~1 detik)
+            setTimeout(() => form.submit(), 1000);
+        });
 
+        // Toggle visibilitas password antara teks dan bintang
         function togglePassword() {
             var x = document.getElementById("password");
-            if (x.type === "password") {
-                x.type = "text";
-            } else {
-                x.type = "password";
-            }
+            x.type = x.type === "password" ? "text" : "password";
         }
     </script>
 </body>
+
 </html>

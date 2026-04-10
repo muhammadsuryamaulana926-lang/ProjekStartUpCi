@@ -4,82 +4,96 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class M_Startup extends Model
+// Model untuk mengelola data startup
+class M_startup extends Model
 {
-    protected $table            = 'startups';
-    protected $primaryKey       = 'id_startup';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'uuid_startup', 'id_dosen_pembina', 'id_program', 'nama_perusahaan', 'deskripsi_bidang_usaha',
-        'tahun_berdiri', 'tahun_daftar', 'target_pemasaran', 'fokus_pelanggan', 'alamat',
-        'nomor_whatsapp', 'email_perusahaan', 'website_perusahaan', 'linkedin_perusahaan',
-        'instagram_perusahaan', 'logo_perusahaan', 'status_startup', 'status_ajuan'
-    ];
-
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $beforeInsert  = ['generateUuid'];
-
-    protected function generateUuid(array $data)
+    // Mengambil semua data startup beserta nama dosen pembina dan nama program
+    public function semua_startup()
     {
-        if (empty($data['data']['uuid_startup'])) {
-            $data['data']['uuid_startup'] = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-        }
-        return $data;
+        $query = "SELECT s.*, d.nama_lengkap as nama_dosen, p.nama_program
+                  FROM startups s
+                  LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+                  LEFT JOIN programs p ON p.id_program = s.id_program
+                  ORDER BY s.id_startup DESC";
+        return $this->db->query($query);
     }
 
-    // Ambil semua startup dengan join dosen dan program
-    public function semuaStartup()
+    // Mengambil satu data startup berdasarkan id_startup
+    public function startup_by_id($data)
     {
-        return $this->db->query("
-            SELECT s.*,
-                   SUBSTRING(s.nama_perusahaan, 1, 50) as nama_perusahaan,
-                   d.nama_lengkap as nama_dosen,
-                   p.nama_program
-            FROM startups s
-            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
-            LEFT JOIN programs p ON p.id_program = s.id_program
-            ORDER BY s.created_at DESC
-        ")->getResultArray();
+        $query = "SELECT * FROM startups WHERE id_startup = '" . $data['id_startup'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil startup by UUID
-    public function startupByUuid($uuid)
+    // Mengambil satu data startup beserta dosen dan program berdasarkan uuid_startup
+    public function startup_by_uuid($data)
     {
-        return $this->db->query("
-            SELECT s.*,
-                   d.nama_lengkap as nama_dosen,
-                   p.nama_program
-            FROM startups s
-            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
-            LEFT JOIN programs p ON p.id_program = s.id_program
-            WHERE s.uuid_startup = ?
-        ", [$uuid])->getRowArray();
+        $query = "SELECT s.*, d.nama_lengkap as nama_dosen, p.nama_program
+                  FROM startups s
+                  LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+                  LEFT JOIN programs p ON p.id_program = s.id_program
+                  WHERE s.uuid_startup = '" . $data['uuid_startup'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil startup by status
-    public function startupByStatus($status)
+    // Mengambil data startup berdasarkan status_startup (aktif/nonaktif)
+    public function startup_by_status($data)
     {
-        return $this->db->query("
-            SELECT s.*, d.nama_lengkap as nama_dosen
-            FROM startups s
-            LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
-            WHERE s.status_startup = ?
-            ORDER BY s.nama_perusahaan ASC
-        ", [$status])->getResultArray();
+        $query = "SELECT s.*, d.nama_lengkap as nama_dosen
+                  FROM startups s
+                  LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
+                  WHERE s.status_startup = '" . $data['status_startup'] . "'
+                  ORDER BY s.nama_perusahaan ASC";
+        return $this->db->query($query);
     }
 
-    // Hapus startup by UUID
-    public function hapusStartup($uuid)
+    // Mencari startup berdasarkan nama perusahaan (case-insensitive)
+    public function get_startup_by_nama($data)
     {
-        return $this->db->query("
-            DELETE FROM startups WHERE uuid_startup = ?
-        ", [$uuid]);
+        return $this->db->table('startups')->where('lower(nama_perusahaan)', strtolower($data['nama_perusahaan']));
+    }
+
+    // Menyimpan data startup baru ke database dan mengembalikan ID yang baru dibuat
+    public function tambah_startup($data)
+    {
+        $db = \Config\Database::connect();
+        $db->table('startups')->insert($data);
+        return $db->insertID();
+    }
+
+    // Mengupdate data startup berdasarkan id_startup
+    public function ubah_startup($data)
+    {
+        return $this->db->table('startups')->where('id_startup', $data['id_startup'])->update($data);
+    }
+
+    // Menghapus data startup berdasarkan id_startup
+    public function hapus_startup($data)
+    {
+        return $this->db->table('startups')->where('id_startup', $data['id_startup'])->delete();
+    }
+
+    // Menghitung total jumlah startup yang terdaftar
+    public function hitung_semua_startup(): int
+    {
+        return $this->db->table('startups')->countAllResults();
+    }
+
+    // Mengambil semua startup dalam bentuk array dengan kolom terbatas
+    public function get_all_startup_array(): array
+    {
+        return $this->db->table('startups')->select('nama_perusahaan, email_perusahaan, nomor_whatsapp, tahun_daftar, status_startup, status_ajuan')->get()->getResultArray();
+    }
+
+    // Mengambil data startup untuk keperluan tampilan detail (kolom terbatas)
+    public function liat_detail_data(): array
+    {
+        return $this->db->table('startups')->select('nama_perusahaan, email_perusahaan, nomor_whatsapp, tahun_daftar, status_startup, status_ajuan')->get()->getResultArray();
+    }
+
+    // Mengambil data startup berdasarkan id_user pemiliknya
+    public function startup_by_id_user($id_user)
+    {
+        return $this->db->table('startups')->where('id_user', $id_user)->get()->getRow();
     }
 }

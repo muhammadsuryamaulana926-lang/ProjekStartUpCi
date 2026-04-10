@@ -4,63 +4,53 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class M_Program extends Model
+// Model untuk mengelola data program inkubasi/akselerasi startup
+class M_program extends Model
 {
-    protected $table            = 'programs';
-    protected $primaryKey       = 'id_program';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $protectFields    = true;
-    protected $allowedFields    = ['uuid_program', 'nama_program', 'tahun_pelaksanaan'];
-
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $beforeInsert  = ['generateUuid'];
-
-    protected function generateUuid(array $data)
+    // Mengambil semua data program diurutkan berdasarkan tahun pelaksanaan terbaru
+    public function semua_program()
     {
-        if (empty($data['data']['uuid_program'])) {
-            $data['data']['uuid_program'] = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-        }
-        return $data;
+        $query = "SELECT id_program, nama_program, tahun_pelaksanaan
+                  FROM programs
+                  ORDER BY tahun_pelaksanaan DESC";
+        return $this->db->query($query);
     }
 
-    // Ambil semua program
-    public function semuaProgram()
+    // Mengambil satu data program berdasarkan id_program
+    public function program_by_id($data)
     {
-        return $this->db->query("
-            SELECT id_program, nama_program, tahun_pelaksanaan
-            FROM programs
-            ORDER BY tahun_pelaksanaan DESC
-        ")->getResultArray();
+        $query = "SELECT * FROM programs WHERE id_program = '" . $data['id_program'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil program by ID
-    public function programById($id)
+    // Mengambil semua program beserta jumlah startup yang mengikutinya
+    public function program_dengan_jumlah_startup()
     {
-        return $this->db->query("
-            SELECT id_program, nama_program, tahun_pelaksanaan
-            FROM programs
-            WHERE id_program = ?
-        ", [$id])->getRowArray();
+        $query = "SELECT p.id_program, p.nama_program, p.tahun_pelaksanaan, COUNT(s.id_startup) as jumlah_startup
+                  FROM programs p
+                  LEFT JOIN startups s ON s.id_program = p.id_program
+                  GROUP BY p.id_program
+                  ORDER BY p.tahun_pelaksanaan DESC";
+        return $this->db->query($query);
     }
 
-    // Ambil program beserta jumlah startup
-    public function programDenganJumlahStartup()
+    // Menyimpan data program baru dan mengembalikan ID yang baru dibuat
+    public function tambah_program($data)
     {
-        return $this->db->query("
-            SELECT p.id_program,
-                   p.nama_program,
-                   p.tahun_pelaksanaan,
-                   COUNT(s.id_startup) as jumlah_startup
-            FROM programs p
-            LEFT JOIN startups s ON s.id_program = p.id_program
-            GROUP BY p.id_program
-            ORDER BY p.tahun_pelaksanaan DESC
-        ")->getResultArray();
+        $db = \Config\Database::connect();
+        $db->table('programs')->insert($data);
+        return $db->insertID();
+    }
+
+    // Mengupdate data program berdasarkan id_program
+    public function ubah_program($data)
+    {
+        return $this->db->table('programs')->where('id_program', $data['id_program'])->update($data);
+    }
+
+    // Menghapus data program berdasarkan id_program
+    public function hapus_program($data)
+    {
+        return $this->db->table('programs')->where('id_program', $data['id_program'])->delete();
     }
 }

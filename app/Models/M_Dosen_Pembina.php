@@ -4,88 +4,53 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class M_Dosen_Pembina extends Model
+// Model untuk mengelola data dosen pembina startup
+class M_dosen_pembina extends Model
 {
-    protected $table            = 'dosen_pembinas';
-    protected $primaryKey       = 'id_dosen_pembina';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $protectFields    = true;
-    protected $allowedFields    = ['uuid_dosen_pembina', 'nama_lengkap', 'nip', 'fakultas', 'kontak'];
-
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $beforeInsert  = ['generateUuid'];
-
-    protected function generateUuid(array $data)
+    // Mengambil semua data dosen pembina diurutkan berdasarkan nama
+    public function semua_dosen()
     {
-        if (empty($data['data']['uuid_dosen_pembina'])) {
-            $data['data']['uuid_dosen_pembina'] = sprintf(
-                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000,
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff)
-            );
-        }
-        return $data;
+        $query = "SELECT id_dosen_pembina, nama_lengkap, nip, fakultas, kontak
+                  FROM dosen_pembinas
+                  ORDER BY nama_lengkap ASC";
+        return $this->db->query($query);
     }
 
-    // Ambil semua dosen urut nama
-    public function semuaDosen()
+    // Mengambil satu data dosen pembina berdasarkan id_dosen_pembina
+    public function dosen_by_id($data)
     {
-        return $this->db->query("
-            SELECT id_dosen_pembina, nama_lengkap, nip, fakultas, kontak
-            FROM dosen_pembinas
-            ORDER BY nama_lengkap ASC
-        ")->getResultArray();
+        $query = "SELECT * FROM dosen_pembinas WHERE id_dosen_pembina = '" . $data['id_dosen_pembina'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil dosen by ID
-    public function dosenById($id)
+    // Mengambil semua dosen beserta jumlah startup yang mereka bina
+    public function dosen_dengan_jumlah_startup()
     {
-        return $this->db->query("
-            SELECT id_dosen_pembina, nama_lengkap, nip, fakultas, kontak
-            FROM dosen_pembinas
-            WHERE id_dosen_pembina = ?
-        ", [$id])->getRowArray();
+        $query = "SELECT d.id_dosen_pembina, d.nama_lengkap, d.fakultas, COUNT(s.id_startup) as jumlah_startup
+                  FROM dosen_pembinas d
+                  LEFT JOIN startups s ON s.id_dosen_pembina = d.id_dosen_pembina
+                  GROUP BY d.id_dosen_pembina
+                  ORDER BY jumlah_startup DESC";
+        return $this->db->query($query);
     }
 
-    // Ambil dosen beserta jumlah startup yang dibimbing
-    public function dosenDenganJumlahStartup()
+    // Menyimpan data dosen pembina baru dan mengembalikan ID yang baru dibuat
+    public function tambah_dosen($data)
     {
-        return $this->db->query("
-            SELECT d.id_dosen_pembina,
-            SUBSTRING(d.nama_lengkap, 1, 30) as nama_lengkap,
-            d.fakultas,
-            COUNT(s.id_startup) as jumlah_startup
-            FROM dosen_pembinas d
-            LEFT JOIN startups s ON s.id_dosen_pembina = d.id_dosen_pembina
-            GROUP BY d.id_dosen_pembina
-            ORDER BY jumlah_startup DESC
-        ")->getResultArray();
+        $db = \Config\Database::connect();
+        $db->table('dosen_pembinas')->insert($data);
+        return $db->insertID();
     }
 
-    // Update dosen
-    public function ubahDosen($id, $data)
+    // Mengupdate data dosen pembina berdasarkan id_dosen_pembina
+    public function ubah_dosen($data)
     {
-        return $this->db->query("
-            UPDATE dosen_pembinas
-            SET nama_lengkap = ?, nip = ?, fakultas = ?, kontak = ?, updated_at = NOW()
-            WHERE id_dosen_pembina = ?
-        ", [$data['nama_lengkap'], $data['nip'], $data['fakultas'], $data['kontak'], $id]);
+        return $this->db->table('dosen_pembinas')->where('id_dosen_pembina', $data['id_dosen_pembina'])->update($data);
     }
 
-    // Hapus dosen
-    public function hapusDosen($id)
+    // Menghapus data dosen pembina berdasarkan id_dosen_pembina
+    public function hapus_dosen($data)
     {
-        return $this->db->query("
-            DELETE FROM dosen_pembinas WHERE id_dosen_pembina = ?
-        ", [$id]);
+        return $this->db->table('dosen_pembinas')->where('id_dosen_pembina', $data['id_dosen_pembina'])->delete();
     }
 }

@@ -45,8 +45,10 @@ body {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    background: #fff;
+    min-height: 0;
+    background: #F3F4F4;
     position: relative;
+    overflow: hidden;
 }
 
 .app-content {
@@ -63,7 +65,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: #F3F4F4;
     position: relative;
     z-index: 50;
     flex-shrink: 0;
@@ -132,13 +134,13 @@ body {
 
 /* Sidebar Active State - Cut-out Illusion */
 .nav-active {
-    background-color: white !important;
+    background-color: #F3F4F4 !important;
     color: var(--primary) !important;
     border-radius: 50px 0 0 50px;
     position: relative;
     margin-right: -24px;
     padding-left: 32px !important;
-    box-shadow: 15px 0 0 0 white;
+    box-shadow: 15px 0 0 0 #F3F4F4;
 }
 
 .nav-active .nav-icon,
@@ -159,7 +161,7 @@ body {
     height: 30px;
     background-color: transparent;
     border-bottom-right-radius: 30px;
-    box-shadow: 15px 15px 0 15px white;
+    box-shadow: 15px 15px 0 15px #F3F4F4;
 }
 
 .nav-active::after {
@@ -171,7 +173,7 @@ body {
     height: 30px;
     background-color: transparent;
     border-top-right-radius: 30px;
-    box-shadow: 15px -15px 0 15px white;
+    box-shadow: 15px -15px 0 15px #F3F4F4;
 }
 
 .sidebar-footer {
@@ -623,7 +625,6 @@ body {
     letter-spacing: 0.3em;
     color: var(--slate-400);
     margin-top: 0.5rem;
-    border-left: 4px solid var(--primary);
     padding-left: 1rem;
 }
 
@@ -765,7 +766,6 @@ body {
 
 .card-premium .card-header-custom {
     background: var(--slate-50);
-    border-bottom: 1.5px solid var(--slate-100);
     padding: 1.25rem 2.5rem;
 }
 
@@ -1148,7 +1148,6 @@ body {
     letter-spacing: 0.3em;
     color: var(--slate-400);
     margin-bottom: 2rem;
-    border-left: 4px solid var(--primary);
     padding-left: 1rem;
 }
 

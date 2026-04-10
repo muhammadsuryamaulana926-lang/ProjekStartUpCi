@@ -4,62 +4,51 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class M_Klaster extends Model
+// Model untuk mengelola data klaster/kategori startup
+class M_klaster extends Model
 {
-    protected $table            = 'klasters';
-    protected $primaryKey       = 'id_klaster';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $protectFields    = true;
-    protected $allowedFields    = ['uuid_klaster', 'nama_klaster'];
-
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $beforeInsert  = ['generateUuid'];
-
-    protected function generateUuid(array $data)
+    // Mengambil semua data klaster diurutkan berdasarkan nama
+    public function semua_klaster()
     {
-        if (empty($data['data']['uuid_klaster'])) {
-            $data['data']['uuid_klaster'] = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-        }
-        return $data;
+        $query = "SELECT id_klaster, nama_klaster FROM klasters ORDER BY nama_klaster ASC";
+        return $this->db->query($query);
     }
 
-    // Ambil semua klaster
-    public function semuaKlaster()
+    // Mengambil satu data klaster berdasarkan id_klaster
+    public function klaster_by_id($data)
     {
-        return $this->db->query("
-            SELECT id_klaster, nama_klaster
-            FROM klasters
-            ORDER BY nama_klaster ASC
-        ")->getResultArray();
+        $query = "SELECT * FROM klasters WHERE id_klaster = '" . $data['id_klaster'] . "'";
+        return $this->db->query($query);
     }
 
-    // Ambil klaster by ID
-    public function klasterById($id)
+    // Mengambil semua klaster beserta jumlah startup yang tergabung di dalamnya
+    public function klaster_dengan_jumlah_startup()
     {
-        return $this->db->query("
-            SELECT id_klaster, nama_klaster
-            FROM klasters
-            WHERE id_klaster = ?
-        ", [$id])->getRowArray();
+        $query = "SELECT k.id_klaster, k.nama_klaster, COUNT(sk.id_startup) as jumlah_startup
+                  FROM klasters k
+                  LEFT JOIN startup_klaster sk ON sk.id_klaster = k.id_klaster
+                  GROUP BY k.id_klaster
+                  ORDER BY jumlah_startup DESC";
+        return $this->db->query($query);
     }
 
-    // Ambil klaster beserta jumlah startup
-    public function klasterDenganJumlahStartup()
+    // Menyimpan data klaster baru dan mengembalikan ID yang baru dibuat
+    public function tambah_klaster($data)
     {
-        return $this->db->query("
-            SELECT k.id_klaster,
-                   k.nama_klaster,
-                   COUNT(sk.id_startup) as jumlah_startup
-            FROM klasters k
-            LEFT JOIN startup_klaster sk ON sk.id_klaster = k.id_klaster
-            GROUP BY k.id_klaster
-            ORDER BY jumlah_startup DESC
-        ")->getResultArray();
+        $db = \Config\Database::connect();
+        $db->table('klasters')->insert($data);
+        return $db->insertID();
+    }
+
+    // Mengupdate data klaster berdasarkan id_klaster
+    public function ubah_klaster($data)
+    {
+        return $this->db->table('klasters')->where('id_klaster', $data['id_klaster'])->update($data);
+    }
+
+    // Menghapus data klaster berdasarkan id_klaster
+    public function hapus_klaster($data)
+    {
+        return $this->db->table('klasters')->where('id_klaster', $data['id_klaster'])->delete();
     }
 }
