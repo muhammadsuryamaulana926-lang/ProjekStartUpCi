@@ -271,7 +271,6 @@
         align-items: center;
     }
     .book-item:hover {
-        transform: translateY(-12px) scale(1.03);
         z-index: 5;
     }
 
@@ -281,7 +280,7 @@
         color: #3D3426;
         text-align: center;
         margin-top: 12px;
-        width: 120px;
+        width: 220px;
         line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -293,8 +292,8 @@
     }
 
     .book-cover {
-        width: 120px;
-        height: 170px;
+        width: 220px;
+        height: 300px;
         border-radius: 4px 10px 10px 4px;
         overflow: hidden;
         position: relative;
@@ -482,8 +481,8 @@
 
     /* Add Book Button on shelf */
     .book-add-btn {
-        width: 120px;
-        height: 170px;
+        width: 220px;
+        height: 300px;
         border-radius: 4px 10px 10px 4px;
         border: 2px dashed #C4B8A8;
         background: rgba(255,255,255,0.5);
@@ -659,33 +658,86 @@
 
     .vid-thumb {
         position: relative;
-        width: 100%;
-        padding-top: 56.25%;
-        background: #1a1a1a;
+        width: calc(100% - 12px);
+        aspect-ratio: 16 / 9;
+        background: #000;
         overflow: hidden;
         cursor: pointer;
         border-radius: 16px;
         margin: 6px 6px 0 6px;
-        width: calc(100% - 12px);
     }
     .vid-thumb img {
         position: absolute;
-        top: 0; left: 0;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: opacity 0.4s;
     }
-    .vid-thumb iframe {
+    .vid-player-placeholder {
         position: absolute;
-        top: 0; left: 0;
+        inset: 0;
         width: 100%;
         height: 100%;
-        border: none;
         display: none;
+        z-index: 1;
+        transition: opacity 0.3s ease;
     }
-    .vid-thumb.playing img { display: none; }
-    .vid-thumb.playing iframe { display: block; }
+    
+    /* Hide the entire player when not hovered, show thumbnail instead */
+    .vid-thumb.playing:not(:hover) .vid-player-placeholder {
+        opacity: 0 !important;
+        pointer-events: none;
+    }
+    .vid-thumb.playing:hover .vid-player-placeholder {
+        opacity: 1 !important;
+    }
+    
+    /* Show thumbnail when not hovering, hide it when player is visible */
+    .vid-thumb img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s ease;
+        opacity: 1;
+        z-index: 0;
+    }
+    .vid-thumb.playing:hover img { 
+        opacity: 0; 
+        pointer-events: none; 
+    }
+    .vid-thumb.playing .vid-player-placeholder { display: block; }
+    
+    /* Plyr Custom Theme (Brand Colors) */
+    .plyr--full-ui.plyr--video { 
+        --plyr-color-main: #8B7355; 
+        height: 100%;
+        width: 100%;
+    }
+    .vid-player-placeholder .plyr__video-wrapper {
+        height: 100% !important;
+        padding-bottom: 0 !important;
+        background: #000 !important;
+        overflow: hidden !important;
+    }
+    /* Hard Masking & Pointer Lockdown */
+    .plyr__video-embed iframe { 
+        transform: scale(1.35) translateY(2%); 
+        transform-origin: center center;
+        pointer-events: none; /* Block all direct interaction with YT iframe */
+        user-select: none;
+    }
+    
+    /* Ensure Plyr controls are always on top and clickable */
+    .plyr__controls { z-index: 20 !important; }
+    .plyr--video .plyr__video-wrapper { z-index: 1; }
+    
+    /* Shield removed as it blocks custom buttons */
+    .plyr__video-wrapper::after {
+        display: none !important;
+    }
 
     .vid-thumb-overlay {
         position: absolute;
@@ -698,39 +750,13 @@
     .vid-card:hover .vid-thumb-overlay { opacity: 1; }
     .vid-thumb.playing .vid-thumb-overlay { display: none; }
 
-    .vid-play-btn {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%) scale(0.9);
-        width: 64px;
-        height: 64px;
-        background: rgba(255,255,255,0.95);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 3;
-        transition: all 0.3s;
-        opacity: 0;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        border: none;
-        cursor: pointer;
+    /* Aggressive Cleanup: Hide everything when NOT hovering */
+    .vid-card:not(:hover) .vid-player-placeholder,
+    .vid-card:not(:hover) .vid-fullscreen {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
     }
-    .vid-card:hover .vid-play-btn {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    .vid-play-btn:hover {
-        background: #fff;
-        transform: translate(-50%, -50%) scale(1.1) !important;
-    }
-    .vid-play-btn svg {
-        width: 28px;
-        height: 28px;
-        color: #ef4444;
-        margin-left: 3px;
-    }
-    .vid-thumb.playing .vid-play-btn { display: none; }
 
     .vid-badge {
         position: absolute;
@@ -750,27 +776,9 @@
         color: #fff;
     }
 
-    .vid-fullscreen {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        width: 36px;
-        height: 36px;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(4px);
-        border: none;
-        border-radius: 10px;
-        color: #fff;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 4;
-        transition: background 0.2s;
-    }
-    .vid-fullscreen:hover { background: rgba(0,0,0,0.85); }
-    .vid-fullscreen svg { width: 16px; height: 16px; }
-    .vid-thumb.playing .vid-fullscreen { display: flex; }
+
+
+    /* vid-fullscreen removed */
 
     .vid-body {
         padding: 20px;
@@ -927,35 +935,9 @@
 <div class="app-content">
 
     <!-- ═══════════════════════════════════════════════
-         FILTER BAR — Icon Buku & Video
-         ═══════════════════════════════════════════════ -->
-    <div class="perpus-filter-bar">
-        <div class="perpus-filter-tabs">
-            <!-- Tab Ebook -->
-            <button class="perpus-filter-tab active" onclick="switchSection('ebook', this)" id="tabEbook">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-                Ebook
-                <span class="tab-count"><?= count($ebooks ?? []) ?></span>
-            </button>
-            <!-- Tab Video -->
-            <button class="perpus-filter-tab" onclick="switchSection('video', this)" id="tabVideo">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
-                </svg>
-                Video
-                <span class="tab-count"><?= count($videos ?? []) ?></span>
-            </button>
-        </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════
          SECTION: EBOOK (Bookshelf)
          ═══════════════════════════════════════════════ -->
     <div class="perpus-section active" id="sectionEbook">
-
-
 
         <!-- Stats -->
         <?php if (session()->get('user_role') === 'admin'): ?>
@@ -992,14 +974,7 @@
 
         <!-- Search Bar -->
         <div class="library-search">
-            <?php if (session()->get('user_role') === 'admin'): ?>
-            <div class="library-tabs">
-                <button class="library-tab active" onclick="filterBooks('all', this)">Semua</button>
-                <button class="library-tab" onclick="filterBooks('publik', this)">Publik</button>
-                <button class="library-tab" onclick="filterBooks('privat', this)">Privat</button>
-            </div>
-            <?php endif; ?>
-            <div class="library-search-input">
+            <div class="library-search-input" style="border-left: none; padding-left: 0;">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 <input type="text" id="searchEbook" placeholder="Cari ebook di perpustakaan..." oninput="searchBooks(this.value)">
             </div>
@@ -1026,7 +1001,7 @@
             <div class="bookshelf">
                 <div class="books-row" id="booksContainer">
                     <?php foreach ($ebooks as $idx => $e): ?>
-                    <div class="book-item" data-title="<?= strtolower(esc($e->judul_ebook)) ?>" data-status="<?= strtolower($e->status_ebook) ?>">
+                    <div class="book-item" data-title="<?= strtolower(esc($e->judul_ebook)) ?>" data-status="<?= strtolower($e->status_ebook) ?>" onclick="<?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" style="cursor:pointer;">
                         <?php if (strtolower($e->status_ebook) !== 'publik'): ?>
                         <span class="book-badge <?= strtolower($e->status_ebook) ?>"><?= $e->status_ebook ?></span>
                         <?php endif; ?>
@@ -1046,10 +1021,15 @@
                                 <div class="book-overlay-author"><?= strtolower(esc($e->penulis_ebook)) ?></div>
                                 <?php endif; ?>
                                 <div class="book-overlay-actions">
-                                    <button onclick="bacaEbook('<?= $e->uuid_konten_ebook ?>')" class="book-overlay-btn btn-read" title="Baca">
+                                    <button onclick="event.stopPropagation(); <?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" class="book-overlay-btn btn-read" title="Baca">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                                     </button>
                                     <?php if (session()->get('user_role') === 'admin'): ?>
+                                    <?php if (strtolower($e->status_ebook) === 'privat'): ?>
+                                    <button onclick="event.stopPropagation(); bukaModalAksesEbook(<?= $e->id_konten_ebook ?>, '<?= esc($e->judul_ebook) ?>')" class="book-overlay-btn btn-edit" title="Kelola Akses" style="background:rgba(99,102,241,0.25);color:#fff;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                    </button>
+                                    <?php endif; ?>
                                     <button onclick="event.stopPropagation(); bukaModalUbahEbook(<?= $e->id_konten_ebook ?>)" class="book-overlay-btn btn-edit" title="Edit">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </button>
@@ -1118,7 +1098,7 @@
         <!-- Video Grid -->
         <div class="video-grid" id="videoContainer">
             <?php foreach ($videos as $v): ?>
-            <div class="vid-card" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>">
+            <div class="vid-card" onclick="<?= $v->punya_akses ? "putarVideo(" . $v->id_konten_video . ", '" . $v->youtube_id . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?>" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>" data-uuid="<?= $v->uuid_konten_video ?>">
                 <div class="vid-thumb" id="thumb_<?= $v->id_konten_video ?>">
                     <img src="https://img.youtube.com/vi/<?= $v->youtube_id ?>/hqdefault.jpg" alt="<?= esc($v->judul_video) ?>">
                     <div class="vid-thumb-overlay"></div>
@@ -1127,21 +1107,13 @@
                     <span class="vid-badge <?= strtolower($v->status_video) ?>"><?= $v->status_video ?></span>
                     <?php endif; ?>
 
-                    <button class="vid-play-btn" onclick="putarVideo(<?= $v->id_konten_video ?>, '<?= $v->youtube_id ?>')">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
+                    <!-- Redundant play button removed for clean UI -->
 
-                    <iframe id="iframe_<?= $v->id_konten_video ?>"
-                        src=""
-                        allowfullscreen
-                        allow="autoplay; encrypted-media; fullscreen">
-                    </iframe>
+                    <div id="player_<?= $v->id_konten_video ?>" class="vid-player-placeholder" 
+                         data-plyr-provider="youtube" 
+                         data-plyr-embed-id="<?= $v->youtube_id ?>"></div>
 
-                    <button class="vid-fullscreen" onclick="layarPenuh(<?= $v->id_konten_video ?>)" title="Layar Penuh">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                        </svg>
-                    </button>
+                    <!-- Redundant fullscreen button removed -->
                 </div>
 
                 <div class="vid-body">
@@ -1153,11 +1125,15 @@
                     <?php endif; ?>
                     <div class="vid-footer">
                         <div class="vid-meta">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            YouTube
+                            <!-- YouTube label removed -->
                         </div>
                         <?php if (session()->get('user_role') === 'admin'): ?>
                         <div class="vid-actions">
+                            <?php if (strtolower($v->status_video) === 'privat'): ?>
+                            <button onclick="bukaModalAksesVideo(<?= $v->id_konten_video ?>, '<?= esc($v->judul_video) ?>')" class="vid-action-btn" title="Kelola Akses">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            </button>
+                            <?php endif; ?>
                             <button onclick="bukaModalUbahVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn" title="Edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
@@ -1193,9 +1169,35 @@
 </div>
 
 <?php if (session()->get('user_role') === 'admin'): ?>
+<!-- Modal Kelola Akses Privat -->
+<div id="modalAkses" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kelola Akses Privat</h5>
+                <div class="modal-subtitle" id="subjudulModalAkses"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="akses_tipe">
+                <input type="hidden" id="akses_id_konten">
+
+                <div class="form-row-custom mb-1">
+                    <label class="form-label-custom">Cari & Tambah User</label>
+                    <input type="text" id="cari_user" class="form-control-custom" placeholder="Ketik nama atau email..." autocomplete="off" oninput="cariUser(this.value)">
+                </div>
+                <div id="hasilCariUser" style="max-height:180px; overflow-y:auto; margin-bottom:20px;"></div>
+
+                <div class="form-label-custom mb-2">Sudah Punya Akses</div>
+                <div id="listAkses" style="max-height:180px; overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Tambah/Edit Ebook -->
 <div id="modalEbook" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <form id="formEbook" enctype="multipart/form-data">
                 <div class="modal-header">
@@ -1205,41 +1207,53 @@
                 </div>
                 <div class="modal-body p-4 pb-2">
                     <input type="hidden" name="id_konten_ebook" id="id_konten_ebook">
-
-                    <div class="form-row-custom">
-                        <label class="form-label-custom">Judul Ebook <span class="text-danger">*</span></label>
-                        <input type="text" name="judul_ebook" id="judul_ebook" class="form-control-custom" style="text-transform: capitalize;" placeholder="Masukkan judul ebook" autocomplete="off" required>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="form-row-custom">
-                            <label class="form-label-custom">Penulis</label>
-                            <input type="text" name="penulis_ebook" id="penulis_ebook" class="form-control-custom" style="text-transform: capitalize;" placeholder="Nama penulis" autocomplete="off">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+                        <!-- Kiri: Form -->
+                        <div>
+                            <div class="form-row-custom">
+                                <label class="form-label-custom">Judul Ebook <span class="text-danger">*</span></label>
+                                <input type="text" name="judul_ebook" id="judul_ebook" class="form-control-custom" style="text-transform:capitalize;" placeholder="Masukkan judul ebook" autocomplete="off" required>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-row-custom">
+                                    <label class="form-label-custom">Penulis</label>
+                                    <input type="text" name="penulis_ebook" id="penulis_ebook" class="form-control-custom" style="text-transform:capitalize;" placeholder="Nama penulis" autocomplete="off">
+                                </div>
+                                <div class="form-row-custom">
+                                    <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
+                                    <select name="status_ebook" id="status_ebook" class="form-control-custom" required onchange="toggleAksesEbook(this.value)">
+                                        <option value="Publik">Publik</option>
+                                        <option value="Privat">Privat</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row-custom">
+                                <label class="form-label-custom">Deskripsi <span style="color:#94a3b8;font-weight:500;font-size:11px;">(Opsional)</span></label>
+                                <textarea name="deskripsi_ebook" id="deskripsi_ebook" class="form-control-custom" rows="3" placeholder="Deskripsi singkat ebook..."></textarea>
+                            </div>
+                            <div class="grid-2 mb-0">
+                                <div class="form-row-custom mb-0">
+                                    <label class="form-label-custom">File PDF <span class="text-danger" id="pdf_required">*</span></label>
+                                    <input type="file" name="file_ebook" id="file_ebook" class="form-control-custom" accept=".pdf">
+                                    <span class="form-helper">Format wajib: .pdf</span>
+                                </div>
+                                <div class="form-row-custom mb-0">
+                                    <label class="form-label-custom">Gambar Sampul</label>
+                                    <input type="file" name="sampul_ebook" class="form-control-custom" accept=".jpg,.jpeg,.png">
+                                    <span class="form-helper">Opsional (.jpg, .png)</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-row-custom">
-                            <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
-                            <select name="status_ebook" id="status_ebook" class="form-control-custom" required>
-                                <option value="Publik">Publik</option>
-                                <option value="Privat">Privat</option>
-                            </select>
+                        <!-- Kanan: Akses -->
+                        <div id="seksiAksesEbook" style="display:none; border-left:1.5px solid #f1f5f9; padding-left:24px;">
+                            <div class="form-label-custom mb-2">Cari & Tambah User</div>
+                            <input type="text" id="cari_user_ebook" class="form-control-custom" placeholder="Ketik nama atau email..." autocomplete="off" oninput="cariUserInline('ebook', this.value)" style="margin-bottom:8px;">
+                            <div id="hasilCariUserEbook" style="max-height:180px; overflow-y:auto; margin-bottom:16px;"></div>
+                            <div class="form-label-custom mb-2" style="font-size:12px;">Sudah Punya Akses</div>
+                            <div id="listAksesEbook" style="max-height:180px; overflow-y:auto;"></div>
                         </div>
-                    </div>
-
-                    <div class="form-row-custom">
-                        <label class="form-label-custom">Deskripsi <span style="color:#94a3b8; font-weight:500; font-size:11px;">(Opsional)</span></label>
-                        <textarea name="deskripsi_ebook" id="deskripsi_ebook" class="form-control-custom" rows="3" placeholder="Deskripsi singkat ebook..."></textarea>
-                    </div>
-
-                    <div class="grid-2 mb-0">
-                        <div class="form-row-custom mb-0">
-                            <label class="form-label-custom">File PDF <span class="text-danger" id="pdf_required">*</span></label>
-                            <input type="file" name="file_ebook" id="file_ebook" class="form-control-custom" accept=".pdf">
-                            <span class="form-helper">Format wajib: .pdf</span>
-                        </div>
-                        <div class="form-row-custom mb-0">
-                            <label class="form-label-custom">Gambar Sampul</label>
-                            <input type="file" name="sampul_ebook" class="form-control-custom" accept=".jpg,.jpeg,.png">
-                            <span class="form-helper">Opsional (.jpg, .png)</span>
+                        <div id="seksiAksesEbookEmpty" style="border-left:1.5px solid #f1f5f9; padding-left:24px; display:flex; align-items:center; justify-content:center;">
+                            <p style="font-size:13px; color:#C4B8A8; text-align:center;">Pilih status <b>Privat</b><br>untuk mengatur akses user.</p>
                         </div>
                     </div>
                 </div>
@@ -1254,7 +1268,7 @@
 
 <!-- Modal Tambah/Edit Video -->
 <div id="modalVideo" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <form id="formVideo" enctype="multipart/form-data">
                 <div class="modal-header">
@@ -1264,29 +1278,41 @@
                 </div>
                 <div class="modal-body p-4 pb-2">
                     <input type="hidden" name="id_konten_video" id="id_konten_video">
-
-                    <div class="form-row-custom">
-                        <label class="form-label-custom">Judul Video <span class="text-danger">*</span></label>
-                        <input type="text" name="judul_video" id="judul_video" class="form-control-custom" style="text-transform: capitalize;" placeholder="Masukkan judul video..." autocomplete="off" required>
-                    </div>
-
-                    <div class="form-row-custom">
-                        <label class="form-label-custom">URL YouTube <span class="text-danger">*</span></label>
-                        <input type="url" name="url_video" id="url_video" class="form-control-custom" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" required>
-                        <span class="form-helper">Pastikan URL video disalin secara penuh dari address bar browser.</span>
-                    </div>
-
-                    <div class="form-row-custom">
-                        <label class="form-label-custom">Deskripsi <span style="color:#94a3b8; font-weight:500; font-size:11px;">(Opsional)</span></label>
-                        <textarea name="deskripsi_video" id="deskripsi_video" class="form-control-custom" rows="3" placeholder="Tambahkan deskripsi singkat mengenai isi konten video ini..."></textarea>
-                    </div>
-
-                    <div class="form-row-custom mb-0">
-                        <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
-                        <select name="status_video" id="status_video" class="form-control-custom" required>
-                            <option value="Publik">Publik</option>
-                            <option value="Privat">Privat</option>
-                        </select>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+                        <!-- Kiri: Form -->
+                        <div>
+                            <div class="form-row-custom">
+                                <label class="form-label-custom">Judul Video <span class="text-danger">*</span></label>
+                                <input type="text" name="judul_video" id="judul_video" class="form-control-custom" style="text-transform:capitalize;" placeholder="Masukkan judul video..." autocomplete="off" required>
+                            </div>
+                            <div class="form-row-custom">
+                                <label class="form-label-custom">URL YouTube <span class="text-danger">*</span></label>
+                                <input type="url" name="url_video" id="url_video" class="form-control-custom" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" required>
+                                <span class="form-helper">Pastikan URL video disalin secara penuh dari address bar browser.</span>
+                            </div>
+                            <div class="form-row-custom">
+                                <label class="form-label-custom">Deskripsi <span style="color:#94a3b8;font-weight:500;font-size:11px;">(Opsional)</span></label>
+                                <textarea name="deskripsi_video" id="deskripsi_video" class="form-control-custom" rows="3" placeholder="Tambahkan deskripsi singkat mengenai isi konten video ini..."></textarea>
+                            </div>
+                            <div class="form-row-custom mb-0">
+                                <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
+                                <select name="status_video" id="status_video" class="form-control-custom" required onchange="toggleAksesVideo(this.value)">
+                                    <option value="Publik">Publik</option>
+                                    <option value="Privat">Privat</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Kanan: Akses -->
+                        <div id="seksiAksesVideo" style="display:none; border-left:1.5px solid #f1f5f9; padding-left:24px;">
+                            <div class="form-label-custom mb-2">Cari & Tambah User</div>
+                            <input type="text" id="cari_user_video" class="form-control-custom" placeholder="Ketik nama atau email..." autocomplete="off" oninput="cariUserInline('video', this.value)" style="margin-bottom:8px;">
+                            <div id="hasilCariUserVideo" style="max-height:180px; overflow-y:auto; margin-bottom:16px;"></div>
+                            <div class="form-label-custom mb-2" style="font-size:12px;">Sudah Punya Akses</div>
+                            <div id="listAksesVideo" style="max-height:180px; overflow-y:auto;"></div>
+                        </div>
+                        <div id="seksiAksesVideoEmpty" style="border-left:1.5px solid #f1f5f9; padding-left:24px; display:flex; align-items:center; justify-content:center;">
+                            <p style="font-size:13px; color:#C4B8A8; text-align:center;">Pilih status <b>Privat</b><br>untuk mengatur akses user.</p>
+                        </div>
                     </div>
                 </div>
                 <div class="form-actions mt-3">
@@ -1303,23 +1329,14 @@
     // ═══════════════════════════════════════════════
     // SECTION SWITCHER — Perpustakaan Filter Tabs
     // ═══════════════════════════════════════════════
-    function switchSection(section, btn) {
-        // Update tab active state
-        document.querySelectorAll('.perpus-filter-tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Show/hide sections with animation
+    function switchSection(section) {
         document.querySelectorAll('.perpus-section').forEach(s => s.classList.remove('active'));
-
         if (section === 'ebook') {
             document.getElementById('sectionEbook').classList.add('active');
         } else {
             document.getElementById('sectionVideo').classList.add('active');
-            // Re-initialize video hover listeners after section becomes visible
             initVideoHoverListeners();
         }
-
-        // Re-render Lucide icons for newly visible sections
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -1373,22 +1390,72 @@
     }
 
     // ═══════════════════════════════════════════════
-    // VIDEO FUNCTIONS
+    // VIDEO FUNCTIONS (WITH TRACKING)
     // ═══════════════════════════════════════════════
+    const CSRF_NAME = '<?= csrf_token() ?>';
+    const CSRF_HASH = '<?= csrf_hash() ?>';
+    var plyrPlayers = {}; // Menyimpan instance Plyr
 
     function putarVideo(id, ytId) {
-        var thumb  = document.getElementById('thumb_' + id);
-        var iframe = document.getElementById('iframe_' + id);
-        iframe.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1&mute=1';
-        thumb.classList.add('playing');
+        if (!ytId) return;
+        var thumb = document.getElementById('thumb_' + id);
+        if (thumb) thumb.classList.add('playing');
+
+        if (!plyrPlayers[id]) {
+            // Inisialisasi Plyr dengan pengaturan Full Hidden Branding
+            const player = new Plyr('#player_' + id, {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                tooltips: { controls: true, seek: true },
+                youtube: {
+                    noCookie: true,
+                    rel: 0,
+                    showinfo: 0,
+                    ivory: 1,
+                    modestbranding: 1,
+                    origin: window.location.origin
+                }
+            });
+
+            plyrPlayers[id] = player;
+
+            // Start playing
+            player.on('ready', event => {
+                player.play();
+            });
+
+            // Tracking Logic
+            player.on('timeupdate', event => {
+                const currentTime = Math.floor(player.currentTime);
+                // Kita kirim tracking setiap interval tertentu (misal 5 detik sekali)
+                if (currentTime > 0 && currentTime % 5 === 0) {
+                    if (player.playing) {
+                        trackProgress(id, currentTime);
+                    }
+                }
+            });
+
+        } else {
+            plyrPlayers[id].play();
+        }
+    }
+
+    function trackProgress(id, time) {
+        $.post('<?= base_url('riwayat/update_video') ?>', {
+            id_video: id,
+            durasi: time,
+            [CSRF_NAME]: CSRF_HASH
+        });
     }
 
     function stopVideo(id) {
-        var thumb  = document.getElementById('thumb_' + id);
-        var iframe = document.getElementById('iframe_' + id);
-        iframe.src = '';
-        thumb.classList.remove('playing');
+        var thumb = document.getElementById('thumb_' + id);
+        if (plyrPlayers[id]) {
+            plyrPlayers[id].pause();
+        }
+        if (thumb) thumb.classList.remove('playing');
     }
+
+    // layarPenuh function removed
 
     function initVideoHoverListeners() {
         document.querySelectorAll('.vid-card').forEach(function(card) {
@@ -1414,12 +1481,45 @@
     // Initialize on page load
     initVideoHoverListeners();
 
+    // Auto switch ke tab video jika URL mengandung ?tab=video
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'video') {
+        switchSection('video');
+        var playId = urlParams.get('play');
+        if (playId) {
+            // Logic to find and play specific video if needed from history
+            setTimeout(() => {
+                var card = document.querySelector(`.vid-card[data-uuid="${playId}"]`);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    putarVideo(card.dataset.vidId, card.dataset.ytId);
+                }
+            }, 600);
+        }
+    }
+
     function layarPenuh(id) {
-        var iframe = document.getElementById('iframe_' + id);
-        if (iframe.requestFullscreen)       iframe.requestFullscreen();
-        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-        else if (iframe.mozRequestFullScreen)    iframe.mozRequestFullScreen();
-        else if (iframe.msRequestFullscreen)     iframe.msRequestFullscreen();
+        var player = ytPlayers[id];
+        
+        // Jika video belum diputar, putar dulu baru fullscreen
+        if (!player) {
+            var card = document.querySelector(`.vid-card[data-vid-id="${id}"]`);
+            if (card) {
+                putarVideo(id, card.dataset.ytId);
+                setTimeout(function() { layarPenuh(id); }, 1000);
+            }
+            return;
+        }
+
+        if (typeof player.getIframe === 'function') {
+            var iframe = player.getIframe();
+            if (iframe) {
+                if (iframe.requestFullscreen)       iframe.requestFullscreen();
+                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+                else if (iframe.mozRequestFullScreen)    iframe.mozRequestFullScreen();
+                else if (iframe.msRequestFullscreen)     iframe.msRequestFullscreen();
+            }
+        }
     }
 
     // Search videos by title
@@ -1444,8 +1544,6 @@
     // ADMIN CRUD (Ebook & Video)
     // ═══════════════════════════════════════════════
     <?php if (session()->get('user_role') === 'admin'): ?>
-    const CSRF_NAME = '<?= csrf_token() ?>';
-    const CSRF_HASH = '<?= csrf_hash() ?>';
 
     // ── Ebook CRUD ──
     function bukaModalTambahEbook() {
@@ -1453,6 +1551,10 @@
         document.getElementById('id_konten_ebook').value = '';
         document.getElementById('judulModalEbook').innerHTML = 'Tambah Ebook';
         document.getElementById('pdf_required').style.display = 'inline';
+        document.getElementById('seksiAksesEbook').style.display = 'none';
+        document.getElementById('seksiAksesEbookEmpty').style.display = 'flex';
+        document.getElementById('listAksesEbook').innerHTML = '';
+        document.getElementById('hasilCariUserEbook').innerHTML = '';
         new bootstrap.Modal(document.getElementById('modalEbook')).show();
     }
 
@@ -1470,9 +1572,135 @@
                 document.getElementById('status_ebook').value     = d.status_ebook;
                 document.getElementById('judulModalEbook').innerHTML = 'Edit Ebook';
                 document.getElementById('pdf_required').style.display = 'none';
+                document.getElementById('hasilCariUserEbook').innerHTML = '';
+                document.getElementById('cari_user_ebook').value = '';
+                if (d.status_ebook === 'Privat') {
+                    document.getElementById('seksiAksesEbook').style.display = 'block';
+                    muatListAksesInline('ebook', d.id_konten_ebook, 'listAksesEbook');
+                } else {
+                    document.getElementById('seksiAksesEbook').style.display = 'none';
+                }
                 new bootstrap.Modal(document.getElementById('modalEbook')).show();
             }
         });
+    }
+
+    function toggleAksesEbook(val) {
+        var seksi      = document.getElementById('seksiAksesEbook');
+        var seksiEmpty = document.getElementById('seksiAksesEbookEmpty');
+        if (val === 'Privat') {
+            seksi.style.display      = 'block';
+            seksiEmpty.style.display = 'none';
+            var id = document.getElementById('id_konten_ebook').value;
+            if (id) muatListAksesInline('ebook', id, 'listAksesEbook');
+        } else {
+            seksi.style.display      = 'none';
+            seksiEmpty.style.display = 'flex';
+        }
+    }
+
+    function toggleAksesVideo(val) {
+        var seksi      = document.getElementById('seksiAksesVideo');
+        var seksiEmpty = document.getElementById('seksiAksesVideoEmpty');
+        if (val === 'Privat') {
+            seksi.style.display      = 'block';
+            seksiEmpty.style.display = 'none';
+            var id = document.getElementById('id_konten_video').value;
+            if (id) muatListAksesInline('video', id, 'listAksesVideo');
+        } else {
+            seksi.style.display      = 'none';
+            seksiEmpty.style.display = 'flex';
+        }
+    }
+
+    function cariUserInline(tipe, q) {
+        var containerId = tipe === 'ebook' ? 'hasilCariUserEbook' : 'hasilCariUserVideo';
+        var listId      = tipe === 'ebook' ? 'listAksesEbook'     : 'listAksesVideo';
+        var idKonten    = tipe === 'ebook' ? document.getElementById('id_konten_ebook').value : document.getElementById('id_konten_video').value;
+        var container   = document.getElementById(containerId);
+        q = q.toLowerCase().trim();
+        if (!q) { container.innerHTML = ''; return; }
+
+        var sudahAkses = Array.from(document.querySelectorAll('#' + listId + ' [data-uid]')).map(el => parseInt(el.dataset.uid));
+        var hasil = _allUsers.filter(u =>
+            (u.nama_lengkap.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
+            && !sudahAkses.includes(u.id_user)
+        );
+
+        if (!hasil.length) { container.innerHTML = '<p style="font-size:12px;color:#9C8E7A;padding:6px 0;">User tidak ditemukan.</p>'; return; }
+
+        container.innerHTML = hasil.map(u =>
+            '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:10px;margin-bottom:5px;">'
+            + '<div><div style="font-size:13px;font-weight:600;color:#0f172a;">' + u.nama_lengkap + '</div>'
+            + '<div style="font-size:11px;color:#64748b;">' + u.email + '</div></div>'
+            + '<button type="button" onclick="tambahAksesInline(\'' + tipe + '\', ' + u.id_user + ', \'' + idKonten + '\')" style="background:#e0e7ff;border:none;color:#6366f1;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">+ Tambah</button>'
+            + '</div>'
+        ).join('');
+    }
+
+    function tambahAksesInline(tipe, id_user, id_konten) {
+        var listId     = tipe === 'ebook' ? 'listAksesEbook' : 'listAksesVideo';
+        var cariId     = tipe === 'ebook' ? 'cari_user_ebook' : 'cari_user_video';
+        var hasilId    = tipe === 'ebook' ? 'hasilCariUserEbook' : 'hasilCariUserVideo';
+        if (!id_konten) {
+            // Konten belum disimpan, simpan sementara di array pending
+            _pendingAkses = _pendingAkses || [];
+            if (!_pendingAkses.find(p => p.id_user == id_user)) {
+                var u = _allUsers.find(u => u.id_user == id_user);
+                _pendingAkses.push({ id_user: id_user, nama_lengkap: u.nama_lengkap, email: u.email });
+            }
+            renderPendingAkses(tipe);
+            document.getElementById(cariId).value = '';
+            document.getElementById(hasilId).innerHTML = '';
+            return;
+        }
+        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [CSRF_NAME]: CSRF_HASH }, function(res) {
+            var d = typeof res === 'string' ? JSON.parse(res) : res;
+            if (d.status) {
+                muatListAksesInline(tipe, id_konten, listId);
+                document.getElementById(cariId).value = '';
+                document.getElementById(hasilId).innerHTML = '';
+            }
+        });
+    }
+
+    function hapusAksesInline(id, tipe, id_konten) {
+        var listId = tipe === 'ebook' ? 'listAksesEbook' : 'listAksesVideo';
+        var cariId = tipe === 'ebook' ? 'cari_user_ebook' : 'cari_user_video';
+        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [CSRF_NAME]: CSRF_HASH }, function() {
+            muatListAksesInline(tipe, id_konten, listId);
+            cariUserInline(tipe, document.getElementById(cariId).value);
+        });
+    }
+
+    function muatListAksesInline(tipe, id_konten, listId) {
+        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [CSRF_NAME]: CSRF_HASH }, function(res) {
+            var list = typeof res === 'string' ? JSON.parse(res) : res;
+            var html = !list.length ? '<p style="font-size:12px;color:#9C8E7A;">Belum ada user.</p>' :
+                list.map(u =>
+                    '<div data-uid="' + u.id_user + '" style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+                    + '<div><div style="font-size:13px;font-weight:600;color:#0f172a;">' + u.nama_lengkap + '</div>'
+                    + '<div style="font-size:11px;color:#64748b;">' + u.email + '</div></div>'
+                    + '<button type="button" onclick="hapusAksesInline(' + u.id + ', \'' + tipe + '\', ' + id_konten + ')" style="background:#fef2f2;border:none;color:#ef4444;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;">Hapus</button>'
+                    + '</div>'
+                ).join('');
+            document.getElementById(listId).innerHTML = html;
+        });
+    }
+
+    var _pendingAkses = [];
+
+    function renderPendingAkses(tipe) {
+        var listId = tipe === 'ebook' ? 'listAksesEbook' : 'listAksesVideo';
+        var html = !_pendingAkses.length ? '<p style="font-size:12px;color:#9C8E7A;">Belum ada user.</p>' :
+            _pendingAkses.map((u, i) =>
+                '<div data-uid="' + u.id_user + '" style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+                + '<div><div style="font-size:13px;font-weight:600;color:#0f172a;">' + u.nama_lengkap + '</div>'
+                + '<div style="font-size:11px;color:#64748b;">' + u.email + '</div></div>'
+                + '<button type="button" onclick="_pendingAkses.splice(' + i + ',1); renderPendingAkses(\'' + tipe + '\')" style="background:#fef2f2;border:none;color:#ef4444;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;">Hapus</button>'
+                + '</div>'
+            ).join('');
+        document.getElementById(listId).innerHTML = html;
     }
 
     $('#formEbook').submit(function(e) {
@@ -1486,9 +1714,15 @@
             success: function(res) {
                 var d = typeof res === 'string' ? JSON.parse(res) : res;
                 if (d.status) {
-                    bootstrap.Modal.getInstance(document.getElementById('modalEbook')).hide();
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Ebook berhasil disimpan', showConfirmButton: false, timer: 1500 })
-                        .then(() => location.reload());
+                    var id_konten = d.id_konten || document.getElementById('id_konten_ebook').value;
+                    var pending = _pendingAkses.slice();
+                    _pendingAkses = [];
+                    var tasks = pending.map(p => $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: 'ebook', id_konten: id_konten, id_user: p.id_user, [CSRF_NAME]: CSRF_HASH }));
+                    $.when.apply($, tasks.length ? tasks : [$.when()]).then(function() {
+                        bootstrap.Modal.getInstance(document.getElementById('modalEbook')).hide();
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Ebook berhasil disimpan', showConfirmButton: false, timer: 1500 })
+                            .then(() => location.reload());
+                    });
                 } else {
                     Swal.fire('Gagal!', d.msg || 'Terjadi kesalahan', 'error');
                 }
@@ -1519,6 +1753,11 @@
         document.getElementById('id_konten_video').value = '';
         document.getElementById('judulModalVideo').innerHTML = 'Tambah Video Baru';
         document.getElementById('subjudulModalVideo').innerHTML = 'Lengkapi informasi di bawah untuk menambahkan konten video.';
+        document.getElementById('seksiAksesVideo').style.display = 'none';
+        document.getElementById('seksiAksesVideoEmpty').style.display = 'flex';
+        document.getElementById('listAksesVideo').innerHTML = '';
+        document.getElementById('hasilCariUserVideo').innerHTML = '';
+        _pendingAkses = [];
         new bootstrap.Modal(document.getElementById('modalVideo')).show();
     }
 
@@ -1536,6 +1775,15 @@
                 document.getElementById('status_video').value    = d.status_video;
                 document.getElementById('judulModalVideo').innerHTML = 'Edit Data Video';
                 document.getElementById('subjudulModalVideo').innerHTML = 'Ubah informasi detail untuk konten video ini.';
+                document.getElementById('hasilCariUserVideo').innerHTML = '';
+                document.getElementById('cari_user_video').value = '';
+                _pendingAkses = [];
+                if (d.status_video === 'Privat') {
+                    document.getElementById('seksiAksesVideo').style.display = 'block';
+                    muatListAksesInline('video', d.id_konten_video, 'listAksesVideo');
+                } else {
+                    document.getElementById('seksiAksesVideo').style.display = 'none';
+                }
                 new bootstrap.Modal(document.getElementById('modalVideo')).show();
             }
         });
@@ -1552,9 +1800,15 @@
             success: function(res) {
                 var d = typeof res === 'string' ? JSON.parse(res) : res;
                 if (d.status) {
-                    bootstrap.Modal.getInstance(document.getElementById('modalVideo')).hide();
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Video berhasil disimpan', showConfirmButton: false, timer: 1500 })
-                        .then(() => location.reload());
+                    var id_konten = d.id_konten || document.getElementById('id_konten_video').value;
+                    var pending = _pendingAkses.slice();
+                    _pendingAkses = [];
+                    var tasks = pending.map(p => $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: 'video', id_konten: id_konten, id_user: p.id_user, [CSRF_NAME]: CSRF_HASH }));
+                    $.when.apply($, tasks.length ? tasks : [$.when()]).then(function() {
+                        bootstrap.Modal.getInstance(document.getElementById('modalVideo')).hide();
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Video berhasil disimpan', showConfirmButton: false, timer: 1500 })
+                            .then(() => location.reload());
+                    });
                 } else {
                     Swal.fire('Gagal!', d.msg || 'Terjadi kesalahan', 'error');
                 }
@@ -1578,5 +1832,109 @@
             }
         });
     }
+
+    // ── Kelola Akses Whitelist ──
+    function bukaModalAksesEbook(id, judul) {
+        document.getElementById('akses_tipe').value      = 'ebook';
+        document.getElementById('akses_id_konten').value = id;
+        document.getElementById('subjudulModalAkses').innerHTML = 'Ebook: ' + judul;
+        document.getElementById('cari_user').value = '';
+        document.getElementById('hasilCariUser').innerHTML = '';
+        muatListAkses();
+        new bootstrap.Modal(document.getElementById('modalAkses')).show();
+    }
+
+    function bukaModalAksesVideo(id, judul) {
+        document.getElementById('akses_tipe').value      = 'video';
+        document.getElementById('akses_id_konten').value = id;
+        document.getElementById('subjudulModalAkses').innerHTML = 'Video: ' + judul;
+        document.getElementById('cari_user').value = '';
+        document.getElementById('hasilCariUser').innerHTML = '';
+        muatListAkses();
+        new bootstrap.Modal(document.getElementById('modalAkses')).show();
+    }
+
+    var _allUsers = <?= json_encode($semua_user) ?>;
+
+    function cariUser(q) {
+        var tipe      = document.getElementById('akses_tipe').value;
+        var id_konten = document.getElementById('akses_id_konten').value;
+        var container = document.getElementById('hasilCariUser');
+        q = q.toLowerCase().trim();
+        if (!q) { container.innerHTML = ''; return; }
+
+        // Ambil id user yg sudah punya akses
+        var sudahAkses = Array.from(document.querySelectorAll('#listAkses [data-uid]')).map(el => parseInt(el.dataset.uid));
+
+        var hasil = _allUsers.filter(u =>
+            (u.nama_lengkap.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
+            && !sudahAkses.includes(u.id_user)
+        );
+
+        if (!hasil.length) {
+            container.innerHTML = '<p style="font-size:12px;color:#9C8E7A;padding:8px 0;">User tidak ditemukan.</p>';
+            return;
+        }
+
+        container.innerHTML = hasil.map(u =>
+            '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin-bottom:6px;">'
+            + '<div><div style="font-size:13px;font-weight:600;color:#0f172a;">' + u.nama_lengkap + '</div>'
+            + '<div style="font-size:11px;color:#64748b;">' + u.email + '</div></div>'
+            + '<button onclick="tambahAkses(' + u.id_user + ')" style="background:#e0e7ff;border:none;color:#6366f1;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">+ Tambah</button>'
+            + '</div>'
+        ).join('');
+    }
+
+    function muatListAkses() {
+        var tipe      = document.getElementById('akses_tipe').value;
+        var id_konten = document.getElementById('akses_id_konten').value;
+        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [CSRF_NAME]: CSRF_HASH }, function(res) {
+            var list = typeof res === 'string' ? JSON.parse(res) : res;
+            var html = '';
+            if (!list.length) {
+                html = '<p style="font-size:13px;color:#9C8E7A;">Belum ada user yang diberi akses.</p>';
+            } else {
+                list.forEach(function(u) {
+                    html += '<div data-uid="' + u.id_user + '" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin-bottom:8px;">'
+                          + '<div><div style="font-size:13px;font-weight:600;color:#0f172a;">' + u.nama_lengkap + '</div>'
+                          + '<div style="font-size:11px;color:#64748b;">' + u.email + '</div></div>'
+                          + '<button onclick="hapusAkses(' + u.id + ')" style="background:#fef2f2;border:none;color:#ef4444;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;">Hapus</button>'
+                          + '</div>';
+                });
+            }
+            document.getElementById('listAkses').innerHTML = html;
+        });
+    }
+
+    function tambahAkses(id_user) {
+        var tipe      = document.getElementById('akses_tipe').value;
+        var id_konten = document.getElementById('akses_id_konten').value;
+        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [CSRF_NAME]: CSRF_HASH }, function(res) {
+            var d = typeof res === 'string' ? JSON.parse(res) : res;
+            if (d.status) {
+                muatListAkses();
+                document.getElementById('cari_user').value = '';
+                document.getElementById('hasilCariUser').innerHTML = '';
+            } else Swal.fire('Gagal', d.msg || 'Terjadi kesalahan', 'error');
+        });
+    }
+
+    function hapusAkses(id) {
+        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [CSRF_NAME]: CSRF_HASH }, function() {
+            muatListAkses();
+            cariUser(document.getElementById('cari_user').value);
+        });
+    }
     <?php endif; ?>
+
+    // ── Notif akses privat untuk user biasa ──
+    function aksesPrivat(tipe, id, judul) {
+        Swal.fire({
+            icon: 'lock',
+            title: 'Konten Terbatas',
+            text: '"' + judul + '" hanya dapat diakses oleh akun tertentu. Hubungi admin untuk mendapatkan akses.',
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#6366f1'
+        });
+    }
 </script>

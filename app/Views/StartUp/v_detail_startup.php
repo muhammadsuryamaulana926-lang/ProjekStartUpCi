@@ -297,11 +297,11 @@
                     <div class="p-3">
                             <ul class="nav nav-tabs nav-bordered mb-3">
                                 <li class="nav-item"><a href="#startup" data-bs-toggle="tab" class="nav-link active"><i class="mdi mdi-home"></i>Starup</a></li>
-                                <li class="nav-item"><a href="#produk" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-package-variant"></i> Produk</a></li>
-                                <li class="nav-item"><a href="#pendanaan" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-cash-multiple"></i> Pendanaan</a></li>
-                                <li class="nav-item"><a href="#prestasi" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-trophy"></i> Prestasi</a></li>
-                                <li class="nav-item"><a href="#mentor" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-account-star"></i> Mentor</a></li>
-                                <li class="nav-item"><a href="#aktifitas" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-history"></i> Aktifitas</a></li>
+                                <!-- <li class="nav-item"><a href="#produk" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-package-variant"></i> Produk</a></li> -->
+                                <!-- <li class="nav-item"><a href="#pendanaan" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-cash-multiple"></i> Pendanaan</a></li> -->
+                                <!-- <li class="nav-item"><a href="#prestasi" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-trophy"></i> Prestasi</a></li> -->
+                                <!-- <li class="nav-item"><a href="#mentor" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-account-star"></i> Mentor</a></li> -->
+                                <!-- <li class="nav-item"><a href="#aktifitas" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-history"></i> Aktifitas</a></li> -->
                                 <li class="nav-item"><a href="#lokasi" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-map-marker"></i> Lokasi</a></li>
                             </ul>
 

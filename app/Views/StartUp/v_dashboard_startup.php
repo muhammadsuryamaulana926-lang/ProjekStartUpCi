@@ -9,9 +9,8 @@
     /* Global Typography & Background */
     .app-content {
         font-family: 'Inter', sans-serif !important;
-        background-color: #f8fafc !important; /* Abu sangat muda */
+        background-color: #f8fafc !important;
         padding: 32px 28px;
-        min-height: 100vh;
     }
 
     /* Dashboard Header */
@@ -202,11 +201,6 @@
 
 <div class="app-content">
 
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Dashboard Utama</h1>
-        <p class="dashboard-subtitle">Ringkasan performa dan data pertumbuhan startup dalam ekosistem.</p>
-    </div>
-
     <!-- Kartu statistik: klik untuk membuka modal daftar lengkap startup -->
     <div class="row g-4 mb-4">
         <div class="col-xl-4 col-md-6">
@@ -225,8 +219,6 @@
         </div>
         <!-- Ruang untuk kartu lain di masa depan, misal "Total Pengguna Aktif" -->
     </div>
-
-</div>
 
 <!-- Modal popup berisi tabel lengkap semua data startup -->
 <div class="modal fade modal-modern" id="modalDetailStartup" tabindex="-1" aria-hidden="true" style="padding-top:20px;">
@@ -330,3 +322,5 @@ $(document).ready(function() {
     });
 });
 </script>
+
+</div><!-- end app-content -->

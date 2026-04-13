@@ -29,6 +29,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/perpustakaan/ambil_ebook',           'Perpustakaan::ambil_ebook');
     $routes->post('/perpustakaan/ubah_ebook',            'Perpustakaan::ubah_ebook');
     $routes->post('/perpustakaan/hapus_ebook',           'Perpustakaan::hapus_ebook');
+    $routes->post('/perpustakaan/get_akses',              'Perpustakaan::get_akses');
+    $routes->post('/perpustakaan/tambah_akses',           'Perpustakaan::tambah_akses');
+    $routes->post('/perpustakaan/hapus_akses',            'Perpustakaan::hapus_akses');
     $routes->get('/v_tambah_startup',                   'Startup::tambah_startup');
     $routes->post('/v_simpan_startup',                  'Startup::simpan_startup');
     $routes->post('/v_hapus_startup',                   'Startup::hapus_startup');
@@ -106,4 +109,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/startup/proses_hapus_informasi_mentor',             'Startup::proses_hapus_informasi_mentor');
     $routes->post('/startup/proses_verifikasi_startup',                 'Startup::proses_verifikasi_startup');
     $routes->post('/startup/proses_tolak_startup',                      'Startup::proses_tolak_startup');
+
+    // Riwayat
+    $routes->get('/v_history',                           'Riwayat::index');
+    $routes->post('/riwayat/update_video',               'Riwayat::update_video');
+    $routes->post('/riwayat/update_ebook',               'Riwayat::update_ebook');
 });

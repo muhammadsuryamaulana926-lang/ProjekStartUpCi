@@ -26,6 +26,10 @@
     <!-- JS SweetAlert2 untuk notifikasi popup yang lebih menarik -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Plyr.io — Modern Video Player for YouTube without branding -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
     <style>
         /* Global Font Override */
         body, .app-wrapper, .app-main, .sidebar, .topbar {

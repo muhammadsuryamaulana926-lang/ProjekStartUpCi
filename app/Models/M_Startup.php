@@ -64,7 +64,9 @@ class M_startup extends Model
     // Mengupdate data startup berdasarkan id_startup
     public function ubah_startup($data)
     {
-        return $this->db->table('startups')->where('id_startup', $data['id_startup'])->update($data);
+        $id = $data['id_startup'];
+        unset($data['id_startup']);
+        return $this->db->table('startups')->where('id_startup', $id)->update($data);
     }
 
     // Menghapus data startup berdasarkan id_startup

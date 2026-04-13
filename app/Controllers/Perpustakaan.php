@@ -19,26 +19,36 @@ class Perpustakaan extends BaseController
     // Menampilkan halaman perpustakaan gabungan video dan ebook
     public function index()
     {
-        $role = session()->get('user_role');
+        $role    = session()->get('user_role');
+        $id_user = session()->get('user_id');
 
-        // Ambil data video via model gabungan
         $videos = $role === 'admin'
             ? $this->m_perpus->semua_video()->getResult()
-            : $this->m_perpus->semua_video_publik()->getResult();
+            : $this->m_perpus->semua_video_publik_dan_akses($id_user)->getResult();
 
         foreach ($videos as $v) {
-            $v->youtube_id = $this->m_perpus->decode_kode_video($v->kode_video);
+            $v->youtube_id  = $this->m_perpus->decode_kode_video($v->kode_video);
+            $v->punya_akses = ($role === 'admin' || strtolower($v->status_video) === 'publik')
+                ? true
+                : $this->m_perpus->cek_akses('video', $v->id_konten_video, $id_user);
         }
 
-        // Ambil data ebook via model gabungan
         $ebooks = $role === 'admin'
             ? $this->m_perpus->semua_ebook()->getResult()
-            : $this->m_perpus->semua_ebook_publik()->getResult();
+            : $this->m_perpus->semua_ebook_publik_dan_akses($id_user)->getResult();
+
+        foreach ($ebooks as $e) {
+            $e->punya_akses = ($role === 'admin' || strtolower($e->status_ebook) === 'publik')
+                ? true
+                : $this->m_perpus->cek_akses('ebook', $e->id_konten_ebook, $id_user);
+        }
+
+        $semua_user = $role === 'admin' ? $this->m_perpus->semua_user() : [];
 
         return view('Partials/v_header')
             . view('Partials/v_sidebar')
             . view('Partials/v_topbar')
-            . view('Startup/v_perpustakaan', ['videos' => $videos, 'ebooks' => $ebooks])
+            . view('Startup/v_perpustakaan', ['videos' => $videos, 'ebooks' => $ebooks, 'semua_user' => $semua_user])
             . view('Partials/v_footer');
     }
 
@@ -64,7 +74,7 @@ class Perpustakaan extends BaseController
         ];
 
         $result = $this->m_perpus->tambah_video($data);
-        echo json_encode(['status' => $result ? true : false]);
+        echo json_encode(['status' => $result ? true : false, 'id_konten' => $result]);
     }
 
     public function ambil_video()
@@ -149,7 +159,7 @@ class Perpustakaan extends BaseController
         }
 
         $result = $this->m_perpus->tambah_ebook($data);
-        echo json_encode(['status' => $result ? true : false]);
+        echo json_encode(['status' => $result ? true : false, 'id_konten' => $result]);
     }
 
     public function ambil_ebook()
@@ -212,6 +222,30 @@ class Perpustakaan extends BaseController
         echo json_encode(['status' => $result ? true : false]);
     }
 
+    // ── AKSES WHITELIST ──────────────────────────────────────────
+
+    public function get_akses()
+    {
+        $tipe      = $this->request->getPost('tipe');
+        $id_konten = $this->request->getPost('id_konten');
+        echo json_encode($this->m_perpus->get_akses($tipe, $id_konten));
+    }
+
+    public function tambah_akses()
+    {
+        $tipe      = $this->request->getPost('tipe');
+        $id_konten = $this->request->getPost('id_konten');
+        $id_user   = $this->request->getPost('id_user');
+        $result    = $this->m_perpus->tambah_akses($tipe, $id_konten, $id_user);
+        echo json_encode(['status' => (bool)$result, 'msg' => $result ? '' : 'User sudah ada di daftar akses']);
+    }
+
+    public function hapus_akses()
+    {
+        $result = $this->m_perpus->hapus_akses($this->request->getPost('id'));
+        echo json_encode(['status' => (bool)$result]);
+    }
+
     // Menampilkan halaman baca ebook dengan efek flip buku
     public function baca_ebook($uuid)
     {
@@ -219,7 +253,9 @@ class Perpustakaan extends BaseController
         if (!$ebook) return redirect()->to(base_url('v_perpustakaan'));
 
         if ($ebook->status_ebook === 'Privat' && session()->get('user_role') !== 'admin') {
-            return redirect()->to(base_url('v_perpustakaan'));
+            if (!$this->m_perpus->cek_akses('ebook', $ebook->id_konten_ebook, session()->get('user_id'))) {
+                return redirect()->to(base_url('perpustakaan'));
+            }
         }
 
         $path = FCPATH . 'uploads/ebook/file/' . $ebook->file_ebook;
@@ -239,7 +275,9 @@ class Perpustakaan extends BaseController
         if (!$ebook) { http_response_code(404); exit; }
 
         if ($ebook->status_ebook === 'Privat' && session()->get('user_role') !== 'admin') {
-            http_response_code(403); exit;
+            if (!$this->m_perpus->cek_akses('ebook', $ebook->id_konten_ebook, session()->get('user_id'))) {
+                http_response_code(403); exit;
+            }
         }
 
         $path = FCPATH . 'uploads/ebook/file/' . $ebook->file_ebook;

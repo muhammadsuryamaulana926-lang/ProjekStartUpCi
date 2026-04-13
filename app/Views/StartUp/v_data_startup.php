@@ -11,7 +11,6 @@
         font-family: 'Inter', sans-serif !important;
         background-color: #f8fafc !important;
         padding: 32px 28px;
-        min-height: 100vh;
     }
     .page-header {
         margin-bottom: 32px;
@@ -178,16 +177,9 @@
 </style>
 
 <div class="app-content">
-    <div class="page-header">
-        <div>
-            <h2>Data Startup</h2>
-            <p class="subtitle">Manajemen Data Startup</p>
-        </div>
-    </div>
-
     <div class="card-premium">
         <div class="card-header-custom d-flex justify-content-between align-items-center">
-            <span class="section-title mb-0">Daftar Startup</span>
+            <span class="section-title mb-0">Data Startup</span>
             <a href="<?= base_url('v_tambah_startup') ?>" class="btn-submit-primary btn-sm"><i data-lucide="plus" style="width: 18px; height: 18px;"></i> Tambah Startup</a>
         </div>
         <div class="p-4">
@@ -233,8 +225,6 @@
             </table>
         </div>
     </div>
-</div>
-
     <!-- Form tersembunyi untuk redirect ke halaman edit dengan metode POST (membawa id_startup) -->
 <form id="post-edit-form" action="<?= base_url('v_edit_startup') ?>" method="post" style="display:none;">
     <?= csrf_field() ?>
@@ -341,3 +331,5 @@
         });
     }
 </script>
+
+</div><!-- end app-content -->

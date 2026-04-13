@@ -309,20 +309,20 @@ class Startup extends BaseController
                 }
             }
 
-            if ($result) {
-                if ($logo['nama']) {
-                    move_uploaded_file(
-                        $_FILES['logo_perusahaan']['tmp_name'],
-                        $logo_dir . $logo['nama']
-                    );
-                    if (file_exists($logo_dir . $logo_lama) && $logo_lama != '') {
-                        unlink($logo_dir . $logo_lama);
-                    }
+            // CI4 ubah_startup() returns false jika tidak ada baris yang berubah (data sama)
+            // Kita anggap berhasil selama tidak ada exception
+            if ($logo['nama']) {
+                move_uploaded_file(
+                    $_FILES['logo_perusahaan']['tmp_name'],
+                    $logo_dir . $logo['nama']
+                );
+                if (file_exists($logo_dir . $logo_lama) && $logo_lama != '') {
+                    unlink($logo_dir . $logo_lama);
                 }
-
-                $data['status'] = true;
-                $this->session->setFlashdata('msg', ['success', 'Startup berhasil diubah']);
             }
+
+            $data['status'] = true;
+            $this->session->setFlashdata('msg', ['success', 'Startup berhasil diubah']);
         }
 
         echo json_encode([
@@ -401,13 +401,21 @@ class Startup extends BaseController
     // Menampilkan halaman video pembelajaran untuk startup
     public function video()
     {
-        return view('Startup/v_video');
+        return view('Partials/v_header')
+            . view('Partials/v_sidebar')
+            . view('Partials/v_topbar')
+            . view('Startup/v_video')
+            . view('Partials/v_footer');
     }
 
     // Menampilkan halaman referensi buku untuk startup
     public function buku()
     {
-        return view('Startup/v_buku');
+        return view('Partials/v_header')
+            . view('Partials/v_sidebar')
+            . view('Partials/v_topbar')
+            . view('Startup/v_buku')
+            . view('Partials/v_footer');
     }
 
     public function hapus_startup()

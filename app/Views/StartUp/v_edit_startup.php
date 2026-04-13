@@ -11,10 +11,12 @@
         font-family: 'Inter', sans-serif !important;
         background-color: #f8fafc !important;
         padding: 32px 28px;
-        min-height: 100vh;
     }
     .page-header {
         margin-bottom: 32px;
+        display: flex;
+        justify-content: center;
+        text-align: center;
     }
     .page-header h2 {
         font-size: 24px;
@@ -393,14 +395,18 @@
                         <small class="text-slate-400" style="font-size:11px">Format: .jpg, .jpeg, .png</small>
                         <?php if (!empty($data[0]['logo_perusahaan'])): ?>
                         <div class="mt-2">
-                            <img src="<?= base_url('public/uploads/file_startup/logo_startup/' . $data[0]['logo_perusahaan']) ?>" style="height:60px;width:auto;border-radius:8px;border:1px solid var(--slate-100)">
+                            <img src="<?= base_url('uploads/file_startup/logo_startup/' . $data[0]['logo_perusahaan']) ?>" style="height:60px;width:auto;border-radius:8px;border:1px solid var(--slate-100)">
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-actions">
+                    <?php if (session()->get('user_role') === 'pemilik_startup'): ?>
+                    <a href="<?= base_url('v_detail/' . session()->get('user_startup_uuid')) ?>" class="btn-secondary-modern">Batal</a>
+                    <?php else: ?>
                     <a href="<?= base_url('v_data_startup') ?>" class="btn-secondary-modern">Batal</a>
+                    <?php endif; ?>
                     <button type="submit" class="submit btn-submit-primary">Simpan Perubahan</button>
                 </div>
 
@@ -449,7 +455,11 @@ $(document).ready(function () {
                 processData: false,
                 success: function (data) {
                     if (data.status) {
+                        <?php if (session()->get('user_role') === 'pemilik_startup'): ?>
+                        window.location.href = "<?= base_url('v_detail/' . session()->get('user_startup_uuid')) ?>";
+                        <?php else: ?>
                         window.location.href = "<?= base_url('v_data_startup') ?>";
+                        <?php endif; ?>
                     } else {
                         forms.addClass('was-validated');
                         if (data.status_nama_perusahaan) {
@@ -466,7 +476,8 @@ $(document).ready(function () {
                 },
                 error: function (xhr) {
                     console.log('status:', xhr.status, 'response:', xhr.responseText);
-                    $('.submit').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Simpan');
+                    Swal.fire('Error!', 'Terjadi kesalahan server: ' + xhr.status, 'error');
+                    $('.submit').prop('disabled', false).html('Simpan Perubahan');
                     $('body').css('cursor', 'default');
                 }
             });

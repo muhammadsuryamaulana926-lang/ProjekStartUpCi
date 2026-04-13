@@ -693,6 +693,8 @@
         : 'null' ?>;
     const BOOK_TITLE = '<?= addslashes($ebook->judul_ebook) ?>';
     const BOOK_AUTHOR = '<?= addslashes($ebook->penulis_ebook ?? '') ?>';
+    const CSRF_NAME = '<?= csrf_token() ?>';
+    const CSRF_HASH = '<?= csrf_hash() ?>';
 
     let pageFlip = null;
     let pdfDoc = null;
@@ -740,7 +742,7 @@
     }
 
     // MEMUAT PDF
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    const pdfjsLib = window['pdfjsLib'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/legacy/build/pdf.worker.min.js';
 
     async function loadPDF() {
@@ -873,6 +875,16 @@
             updatePageInfo();
             renderNearbyPages(e.data);
             setTimeout(updateBookEdges, 10);
+
+            // TRACKING: Kirim data ke server
+            const pageNum = e.data + 1; // 0-based to 1-based
+            if (pageNum <= totalPages) {
+                $.post('<?= base_url('riwayat/update_ebook') ?>', {
+                    id_ebook: '<?= $ebook->id_konten_ebook ?>',
+                    halaman_terakhir: pageNum,
+                    [CSRF_NAME]: CSRF_HASH
+                });
+            }
         });
 
         pageFlip.on('changeState', function(e) {

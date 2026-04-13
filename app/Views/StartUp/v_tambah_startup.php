@@ -11,10 +11,12 @@
         font-family: 'Inter', sans-serif !important;
         background-color: #f8fafc !important;
         padding: 32px 28px;
-        min-height: 100vh;
     }
     .page-header {
         margin-bottom: 32px;
+        display: flex;
+        justify-content: center;
+        text-align: center;
     }
     .page-header h2 {
         font-size: 24px;
