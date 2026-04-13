@@ -1,48 +1,180 @@
 <?php /* View: Data Startup — menampilkan tabel semua startup dengan aksi detail, edit, dan hapus */ ?>
-<style>
-    .app-content { background-color: #F3F4F4 !important; }
+<!-- Import Font Inter & Lucide Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 
-    div.dataTables_wrapper div.dataTables_length,
-    div.dataTables_wrapper div.dataTables_filter { margin-bottom: 12px; }
-    div.dataTables_wrapper div.dataTables_length label,
-    div.dataTables_wrapper div.dataTables_filter label { font-size: 13px; color: #64748b; }
-    div.dataTables_wrapper div.dataTables_length select,
-    div.dataTables_wrapper div.dataTables_filter input {
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-size: 13px;
-        outline: none;
+<style>
+    /* Global Typography & Background */
+    .app-content {
+        font-family: 'Inter', sans-serif !important;
+        background-color: #f8fafc !important;
+        padding: 32px 28px;
+        min-height: 100vh;
     }
-    div.dataTables_wrapper div.dataTables_info,
-    div.dataTables_wrapper div.dataTables_paginate { margin-top: 12px; font-size: 13px; color: #64748b; }
-    div.dataTables_wrapper div.dataTables_paginate .paginate_button {
-        border-radius: 6px !important;
-        font-size: 13px;
+    .page-header {
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    /* Hapus semua border biru bawaan DataTables */
-    table.dataTable thead th,
-    table.dataTable thead td { border-bottom: 1px solid #e2e8f0 !important; }
-    table.dataTable.no-footer { border-bottom: 1px solid #e2e8f0 !important; }
-    .dataTables_scrollHeadInner, .dataTables_scrollHead { border-bottom: none !important; }
-    table.dataTable thead .sorting,
-    table.dataTable thead .sorting_asc,
-    table.dataTable thead .sorting_desc { outline: none !important; }
+    .page-header h2 {
+        font-size: 24px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+    }
+    .page-header .subtitle {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    /* Card Data Table */
+    .card-premium {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+    }
+    .card-header-custom {
+        padding: 24px 32px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+    }
+    .section-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.3px;
+    }
+
+    /* Button Primary */
+    .btn-submit-primary, .btn-primary {
+        background: #6366f1;
+        border: 1.5px solid #6366f1;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-submit-primary:hover, .btn-primary:hover {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+        transform: translateY(-1px);
+    }
+
+    /* Datatable styling modern */
+    #tabel_startup { font-family: 'Inter', sans-serif; width: 100% !important; margin-bottom: 1rem; }
+    #tabel_startup td, #tabel_startup th { vertical-align: middle; font-size: 14px; color: #334155; }
+    #tabel_startup thead th { 
+        background: #f8fafc; 
+        font-size: 11px; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        letter-spacing: 0.1em; 
+        color: #64748b; 
+        border-bottom: 2px solid #e2e8f0 !important; 
+        padding: 14px 16px; 
+    }
+    #tabel_startup tbody td {
+        border-bottom: 1px solid #f1f5f9;
+        padding: 14px 16px;
+    }
+    
+    div.dataTables_wrapper div.dataTables_filter input,
+    div.dataTables_wrapper div.dataTables_length select {
+        border: 1.5px solid #e2e8f0; 
+        border-radius: 8px; 
+        padding: 8px 14px; 
+        font-size: 13px; 
+        outline: none; 
+        transition: all 0.2s;
+        font-family: inherit;
+        color: #0f172a;
+    }
+    div.dataTables_wrapper div.dataTables_filter input:focus,
+    div.dataTables_wrapper div.dataTables_length select:focus { 
+        border-color: #6366f1; 
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
+    }
+    
     div.dataTables_wrapper div.dataTables_paginate .paginate_button.current,
     div.dataTables_wrapper div.dataTables_paginate .paginate_button.current:hover {
-        background: #0061FF !important;
-        color: #fff !important;
-        border: none !important;
-        border-radius: 6px !important;
+        background: #6366f1 !important; 
+        color: #fff !important; 
+        border: none !important; 
+        border-radius: 8px !important; 
+        font-weight: 600;
     }
     div.dataTables_wrapper div.dataTables_paginate .paginate_button:hover {
-        background: #f1f5f9 !important;
-        color: #334155 !important;
-        border: none !important;
+        background: #f1f5f9 !important; 
+        color: #334155 !important; 
+        border: none !important; 
+        border-radius: 8px !important;
     }
-    div.dataTables_wrapper div.dataTables_paginate .paginate_button {
-        border: none !important;
+    div.dataTables_wrapper div.dataTables_info,
+    div.dataTables_wrapper div.dataTables_paginate { margin-top: 1.5rem; font-size: 13px; color: #64748b; }
+    div.dataTables_wrapper div.dataTables_filter,
+    div.dataTables_wrapper div.dataTables_length { margin-bottom: 1.5rem; font-size: 13px; color: #64748b; }
+
+    table.dataTable { clear: both; margin-top: 6px !important; margin-bottom: 6px !important; max-width: none !important; border-collapse: collapse !important; }
+    table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc { outline: none !important; }
+    
+    /* Aksi Buttons */
+    .btn-action {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
+    .btn-action:hover {
+        background: #f1f5f9;
+        color: #6366f1;
+    }
+    .btn-action.btn-danger-hover:hover {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+    .btn-action svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Badges */
+    .badge-custom {
+        padding: 6px 14px; 
+        border-radius: 24px; 
+        font-size: 11px; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em; 
+        display: inline-block;
+    }
+    .badge-blue { background: rgba(99,102,241,0.1); color: #6366f1; }
+    .badge-green { background: rgba(34,197,94,0.1); color: #16a34a; }
 </style>
 
 <div class="app-content">
@@ -56,7 +188,7 @@
     <div class="card-premium">
         <div class="card-header-custom d-flex justify-content-between align-items-center">
             <span class="section-title mb-0">Daftar Startup</span>
-            <a href="<?= base_url('v_tambah_startup') ?>" class="btn btn-primary btn-sm"><i class="mdi mdi-plus me-1"></i> Tambah Startup</a>
+            <a href="<?= base_url('v_tambah_startup') ?>" class="btn-submit-primary btn-sm"><i data-lucide="plus" style="width: 18px; height: 18px;"></i> Tambah Startup</a>
         </div>
         <div class="p-4">
             <table id="tabel_startup" class="table-premium w-100">
@@ -76,10 +208,10 @@
                     <?php if (!empty($startups)): $no = 1; foreach ($startups as $row): ?>
                     <tr>
                         <td><?= $no++ ?></td>
-                        <td class="company-name"><?= esc($row->nama_perusahaan) ?></td>
-                        <td class="cell-text"><?= esc($row->email_perusahaan) ?></td>
-                        <td class="cell-text"><?= esc($row->nomor_whatsapp) ?></td>
-                        <td class="cell-text"><?= esc($row->tahun_daftar) ?></td>
+                        <td class="company-name" style="text-transform: capitalize; font-weight: 500;"><?= strtolower(esc($row->nama_perusahaan)) ?></td>
+                        <td class="cell-text" style="text-transform: lowercase; font-weight: 400;"><?= esc($row->email_perusahaan) ?></td>
+                        <td class="cell-text" style="font-weight: 400;"><?= esc($row->nomor_whatsapp) ?></td>
+                        <td class="cell-text" style="font-weight: 400;"><?= esc($row->tahun_daftar) ?></td>
                         <td><span class="badge-custom badge-blue"><?= esc($row->status_startup) ?></span></td>
                         <td><span class="badge-custom badge-green"><?= esc($row->status_ajuan) ?></span></td>
                         <td>
@@ -119,8 +251,37 @@
     const CSRF_HASH  = '<?= csrf_hash() ?>';
 
     $(document).ready(function () {
-        // Inisialisasi DataTables pada tabel startup
-        $('#tabel_startup').DataTable();
+        lucide.createIcons();
+        // Inisialisasi DataTables pada tabel startup dengan pengaturan bahasa dan empty state kustom
+        $('#tabel_startup').DataTable({
+            processing: true,
+            language: {
+                processing: `<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:24px;color:#6366f1;">
+                                <i data-lucide="loader-circle" style="animation: spin 1s linear infinite;"></i> Memuat Data...
+                             </div>`,
+                emptyTable: `<div class="empty-state">
+                                <i data-lucide="inbox" class="empty-state-icon" style="width:48px;height:48px;stroke-width:1.5"></i>
+                                <div class="empty-state-text">Belum ada data startup yang terdaftar</div>
+                            </div>`,
+                zeroRecords: `<div class="empty-state">
+                                <i data-lucide="search-x" class="empty-state-icon" style="width:48px;height:48px;stroke-width:1.5"></i>
+                                <div class="empty-state-text">Tidak ditemukan data yang sesuai dengan pencarian</div>
+                            </div>`,
+                search: "Pencarian:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari total _TOTAL_ startup",
+                infoEmpty: "Data tidak tersedia",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Lanjut",
+                    previous: "Kembali"
+                }
+            },
+            drawCallback: function() {
+                lucide.createIcons();
+            }
+        });
 
         // Tampilkan notifikasi SweetAlert dari flashdata session (setelah tambah/edit/hapus)
         <?php $msg = session()->getFlashdata('msg'); if ($msg): ?>

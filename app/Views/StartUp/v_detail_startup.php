@@ -1,27 +1,179 @@
 <?php /* View: Detail Startup — menampilkan semua informasi startup dalam tab: info, tim, produk, pendanaan, prestasi, mentor, aktivitas, lokasi */ ?>
+<!-- Import Font Inter & Lucide Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
 <style>
-    .timeline-sm { padding-left: 140px; }
+    /* Global Typography & Background */
+    .app-content {
+        font-family: 'Inter', sans-serif !important;
+        background-color: #f8fafc !important;
+        padding: 32px 28px;
+        min-height: 100vh;
+    }
+    .section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+    }
+
+    /* Cards */
+    .card-premium {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    /* Attributes Styling */
+    .label-text {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 4px;
+    }
+    .value-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #334155;
+    }
+
+    /* Timeline */
+    .timeline-sm { padding-left: 20px; }
     .timeline-sm .timeline-sm-item {
         position: relative;
-        padding-bottom: 20px;
-        padding-left: 17px;
-        border-left: 2px solid var(--slate-200);
+        padding-bottom: 24px;
+        padding-left: 24px;
+        border-left: 2px solid #e2e8f0;
+    }
+    .timeline-sm .timeline-sm-item:before {
+        content: '';
+        position: absolute;
+        left: -6px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #6366f1;
+        border: 2px solid #fff;
     }
     .timeline-sm .timeline-sm-item .timeline-sm-date {
-        position: absolute;
-        left: -138px;
-        font-size: 11px;
-        color: var(--slate-400);
+        font-size: 12px;
+        color: #64748b;
         font-weight: 700;
-        white-space: nowrap;
+        display: block;
+        margin-bottom: 4px;
     }
+    .timeline-sm .timeline-sm-item h5 {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+    .timeline-sm .timeline-sm-item p {
+        font-size: 13px;
+        color: #475569;
+        margin: 0;
+    }
+
     .select2-container--open { z-index: 9999999; }
-    .modal-dialog { margin-top: 150px; }
+    
+    /* Custom Headers override for legacy `.bg-light.p-2` */
+    h5.bg-light.p-2 {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #334155 !important;
+        background: #f1f5f9 !important;
+        border-radius: 10px !important;
+        padding: 14px 18px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-bottom: 20px !important;
+        letter-spacing: 0.03em !important;
+        text-transform: uppercase !important;
+    }
+    
+    /* Tab Overrides */
+    .nav-tabs.nav-bordered {
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0px;
+        gap: 16px;
+    }
+    .nav-tabs.nav-bordered .nav-link {
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 12px 4px;
+        margin-bottom: -2px;
+        background: transparent !important;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav-tabs.nav-bordered .nav-link i { font-size: 16px; }
+    .nav-tabs.nav-bordered .nav-link.active {
+        color: #6366f1;
+        border-bottom: 2px solid #6366f1;
+    }
+    .nav-tabs.nav-bordered .nav-link:hover:not(.active) { color: #0f172a; }
 
-</style>
+    /* Button Primary */
+    .btn-action-primary {
+        background: #6366f1;
+        border: none;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-action-primary:hover {
+        background: #4f46e5;
+        transform: translateY(-1px);
+        color: #fff;
+    }
+    
+    /* Table Styling Minimalist override for `.table-sm` */
+    .table-sm th {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        color: #94a3b8 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 12px 8px !important;
+        background: transparent !important;
+    }
+    .table-sm td {
+        font-size: 13px !important;
+        color: #334155 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        vertical-align: middle !important;
+    }
 
-<style>
-    .app-content { background-color: #F3F4F4 !important; }
+    /* Modal Styling */
+    .modal-content { border: none; border-radius: 20px; box-shadow: 0 24px 48px rgba(0,0,0,0.12); font-family: 'Inter', sans-serif; }
+    .modal-header { background: #ffffff; border-bottom: 1px solid #f1f5f9; padding: 24px 32px; flex-direction: column; align-items: flex-start; position: relative; }
+    .modal-header .btn-close { position: absolute; top: 24px; right: 32px; opacity: 0.5; margin: 0; padding: 0; }
+    .modal-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 0px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+    .modal-body { padding: 32px; background: #ffffff; }
+    .modal-footer { padding: 24px 32px; background: #f8fafc; border-top: 1px solid #f1f5f9; }
 </style>
 
 <div class="app-content">
@@ -43,25 +195,28 @@
         <?php } ?>
 
         <div class="row g-4">
-            <!-- Sidebar kiri: logo, nama, status, dan info ringkas startup -->
+            <!-- Sidebar profil utama startup -->
             <div class="col-lg-3">
-                <div class="card-premium">
-                    <div class="p-3 d-flex justify-content-end">
+                <div class="card-premium profile-hero" style="position:relative; overflow:hidden; border:none; box-shadow:0 12px 32px rgba(0,0,0,0.05);">
+                    <!-- Menu Tindakan Cepat (Dropdown di pojok atas) -->
+                    <div style="position:absolute; top:12px; right:12px; z-index:10;">
                         <div class="dropdown">
-                            <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end">
+                            <button class="btn-action" style="background:rgba(0,0,0,0.05); backdrop-filter:blur(4px); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border:none; transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.1)'" onmouseout="this.style.background='rgba(0,0,0,0.05)'" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-lucide="more-horizontal" style="width:18px; height:18px; color:#475569;"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" style="border:none;box-shadow:0 10px 25px rgba(0,0,0,0.1);border-radius:12px;overflow:hidden;padding:0;">
                                 <?php if ($data[0]['status_ajuan'] == "ajuan") { ?>
-                                <a type="button" class="dropdown-item" onclick="verifikasi_startup(<?php echo $data[0]['id_startup']; ?>, <?php echo $_SESSION['id_pengguna']; ?>)">Verifikasi</a>
-                                <a type="button" class="dropdown-item" onclick="tolak_startup(<?php echo $data[0]['id_startup']; ?>, <?php echo $_SESSION['id_pengguna']; ?>)">Tolak</a>
+                                <a type="button" class="dropdown-item py-2" onclick="verifikasi_startup(<?php echo $data[0]['id_startup']; ?>, <?php echo $_SESSION['id_pengguna']; ?>)"><i data-lucide="check-circle" class="me-2" style="width:16px;color:#10b981;"></i> Verifikasi</a>
+                                <a type="button" class="dropdown-item py-2" onclick="tolak_startup(<?php echo $data[0]['id_startup']; ?>, <?php echo $_SESSION['id_pengguna']; ?>)"><i data-lucide="x-circle" class="me-2" style="width:16px;color:#ef4444;"></i> Tolak</a>
+                                <div class="dropdown-divider my-0"></div>
                                 <?php } ?>
-                                <a href="<?php echo base_url('v_data_startup'); ?>" class="dropdown-item">Kembali</a>
+                                <a href="<?php echo base_url('v_data_startup'); ?>" class="dropdown-item py-2"><i data-lucide="arrow-left" class="me-2" style="width:16px;color:#64748b;"></i> Kembali</a>
                             </div>
                         </div>
                     </div>
-
-                    <div class="text-center px-3 pb-3">
+                    
+                    <!-- Banner Logo Ruang Tengah -->
+                    <div style="width:100%; height:160px; padding:24px; background:#ffffff; border-bottom:1px dashed #e2e8f0; display:flex; align-items:center; justify-content:center;">
                         <?php
                             $logo = $data[0]['logo_perusahaan'] ?? '';
                             if ($logo && file_exists(FCPATH . 'uploads/file_startup/logo_startup/' . $logo)) {
@@ -72,29 +227,66 @@
                                 $logo_url = base_url('img/logo-dkst.png');
                             }
                         ?>
-                        <img src="<?php echo $logo_url; ?>" class="mb-3" style="max-width:160px;max-height:120px;width:auto;height:auto;object-fit:contain;">
-                        <h5 class="fw-black mb-1" style="font-size:14px;"><?php echo $data[0]['nama_perusahaan']; ?></h5>
-                        <div class="mb-2">
-                            <span class="badge <?php echo ($data[0]['status_startup'] == 'aktif') ? 'bg-success' : 'bg-danger'; ?>"><?php echo ucfirst($data[0]['status_startup']); ?></span>
-                            <span class="badge <?php echo ($data[0]['status_ajuan'] == 'verifikasi') ? 'bg-success' : ($data[0]['status_ajuan'] == 'tolak' ? 'bg-danger' : 'bg-info'); ?>"><?php echo ucfirst($data[0]['status_ajuan']); ?></span>
+                        <img src="<?php echo $logo_url; ?>" style="max-width:100%; height:100px; object-fit:contain;">
+                    </div>
+
+                    <div class="px-4 pt-4 pb-4">
+                        <!-- Data Utama Perusahaan -->
+                        <div class="text-center mb-4">
+                            <h4 style="font-size:18px; font-weight:700; color:#0f172a; margin-bottom:4px; letter-spacing:-0.5px; text-transform: capitalize;"><?php echo strtolower($data[0]['nama_perusahaan']); ?></h4>
+                            <p style="font-size:12px; color:#64748b; font-weight:500; margin-bottom:12px; line-height:1.4; text-transform: capitalize;"><?php echo is_array($data[0]['klasters']) ? strtolower(implode(", ", $data[0]['klasters'])) : strtolower($data[0]['klasters']); ?></p>
+                            
+                            <div class="d-flex justify-content-center flex-wrap gap-2">
+                                <span style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:6px; background: <?php echo ($data[0]['status_startup'] == 'aktif') ? '#ecfdf5' : '#fef2f2'; ?>; color: <?php echo ($data[0]['status_startup'] == 'aktif') ? '#059669' : '#dc2626'; ?>; border:1px solid <?php echo ($data[0]['status_startup'] == 'aktif') ? '#a7f3d0' : '#fecaca'; ?>;">
+                                    <?php echo ucfirst($data[0]['status_startup']); ?>
+                                </span>
+                                <span style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:6px; background: <?php echo ($data[0]['status_ajuan'] == 'verifikasi') ? '#eff6ff' : ($data[0]['status_ajuan'] == 'tolak' ? '#fef2f2' : '#fffbeb'); ?>; color: <?php echo ($data[0]['status_ajuan'] == 'verifikasi') ? '#2563eb' : ($data[0]['status_ajuan'] == 'tolak' ? '#dc2626' : '#d97706'); ?>; border:1px solid <?php echo ($data[0]['status_ajuan'] == 'verifikasi') ? '#bfdbfe' : ($data[0]['status_ajuan'] == 'tolak' ? '#fecaca' : '#fde68a'); ?>;">
+                                    <?php echo ucfirst($data[0]['status_ajuan']); ?>
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="px-3 pb-3">
-                        <p class="label-text">Deskripsi</p>
-                        <p class="value-text mb-3"><?php echo $data[0]['deskripsi_bidang_usaha']; ?></p>
-                        <p class="label-text">Klaster</p>
-                        <p class="value-text mb-3"><?php echo is_array($data[0]['klasters']) ? implode(", ", $data[0]['klasters']) : $data[0]['klasters']; ?></p>
-                        <p class="label-text">Tahun Berdiri</p>
-                        <p class="value-text mb-3"><?php echo $data[0]['tahun_berdiri']; ?></p>
-                        <p class="label-text">Tahun Daftar</p>
-                        <p class="value-text mb-3"><?php echo $data[0]['tahun_daftar']; ?></p>
-                    </div>
+                        <!-- Panel Detail Berjenjang -->
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div style="background:#f8fafc; border:1px solid #f1f5f9; border-radius:12px; padding:14px;">
+                                <span style="display:block; font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Deskripsi Singkat</span>
+                                <p style="font-size:12px; color:#334155; line-height:1.5; margin:0;"><?php echo $data[0]['deskripsi_bidang_usaha'] ?: '-'; ?></p>
+                            </div>
 
-                    <div class="px-3 pb-3 d-flex gap-2 justify-content-center">
-                        <?php if($data[0]['nomor_whatsapp']) { ?><a href="https://wa.me/<?php echo $data[0]['nomor_whatsapp']; ?>" class="btn btn-sm btn-outline-success"><i class="mdi mdi-whatsapp"></i> WA</a><?php } ?>
-                        <?php if($data[0]['email_perusahaan']) { ?><a href="mailto:<?php echo $data[0]['email_perusahaan']; ?>" class="btn btn-sm btn-outline-danger"><i class="mdi mdi-email-outline"></i> Email</a><?php } ?>
-                        <?php if($data[0]['website_perusahaan']) { ?><a href="<?php echo $data[0]['website_perusahaan']; ?>" target="_blank" class="btn btn-sm btn-outline-primary"><i class="mdi mdi-web"></i> Web</a><?php } ?>
+                            <div style="background:#f8fafc; border:1px solid #f1f5f9; border-radius:12px; padding:14px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                <div>
+                                    <span style="display:flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">
+                                        <i data-lucide="calendar" style="width:12px;"></i> Berdiri
+                                    </span>
+                                    <span style="font-size:13px; font-weight:700; color:#0f172a;"><?php echo $data[0]['tahun_berdiri']; ?></span>
+                                </div>
+                                <div>
+                                    <span style="display:flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">
+                                        <i data-lucide="file-check-2" style="width:12px;"></i> Daftar
+                                    </span>
+                                    <span style="font-size:13px; font-weight:700; color:#0f172a;"><?php echo $data[0]['tahun_daftar']; ?></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kontak Cepat Berderet -->
+                        <div class="mt-4 pt-4 pb-2" style="border-top:1px dashed #e2e8f0; display:flex; justify-content:center; gap:12px;">
+                            <?php if($data[0]['nomor_whatsapp']) { ?>
+                                <a href="https://wa.me/<?php echo $data[0]['nomor_whatsapp']; ?>" target="_blank" style="width:36px; height:36px; border-radius:10px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" title="WhatsApp">
+                                    <i class="mdi mdi-whatsapp" style="font-size:18px;"></i>
+                                </a>
+                            <?php } ?>
+                            <?php if($data[0]['email_perusahaan']) { ?>
+                                <a href="mailto:<?php echo $data[0]['email_perusahaan']; ?>" style="width:36px; height:36px; border-radius:10px; background:#fef2f2; color:#ef4444; border:1px solid #fecaca; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" title="Kirim Email">
+                                    <i class="mdi mdi-email-outline" style="font-size:18px;"></i>
+                                </a>
+                            <?php } ?>
+                            <?php if($data[0]['website_perusahaan']) { ?>
+                                <a href="<?php echo $data[0]['website_perusahaan']; ?>" target="_blank" style="width:36px; height:36px; border-radius:10px; background:#eff6ff; color:#3b82f6; border:1px solid #bfdbfe; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" title="Website Resmi">
+                                    <i class="mdi mdi-web" style="font-size:18px;"></i>
+                                </a>
+                            <?php } ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,31 +317,31 @@
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
                                             <p class="label-text">Target Pemasaran</p>
-                                            <p class="value-text"><?php echo $data[0]['target_pemasaran'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: capitalize;"><?php echo strtolower($data[0]['target_pemasaran'] ?: '-'); ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Fokus Pelanggan</p>
-                                            <p class="value-text"><?php echo $data[0]['fokus_pelanggan'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: capitalize;"><?php echo strtolower($data[0]['fokus_pelanggan'] ?: '-'); ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Dosen Pembina</p>
-                                            <p class="value-text"><?php echo $data[0]['nama_dosen'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: capitalize;"><?php echo strtolower($data[0]['nama_dosen'] ?: '-'); ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Alamat</p>
-                                            <p class="value-text"><?php echo $data[0]['alamat'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: capitalize;"><?php echo strtolower($data[0]['alamat'] ?: '-'); ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Program Yang Diikuti</p>
-                                            <p class="value-text"><?php echo $data[0]['nama_program'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: capitalize;"><?php echo strtolower($data[0]['nama_program'] ?: '-'); ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">LinkedIn</p>
-                                            <p class="value-text"><?php echo $data[0]['linkedin_perusahaan'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: lowercase;"><?php echo $data[0]['linkedin_perusahaan'] ?: '-'; ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Instagram</p>
-                                            <p class="value-text"><?php echo $data[0]['instagram_perusahaan'] ?: '-'; ?></p>
+                                            <p class="value-text" style="text-transform: lowercase;"><?php echo $data[0]['instagram_perusahaan'] ?: '-'; ?></p>
                                         </div>
                                         <div class="col-md-6">
                                             <p class="label-text">Lokasi</p>
@@ -195,9 +387,9 @@
                                                 <?php } } else { ?>
                                                 <tr>
                                                     <td colspan="5">
-                                                        <div class="text-center py-4 text-muted">
-                                                            <i class="mdi mdi-account-group-outline" style="font-size:2.5rem;"></i>
-                                                            <p class="mb-0 mt-1" style="font-size:13px;">Belum ada data tim</p>
+                                                        <div class="empty-state" style="padding: 32px 14px;">
+                                                            <i data-lucide="users" class="empty-state-icon" style="width:36px;height:36px;stroke-width:1.5"></i>
+                                                            <div class="empty-state-text">Belum ada data struktur tim ditambahkan</div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -226,7 +418,7 @@
                                                         <button onclick="hapus_informasi_produk(<?php echo $row->id_startup_produk; ?>)" class="btn btn-danger btn-xs"><i class="mdi mdi-trash-can"></i></button>
                                                     </td>
                                                 </tr>
-                                                <?php } } else { echo "<tr><td colspan='3' class='text-center'>Belum ada produk</td></tr>"; } ?>
+                                                <?php } } else { echo "<tr><td colspan='3'><div class='empty-state' style='padding:32px 14px;'><i data-lucide='package-open' class='empty-state-icon' style='width:36px;height:36px;stroke-width:1.5'></i><div class='empty-state-text'>Belum ada portfolio produk didaftarkan</div></div></td></tr>"; } ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -332,9 +524,9 @@
                                             });
                                         </script>
                                     <?php else: ?>
-                                        <div class="text-center py-5" style="color:var(--slate-300);">
-                                            <i class="mdi mdi-map-marker-off" style="font-size:3rem;"></i>
-                                            <p class="mt-2" style="font-size:13px;font-weight:700;">Titik lokasi belum ditentukan</p>
+                                        <div class="empty-state" style="padding: 64px 24px;">
+                                            <i data-lucide="map-pin-off" class="empty-state-icon" style="width:48px;height:48px;stroke-width:1.5"></i>
+                                            <div class="empty-state-text">Titik kordinat lokasi startup belum ditentukan</div>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -486,6 +678,7 @@
 <!-- Scripts -->
 <script>
     $(document).ready(function() {
+        lucide.createIcons();
         // Fungsi verifikasi startup: ubah status ajuan menjadi 'Verified'
         function verifikasi_startup(id, idp){
             if(confirm('Verifikasi?')){

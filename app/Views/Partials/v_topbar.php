@@ -36,15 +36,13 @@ $currentPage = $uri->getSegment(1);
 
             <!-- Logout Dropdown -->
             <div id="logoutDropdown" class="profile-dropdown">
-                <div class="profile-dropdown-header">
-                    <p class="label mb-1">Akun Anda</p>
-                    <p class="email mb-0"><?= esc(session()->get('user_email') ?? '') ?></p>
+                <div class="profile-dropdown-header py-3 px-4">
+                    <div class="profile-name mb-1" style="font-size: 13px;"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
+                    <div class="profile-email" style="font-size: 11px; opacity: 0.8;"><?= esc(session()->get('user_email') ?? 'admin@startup.id') ?></div>
                 </div>
-                <div class="p-2 border-top" style="border-color: var(--slate-50) !important">
-                    <button onclick="window.location.href='<?= base_url('logout') ?>'" class="logout-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
+                <div class="p-2 border-top">
+                    <button onclick="window.location.href='<?= base_url('logout') ?>'" class="logout-btn py-2">
+                        <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
                         Logout
                     </button>
                 </div>
@@ -54,19 +52,25 @@ $currentPage = $uri->getSegment(1);
 </header>
 
 <!-- MODAL SESSION TIMEOUT -->
-<div id="sessionModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center">
-    <div style="background:#fff;border-radius:20px;padding:2.5rem;max-width:400px;width:90%;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.2)">
-        <div style="width:64px;height:64px;background:#fff7ed;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:#f97316" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-            </svg>
+<div id="sessionModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.6);backdrop-filter:blur(10px);align-items:center;justify-content:center;font-family:'Inter', sans-serif;">
+    <div style="background:#fff;border-radius:24px;padding:3rem;max-width:440px;width:90%;text-align:center;box-shadow:0 30px 60px -12px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;">
+        <!-- Background Subtle Pattern -->
+        <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, #6366f1, #a855f7);"></div>
+        
+        <div style="width:72px;height:72px;background:#fef2f2;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.75rem;transform:rotate(-5deg);">
+            <i data-lucide="timer" style="width:36px;height:36px;color:#ef4444;"></i>
         </div>
-        <h5 style="font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#0f172a;margin-bottom:.5rem">Sesi Hampir Berakhir</h5>
-        <p style="color:#64748b;font-size:14px;margin-bottom:1.5rem">Anda tidak aktif. Sesi akan otomatis berakhir dalam</p>
-        <div id="sessionCountdown" style="font-size:3rem;font-weight:900;color:#f97316;line-height:1;margin-bottom:1.5rem">05:00</div>
-        <div style="display:flex;gap:.75rem;justify-content:center">
-            <button onclick="doLogout()" style="padding:.6rem 1.5rem;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer;color:#64748b">Logout</button>
-            <button onclick="keepAlive()" style="padding:.6rem 1.5rem;border-radius:10px;border:none;background:#0061FF;color:#fff;font-weight:900;font-size:13px;text-transform:uppercase;cursor:pointer">Tetap Masuk</button>
+
+        <h3 style="font-weight:800;color:#0f172a;margin-bottom:0.75rem;letter-spacing:-0.5px;font-size:24px;">Sesi Hampir Berakhir</h3>
+        <p style="color:#64748b;font-size:15px;margin-bottom:2rem;line-height:1.6;">Anda telah tidak aktif cukup lama. Sesi Anda akan otomatis ditutup dalam waktu:</p>
+        
+        <div style="background:#f8fafc;padding:1.5rem;border-radius:20px;margin-bottom:2rem;border:1px solid #f1f5f9;">
+            <div id="sessionCountdown" style="font-size:4rem;font-weight:900;color:#0f172a;line-height:1;font-variant-numeric: tabular-nums;letter-spacing:-2px;">05:00</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <button onclick="keepAlive()" style="width:100%;padding:1rem;border-radius:14px;border:none;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);" onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">Tetap Masuk</button>
+            <button onclick="doLogout()" style="width:100%;padding:1rem;border-radius:14px;border:1.5px solid #e2e8f0;background:transparent;font-weight:600;font-size:14px;cursor:pointer;color:#64748b;transition:all 0.2s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">Logout Sekarang</button>
         </div>
     </div>
 </div>
@@ -134,6 +138,7 @@ $currentPage = $uri->getSegment(1);
     function toggleProfilDropdown() {
         const d = document.getElementById('logoutDropdown');
         d.classList.toggle('show');
+        if(d.classList.contains('show')) lucide.createIcons();
     }
     // Tutup dropdown profil jika user klik di luar area dropdown
     window.addEventListener('click', function(e) {

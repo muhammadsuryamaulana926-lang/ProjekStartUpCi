@@ -82,61 +82,86 @@
     }
     .map-dropdown-item:hover { background: #f1f5f9; }
 
-    /* Panel Detail */
+    /* Panel Detail Modern */
     #panel-detail {
         position: absolute;
         top: 0; left: 0;
-        width: 340px; height: 100%;
-        background: #fff;
+        width: 360px; height: 100%;
+        background: #f8fafc;
         border-radius: 0;
-        box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
         z-index: 999;
-        overflow-y: auto;
         display: flex; flex-direction: column;
         transform: translateX(-100%);
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: 'Inter', sans-serif;
     }
     #panel-detail.show { transform: translateX(0); }
 
-    .panel-logo {
-        width: 100%; height: 150px;
-        object-fit: contain;
-        background: var(--slate-50);
-        border-bottom: 1px solid var(--slate-100);
-        padding: 18px 22px;
-    }
-    .panel-body { padding: 18px 18px 8px; flex: 1; }
-    .panel-nama { font-size: 16px; font-weight: 900; color: var(--slate-900); margin-bottom: 6px; line-height: 1.3; text-align: center; }
-    .panel-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; justify-content: center; }
-    .panel-badge { padding: 3px 10px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
-    .badge-aktif    { background: rgba(34,197,94,0.1);  color: #16a34a; }
-    .badge-nonaktif { background: rgba(239,68,68,0.1);  color: #dc2626; }
-    .badge-pending  { background: rgba(245,158,11,0.1); color: #d97706; }
-    .badge-verified { background: rgba(34,197,94,0.1);  color: #16a34a; }
-    .badge-rejected { background: rgba(239,68,68,0.1);  color: #dc2626; }
-    .panel-divider { height: 1px; background: var(--slate-100); margin: 4px 0 12px; }
-    .panel-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; font-size: 13px; color: var(--slate-800); line-height: 1.5; }
-    .panel-row i { font-size: 18px; color: var(--slate-800); flex-shrink: 0; width: 20px; text-align: center; line-height: 1.5; }
-    .panel-row span { word-break: break-word; flex: 1; }
-    .panel-row a { color: var(--slate-800); text-decoration: none; font-weight: 600; }
-    .panel-row a:hover { text-decoration: underline; }
-    .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
-    .panel-close {
-        position: absolute; top: 10px; right: 10px;
-        width: 28px; height: 28px;
-        background: rgba(0,0,0,0.35); border: none; border-radius: 50%;
-        color: #fff; font-size: 14px; cursor: pointer;
+    .panel-cover {
+        width: 100%; padding: 16px; min-height: 140px;
+        background: #ffffff;
+        border-bottom: 1px dashed #e2e8f0;
         display: flex; align-items: center; justify-content: center;
-        z-index: 10; line-height: 1; transition: background 0.2s;
+        position: relative;
     }
-    .panel-close:hover { background: rgba(0,0,0,0.65); }
-    .panel-footer { padding: 12px 18px 16px; border-top: 1px solid var(--slate-100); }
+    .panel-logo-wrap {
+        width: 100%; height: 110px;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+    }
+    .panel-logo-wrap img { max-width: 100%; height: 100%; object-fit: contain; }
+
+    .panel-close {
+        position: absolute; top: 16px; right: 16px;
+        width: 32px; height: 32px;
+        background: rgba(255,255,255,0.8); border: none; border-radius: 50%;
+        color: #0f172a; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 10; transition: all 0.2s; backdrop-filter: blur(4px);
+    }
+    .panel-close:hover { background: #fff; transform: scale(1.1); }
+
+    .panel-body-scroll {
+        flex: 1; padding: 24px; overflow-y: auto; scrollbar-width: none;
+    }
+    .panel-body-scroll::-webkit-scrollbar { display: none; }
+    
+    .panel-nama { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 8px; line-height: 1.2; letter-spacing: -0.5px; text-align: center; }
+    
+    .panel-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; justify-content: center; }
+    .panel-badge { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; border: 1px solid transparent; }
+    
+    .panel-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .panel-section-title { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: block; }
+    
+    .panel-desc { font-size: 13px; color: #475569; line-height: 1.6; margin: 0; }
+    
+    .panel-info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .panel-info-row:last-child { margin-bottom: 0; }
+    .panel-info-icon { width: 24px; height: 24px; border-radius: 6px; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .panel-info-content { flex: 1; }
+    .panel-info-label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .panel-info-value { font-size: 13px; color: #334155; font-weight: 500; word-break: break-word; line-height: 1.4; }
+    .panel-info-value a { color: #6366f1; text-decoration: none; font-weight: 500; }
+    .panel-info-value a:hover { text-decoration: underline; }
+
+    .panel-grid-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-box-item { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px; text-align: center; }
+    .grid-box-val { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 2px; }
+    .grid-box-lbl { font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .panel-social-link { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; text-decoration: none !important; }
+
+    .panel-footer { padding: 20px 24px; background: #fff; border-top: 1px solid #e2e8f0; }
     .panel-btn-detail {
-        display: block; text-align: center; background: var(--primary); color: #fff;
-        font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em;
-        padding: 10px; border-radius: 10px; text-decoration: none; transition: background 0.2s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; background: #6366f1; color: #fff;
+        font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+        padding: 12px 16px; border-radius: 12px; text-decoration: none;
+        transition: all 0.2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
-    .panel-btn-detail:hover { background: var(--primary-hover); color: #fff; }
+    .panel-btn-detail:hover { background: #4f46e5; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35); }
 </style>
 
 <div class="map-fullscreen-wrap">
@@ -230,16 +255,24 @@
 
     <!-- Panel Detail Startup -->
     <div id="panel-detail">
-        <button class="panel-close" onclick="tutupPanel()">&#x2715;</button>
-        <img id="panel-logo" src="" alt="Logo" class="panel-logo">
-        <div class="panel-body">
-            <div class="panel-nama" id="panel-nama"></div>
-            <div class="panel-badges" id="panel-badges"></div>
-            <div class="panel-divider"></div>
-            <div id="panel-rows"></div>
+        <div class="panel-cover">
+            <button class="panel-close" onclick="tutupPanel()"><i data-lucide="x" style="width:16px;"></i></button>
+            <div class="panel-logo-wrap">
+                <img id="panel-logo" src="" alt="Logo">
+            </div>
         </div>
+        
+        <div class="panel-body-scroll">
+            <h3 class="panel-nama" id="panel-nama"></h3>
+            <div class="panel-badges" id="panel-badges"></div>
+            
+            <div id="panel-content-wrapper"></div>
+        </div>
+        
         <div class="panel-footer">
-            <a id="panel-link" href="#" class="panel-btn-detail"><i class="mdi mdi-eye me-1"></i> Lihat Detail Startup</a>
+            <a id="panel-link" href="#" class="panel-btn-detail">
+                Lihat Detail Lengkap <i data-lucide="arrow-right" style="width:16px;"></i>
+            </a>
         </div>
     </div>
 </div>
@@ -259,7 +292,9 @@
     var baseDetailUrl = '<?= base_url('v_detail/') ?>';
 
     data.forEach(function(s) {
-        var m = L.marker([s.latitude, s.longitude]).addTo(map);
+        var markerHtml = `<div style="background:#6366f1; width:24px; height:24px; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 8px rgba(0,0,0,0.2);"></div>`;
+        var customIcon = L.divIcon({ className: 'custom-pin', html: markerHtml, iconSize: [24, 24], iconAnchor: [12, 12] });
+        var m = L.marker([s.latitude, s.longitude], {icon: customIcon}).addTo(map);
         m.on('click', function() { bukaPanel(s); });
         markers.push(m);
     });
@@ -280,44 +315,100 @@
         }, 300);
     }
 
+    // Fungsi utilitas untuk memformat teks (misal: "DAJA@GMAIL.COM" jadi lowercase)
+    function sanitizeData(val, mode) {
+        if(!val) return '';
+        if(mode === 'email' || mode === 'web') return val.toLowerCase();
+        if(mode === 'name') return val.toLowerCase().replace(/\\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
+        return val;
+    }
+
     function bukaPanel(s) {
         document.getElementById('panel-logo').src = s.logo_perusahaan ? baseLogoUrl + s.logo_perusahaan : defaultLogo;
         document.getElementById('panel-nama').textContent = s.nama_perusahaan;
 
-        var statusClass = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? 'badge-aktif' : 'badge-nonaktif';
-        var ajuanMap = { 'pending': 'badge-pending', 'verified': 'badge-verified', 'rejected': 'badge-rejected' };
-        var ajuanClass = ajuanMap[(s.status_ajuan || '').toLowerCase()] || 'badge-pending';
+        let bgAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#ecfdf5' : '#fef2f2';
+        let colorAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#059669' : '#dc2626';
+        let borderAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#a7f3d0' : '#fecaca';
+        
+        let ajuanVal = (s.status_ajuan || '').toLowerCase();
+        let bgAjuan = (ajuanVal === 'verified') ? '#eff6ff' : (ajuanVal === 'rejected' ? '#fef2f2' : '#fffbeb');
+        let colorAjuan = (ajuanVal === 'verified') ? '#2563eb' : (ajuanVal === 'rejected' ? '#dc2626' : '#d97706');
+        let borderAjuan = (ajuanVal === 'verified') ? '#bfdbfe' : (ajuanVal === 'rejected' ? '#fecaca' : '#fde68a');
+
         document.getElementById('panel-badges').innerHTML =
-            '<span class="panel-badge ' + statusClass + '">' + s.status_startup + '</span>' +
-            '<span class="panel-badge ' + ajuanClass + '">' + s.status_ajuan + '</span>';
+            `<span class="panel-badge" style="background:${bgAktif}; color:${colorAktif}; border-color:${borderAktif};">${s.status_startup}</span>` +
+            `<span class="panel-badge" style="background:${bgAjuan}; color:${colorAjuan}; border-color:${borderAjuan};">${s.status_ajuan}</span>`;
 
-        var fullRows = '', gridItems = '';
-        if (s.alamat)                fullRows += row('mdi-map-marker',       s.alamat);
-        if (s.deskripsi_bidang_usaha) fullRows += row('mdi-text-box-outline', s.deskripsi_bidang_usaha);
-        if (s.email_perusahaan)      fullRows += row('mdi-email-outline',    '<a href="mailto:' + s.email_perusahaan + '">' + s.email_perusahaan + '</a>');
-        if (s.website_perusahaan)    fullRows += row('mdi-web',              '<a href="' + s.website_perusahaan + '" target="_blank">' + s.website_perusahaan + '</a>');
-        if (s.nama_program)          fullRows += row('mdi-school-outline',   s.nama_program);
-        if (s.nama_dosen)            fullRows += row('mdi-account-tie',      'Pembina: ' + s.nama_dosen);
-        if (s.nomor_whatsapp)        gridItems += gridItem('mdi-whatsapp',   '<a href="https://wa.me/' + s.nomor_whatsapp + '" target="_blank">' + s.nomor_whatsapp + '</a>');
-        if (s.instagram_perusahaan)  gridItems += gridItem('mdi-instagram',  '@' + s.instagram_perusahaan);
-        if (s.tahun_daftar)          gridItems += gridItem('mdi-calendar-check',  'Daftar ' + s.tahun_daftar);
-        if (s.tahun_berdiri)         gridItems += gridItem('mdi-office-building', 'Berdiri ' + s.tahun_berdiri);
+        let contentHtml = '';
 
-        document.getElementById('panel-rows').innerHTML = fullRows + (gridItems ? '<div class="panel-grid">' + gridItems + '</div>' : '');
+        // Tentang Profile
+        if(s.deskripsi_bidang_usaha) {
+            contentHtml += `
+                <div class="panel-section" style="background:transparent; padding:0; border:none; box-shadow:none;">
+                    <p class="panel-desc" style="font-weight:400;">${s.deskripsi_bidang_usaha}</p>
+                </div>
+            `;
+        }
+
+        // Timeline Grid
+        if(s.tahun_berdiri || s.tahun_daftar) {
+            contentHtml += `<div class="panel-grid-box mb-3">`;
+            if(s.tahun_berdiri) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_berdiri}</div><div class="grid-box-lbl">Tahun Berdiri</div></div>`;
+            if(s.tahun_daftar) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_daftar}</div><div class="grid-box-lbl">Tahun Daftar</div></div>`;
+            contentHtml += `</div>`;
+        }
+
+        // Informasi Umum
+        contentHtml += `<div class="panel-section">`;
+        contentHtml += `<span class="panel-section-title">Informasi Umum</span>`;
+        if (s.nama_program) contentHtml += infoRow('graduation-cap', 'Program', sanitizeData(s.nama_program, 'name'));
+        if (s.nama_dosen) contentHtml += infoRow('user', 'Pembina', sanitizeData(s.nama_dosen, 'name'));
+        if (s.alamat) contentHtml += infoRow('map-pin', 'Alamat', `<span style="text-transform:capitalize;">${s.alamat.toLowerCase()}</span>`);
+        contentHtml += `</div>`;
+
+        // Kontak Section
+        if(s.email_perusahaan || s.nomor_whatsapp || s.website_perusahaan || s.instagram_perusahaan) {
+            contentHtml += `<div class="panel-section">`;
+            contentHtml += `<span class="panel-section-title">Kontak & Tautan</span>`;
+            
+            if (s.email_perusahaan) contentHtml += infoRow('mail', 'Email', `<a href="mailto:${s.email_perusahaan}">${sanitizeData(s.email_perusahaan, 'email')}</a>`);
+            if (s.website_perusahaan) contentHtml += infoRow('globe', 'Website', `<a href="${s.website_perusahaan}" target="_blank">${sanitizeData(s.website_perusahaan, 'web')}</a>`);
+            
+            // Social icons
+            let socHtml = `<div class="d-flex gap-2 mt-3 pt-3" style="border-top:1px solid #f1f5f9;">`;
+            if (s.nomor_whatsapp) socHtml += `<a href="https://wa.me/${s.nomor_whatsapp}" target="_blank" class="panel-social-link" style="background:#ecfdf5; color:#10b981;"><i class="mdi mdi-whatsapp" style="font-size:18px;"></i></a>`;
+            if (s.instagram_perusahaan) socHtml += `<a href="#" class="panel-social-link" style="background:#fdf4ff; color:#d946ef;"><i class="mdi mdi-instagram" style="font-size:18px;"></i></a>`;
+            socHtml += `</div>`;
+            
+            contentHtml += socHtml;
+            contentHtml += `</div>`;
+        }
+
+        document.getElementById('panel-content-wrapper').innerHTML = contentHtml;
         document.getElementById('panel-link').href = baseDetailUrl + s.uuid_startup;
         document.getElementById('panel-detail').classList.add('show');
+        
+        lucide.createIcons(); // render all lucide icons
         map.panTo([s.latitude, s.longitude]);
     }
 
-    function row(icon, val) {
-        return '<div class="panel-row"><i class="mdi ' + icon + '"></i><span>' + val + '</span></div>';
+    function infoRow(icon, label, value) {
+        return `
+            <div class="panel-info-row">
+                <div class="panel-info-icon"><i data-lucide="${icon}" style="width:14px;"></i></div>
+                <div class="panel-info-content">
+                    <div class="panel-info-label">${label}</div>
+                    <div class="panel-info-value">${value}</div>
+                </div>
+            </div>
+        `;
     }
-    function gridItem(icon, val) {
-        return '<div class="panel-row"><i class="mdi ' + icon + '"></i><span>' + val + '</span></div>';
-    }
+
     function tutupPanel() {
         document.getElementById('panel-detail').classList.remove('show');
     }
+    
     function fokusMarker(lat, lng) {
         map.setView([lat, lng], 17);
         document.getElementById('ddTerpetakan').style.display = 'none';
@@ -326,6 +417,7 @@
         });
         if (s) bukaPanel(s);
     }
+
     function toggleMapDropdown(id) {
         var all = ['ddTerpetakan', 'ddBelumLokasi'];
         all.forEach(function(d) {
@@ -334,6 +426,7 @@
         var el = document.getElementById(id);
         if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
+    
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.map-stat-card') && !e.target.closest('.map-dropdown')) {
             ['ddTerpetakan', 'ddBelumLokasi'].forEach(function(id) {

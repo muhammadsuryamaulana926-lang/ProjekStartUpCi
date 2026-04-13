@@ -36,22 +36,13 @@ $role        = session()->get('user_role');
                     <span class="nav-label">Edit Startup</span>
                 </a>
 
-                <!-- Menu Video: halaman konten video pembelajaran -->
-                <a href="<?= base_url('v_video') ?>"
-                   class="nav-link-item <?= ($currentPage == 'v_video') ? 'nav-active' : '' ?>">
+                <!-- Menu Perpustakaan: halaman gabungan video & ebook -->
+                <a href="<?= base_url('v_perpustakaan') ?>"
+                   class="nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'v_video', 'v_buku']) ? 'nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
-                    <span class="nav-label">Video</span>
-                </a>
-
-                <!-- Menu Buku: halaman referensi buku -->
-                <a href="<?= base_url('v_buku') ?>"
-                   class="nav-link-item <?= ($currentPage == 'v_buku') ? 'nav-active' : '' ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                    <span class="nav-label">Buku</span>
+                    <span class="nav-label">Perpustakaan</span>
                 </a>
 
                 <!-- Menu Peta: halaman peta lokasi startup milik sendiri -->
@@ -85,22 +76,13 @@ $role        = session()->get('user_role');
                     <span class="nav-label">Data Startup</span>
                 </a>
 
-                <!-- Menu Video: halaman konten video pembelajaran -->
-                <a href="<?= base_url('v_video') ?>"
-                   class="nav-link-item <?= ($currentPage == 'v_video') ? 'nav-active' : '' ?>">
+                <!-- Menu Perpustakaan: halaman gabungan video & ebook -->
+                <a href="<?= base_url('v_perpustakaan') ?>"
+                   class="nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'v_video', 'v_buku']) ? 'nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
-                    <span class="nav-label">Video</span>
-                </a>
-
-                <!-- Menu Buku: halaman referensi buku -->
-                <a href="<?= base_url('v_buku') ?>"
-                   class="nav-link-item <?= ($currentPage == 'v_buku') ? 'nav-active' : '' ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                    <span class="nav-label">Buku</span>
+                    <span class="nav-label">Perpustakaan</span>
                 </a>
 
                 <!-- Menu Peta: halaman peta lokasi semua startup -->
