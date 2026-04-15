@@ -20,11 +20,11 @@ class Dashboard_startup extends BaseController
     {
         $data['total_startup'] = $this->m_startup->hitung_semua_startup();
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_dashboard_startup', $data)
-            . view('Partials/v_footer');
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_dashboard', $data)
+            . view('layout/v_footer');
     }
 
     // Mengembalikan data startup dalam format JSON untuk keperluan chart/tabel di dashboard (AJAX)
@@ -32,5 +32,20 @@ class Dashboard_startup extends BaseController
     {
         $data = $this->m_startup->liat_detail_data();
         return $this->response->setJSON($data);
+    }
+
+    // Data chart startup per tahun
+    public function chart_per_tahun()
+    {
+        $start = (int)($this->request->getGet('start_year') ?? date('Y') - 2);
+        $end   = (int)($this->request->getGet('end_year')   ?? date('Y'));
+        return $this->response->setJSON($this->m_startup->startup_per_tahun($start, $end));
+    }
+
+    // Data chart startup per bulan
+    public function chart_per_bulan()
+    {
+        $tahun = (int)($this->request->getGet('tahun') ?? date('Y'));
+        return $this->response->setJSON($this->m_startup->startup_per_bulan($tahun));
     }
 }

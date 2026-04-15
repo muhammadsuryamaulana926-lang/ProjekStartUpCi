@@ -314,7 +314,7 @@
                 <div class="form-row-custom">
                     <label class="form-label-custom">Dosen Pembina</label>
                     <div>
-                        <select name="id_dosen_pembina" class="form-control-custom">
+                        <select name="id_dosen_pembina" class="form-control-custom select2-dosen">
                             <option value="">Pilih Dosen Pembina</option>
                             <?php foreach ($daftar_anggota as $row): ?>
                             <option value="<?= $row->id_anggota ?>" <?= $data[0]['id_dosen_pembina'] == $row->id_anggota ? 'selected' : '' ?>><?= esc($row->nama_lengkap) ?></option>
@@ -326,7 +326,7 @@
                 <div class="form-row-custom">
                     <label class="form-label-custom">Program Yang Diikuti</label>
                     <div>
-                        <select name="id_program_kewirausahaan_startup" class="form-control-custom">
+                        <select name="id_program_kewirausahaan_startup" class="form-control-custom select2-program">
                             <option value="">Pilih Program</option>
                             <?php foreach ($daftar_program_startup as $row): ?>
                             <option value="<?= $row->id_program_kewirausahaan_startup ?>" <?= $data[0]['id_program_kewirausahaan_startup'] == $row->id_program_kewirausahaan_startup ? 'selected' : '' ?>><?= esc($row->nama_program) ?></option>
@@ -393,21 +393,32 @@
                         <input class="form-control-custom" type="file" name="logo_perusahaan" accept=".jpg,.jpeg,.png">
                         <div class="invalid-logo_perusahaan" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></div>
                         <small class="text-slate-400" style="font-size:11px">Format: .jpg, .jpeg, .png</small>
-                        <?php if (!empty($data[0]['logo_perusahaan'])): ?>
-                        <div class="mt-2">
-                            <img src="<?= base_url('uploads/file_startup/logo_startup/' . $data[0]['logo_perusahaan']) ?>" style="height:60px;width:auto;border-radius:8px;border:1px solid var(--slate-100)">
-                        </div>
+                        <?php 
+                        $logo_name = $data[0]['logo_perusahaan'] ?? '';
+                        $logo_path_main = 'uploads/file_startup/logo_startup/' . $logo_name;
+                        // Cek fisik file di folder public/uploads/...
+                        if (!empty($logo_name) && file_exists(FCPATH . $logo_path_main)): 
+                        ?>
+                            <div class="mt-2">
+                                <img src="<?= base_url($logo_path_main) ?>" style="height:60px;width:auto;border-radius:8px;border:1px solid #f1f5f9;box-shadow:0 2px 4px rgba(0,0,0,0.05)">
+                            </div>
+                        <?php elseif (!empty($logo_name)): ?>
+                            <div class="mt-2">
+                                <span class="text-danger" style="font-size:11px"><i class="mdi mdi-alert-circle"></i> File logo tidak ditemukan di folder uploads</span>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <?php if (session()->get('user_role') === 'pemilik_startup'): ?>
-                    <a href="<?= base_url('v_detail/' . session()->get('user_startup_uuid')) ?>" class="btn-secondary-modern">Batal</a>
-                    <?php else: ?>
-                    <a href="<?= base_url('v_data_startup') ?>" class="btn-secondary-modern">Batal</a>
-                    <?php endif; ?>
-                    <button type="submit" class="submit btn-submit-primary">Simpan Perubahan</button>
+                    <?php 
+                    $role = session()->get('user_role');
+                    $user_uuid = session()->get('user_startup_uuid');
+                    // Jika pemilik, redirect ke detail miliknya. Jika admin, ke daftar startup.
+                    $cancel_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup');
+                    ?>
+                    <a href="<?= $cancel_url ?>" class="btn-secondary-modern">Batal</a>
+                    <button type="submit" class="submit btn-submit-primary"><i class="mdi mdi-content-save"></i> Simpan Perubahan</button>
                 </div>
 
             </form>
@@ -418,75 +429,63 @@
 <script>
 $(document).ready(function () {
     lucide.createIcons();
-    // Set nilai awal semua dropdown sesuai data startup yang sedang diedit
+    // Set nilai awal dropdown
     $('select[name="tahun_berdiri"]').val('<?= $data[0]['tahun_berdiri'] ?>');
     $('select[name="id_dosen_pembina"]').val('<?= $data[0]['id_dosen_pembina'] ?>');
     $('select[name="status_startup"]').val('<?= $data[0]['status_startup'] ?>');
     $('select[name="id_program_kewirausahaan_startup"]').val('<?= $data[0]['id_program_kewirausahaan_startup'] ?>');
     $('select[name="tahun_daftar"]').val('<?= $data[0]['tahun_daftar'] ?>');
 
-    // Inisialisasi Select2 pada dropdown tahun (try-catch agar tidak error jika belum dimuat)
     try { $('.select2_tahun_berdiri').select2(); $('.select2_tahun_daftar').select2(); } catch(e) {}
+    $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true });
+    $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true });
     cek_klaster();
 
-    // Submit form edit startup via AJAX dengan validasi nama dan logo
-    $('#form_ubah').submit(function () {
+    $('#form_ubah').submit(function (e) {
+        e.preventDefault();
         var forms = $('#form_ubah');
-        var formData = new FormData($('#form_ubah')[0]);
-        $('.submit').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Loading...');
+        var formData = new FormData(this);
+        
+        $('.submit').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Menyimpan...');
         $('body').css('cursor', 'wait');
 
-        var nama = $('input[name="nama_perusahaan"]').val().replace(/^\s+|\s+$/gm, '');
-        $('input[name="nama_perusahaan"]').val(nama);
-        cek_nama_perusahaan();
-
-        var desk = $('textarea[name="deskripsi_bidang_usaha"]').val().replace(/^\s+|\s+$/gm, '');
-        $('textarea[name="deskripsi_bidang_usaha"]').val(desk);
-        cek_deskripsi();
-
-        if (forms[0].checkValidity()) {
-            $.ajax({
-                url: "<?= base_url('v_update_startup') ?>",
-                type: 'post',
-                data: formData,
-                dataType: 'json',
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    if (data.status) {
-                        <?php if (session()->get('user_role') === 'pemilik_startup'): ?>
-                        window.location.href = "<?= base_url('v_detail/' . session()->get('user_startup_uuid')) ?>";
-                        <?php else: ?>
-                        window.location.href = "<?= base_url('v_data_startup') ?>";
-                        <?php endif; ?>
-                    } else {
-                        forms.addClass('was-validated');
-                        if (data.status_nama_perusahaan) {
-                            $('input[name="nama_perusahaan"]').val('').focus();
-                            $('.invalid-name').html(data.msg_nama_perusahaan).css('display', 'block');
-                        }
-                        if (data.status_logo_perusahaan) {
-                            $('input[name="logo_perusahaan"]').val('').focus();
-                            $('.invalid-logo_perusahaan').html(data.msg_logo_perusahaan).css('display', 'block');
-                        }
-                        $('.submit').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Simpan');
-                        $('body').css('cursor', 'default');
+        $.ajax({
+            url: "<?= base_url('v_update_startup') ?>",
+            type: 'post',
+            data: formData,
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (data.status) {
+                    Toast.fire({ icon: 'success', title: 'Perubahan berhasil disimpan' });
+                    setTimeout(function(){
+                        <?php 
+                            // Tentukan tujuan redirect di sisi PHP agar JS tinggal mengeksekusi
+                            $redirect_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup');
+                        ?>
+                        window.location.href = "<?= $redirect_url ?>";
+                    }, 1000);
+                } else {
+                    forms.addClass('was-validated');
+                    if (data.status_nama_perusahaan) {
+                        $('.invalid-name').html(data.msg_nama_perusahaan).show();
                     }
-                },
-                error: function (xhr) {
-                    console.log('status:', xhr.status, 'response:', xhr.responseText);
-                    Swal.fire('Error!', 'Terjadi kesalahan server: ' + xhr.status, 'error');
-                    $('.submit').prop('disabled', false).html('Simpan Perubahan');
+                    if (data.status_logo_perusahaan) {
+                        $('.invalid-logo_perusahaan').html(data.msg_logo_perusahaan).show();
+                    }
+                    $('.submit').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Simpan Perubahan');
                     $('body').css('cursor', 'default');
                 }
-            });
-        } else {
-            forms.addClass('was-validated');
-            $('.submit').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Simpan');
-            $('body').css('cursor', 'default');
-        }
-
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                Swal.fire('Error!', 'Terjadi kesalahan sistem: ' + xhr.status, 'error');
+                $('.submit').prop('disabled', false).html('<i class="mdi mdi-content-save"></i> Simpan Perubahan');
+                $('body').css('cursor', 'default');
+            }
+        });
         return false;
     });
 });

@@ -47,18 +47,21 @@ class M_perpustakaan extends Model
 
     public function video_by_id($data)
     {
+        // Mengambil satu video berdasarkan id_konten_video
         $query = "SELECT * FROM konten_video WHERE id_konten_video = '" . $data['id_konten_video'] . "'";
         return $this->db->query($query);
     }
 
     public function video_by_uuid($data)
     {
+        // Mengambil satu video berdasarkan uuid_konten_video
         $query = "SELECT * FROM konten_video WHERE uuid_konten_video = '" . $data['uuid_konten_video'] . "'";
         return $this->db->query($query);
     }
 
     public function tambah_video($data)
     {
+        // Menyimpan data video baru ke database
         $insert = [
             'id_user'           => $data['id_user'],
             'judul_video'       => $data['judul_video'],
@@ -74,6 +77,7 @@ class M_perpustakaan extends Model
 
     public function ubah_video($data)
     {
+        // Memperbarui data video berdasarkan id_konten_video
         $update = [
             'judul_video'     => $data['judul_video'],
             'deskripsi_video' => $data['deskripsi_video'] ?? null,
@@ -85,11 +89,13 @@ class M_perpustakaan extends Model
 
     public function hapus_video($data)
     {
+        // Menghapus data video berdasarkan id_konten_video
         return $this->db->table('konten_video')->where('id_konten_video', $data['id_konten_video'])->delete();
     }
 
     public function decode_kode_video($kode)
     {
+        // Mendekode kode video dari base64 menjadi YouTube ID asli
         return base64_decode($kode);
     }
 
@@ -97,6 +103,7 @@ class M_perpustakaan extends Model
 
     public function semua_ebook()
     {
+        // Mengambil semua ebook beserta nama uploader
         $query = "SELECT ke.*, u.nama_lengkap as nama_uploader
                   FROM konten_ebook ke
                   LEFT JOIN users u ON u.id_user = ke.id_user
@@ -106,6 +113,7 @@ class M_perpustakaan extends Model
 
     public function semua_ebook_publik()
     {
+        // Mengambil semua ebook dengan status Publik saja
         $query = "SELECT ke.*, u.nama_lengkap as nama_uploader
                   FROM konten_ebook ke
                   LEFT JOIN users u ON u.id_user = ke.id_user
@@ -131,18 +139,21 @@ class M_perpustakaan extends Model
 
     public function ebook_by_id($data)
     {
+        // Mengambil satu ebook berdasarkan id_konten_ebook
         $query = "SELECT * FROM konten_ebook WHERE id_konten_ebook = '" . $data['id_konten_ebook'] . "'";
         return $this->db->query($query);
     }
 
     public function ebook_by_uuid($data)
     {
+        // Mengambil satu ebook berdasarkan uuid_konten_ebook
         $query = "SELECT * FROM konten_ebook WHERE uuid_konten_ebook = '" . $data['uuid_konten_ebook'] . "'";
         return $this->db->query($query);
     }
 
     public function tambah_ebook($data)
     {
+        // Menyimpan data ebook baru ke database
         $insert = [
             'id_user'           => $data['id_user'],
             'judul_ebook'       => $data['judul_ebook'],
@@ -160,6 +171,7 @@ class M_perpustakaan extends Model
 
     public function ubah_ebook($data)
     {
+        // Memperbarui data ebook berdasarkan id_konten_ebook
         $update = [
             'judul_ebook'    => $data['judul_ebook'],
             'deskripsi_ebook'=> $data['deskripsi_ebook'] ?? null,
@@ -173,6 +185,7 @@ class M_perpustakaan extends Model
 
     public function hapus_ebook($data)
     {
+        // Menghapus data ebook beserta file PDF dan sampulnya
         return $this->db->table('konten_ebook')->where('id_konten_ebook', $data['id_konten_ebook'])->delete();
     }
 
@@ -180,6 +193,7 @@ class M_perpustakaan extends Model
 
     public function cek_akses($tipe, $id_konten, $id_user)
     {
+        // Mengecek apakah user tertentu punya akses ke konten privat
         return $this->db->table('konten_akses')
             ->where(['tipe' => $tipe, 'id_konten' => $id_konten, 'id_user' => $id_user])
             ->countAllResults() > 0;
@@ -187,6 +201,7 @@ class M_perpustakaan extends Model
 
     public function get_akses($tipe, $id_konten)
     {
+        // Mengambil daftar user yang punya akses ke konten privat tertentu
         return $this->db->table('konten_akses ka')
             ->select('ka.id, ka.id_user, u.nama_lengkap, u.email')
             ->join('users u', 'u.id_user = ka.id_user')
@@ -196,6 +211,7 @@ class M_perpustakaan extends Model
 
     public function tambah_akses($tipe, $id_konten, $id_user)
     {
+        // Menambahkan user ke whitelist akses konten privat
         if ($this->cek_akses($tipe, $id_konten, $id_user)) return false;
         return $this->db->table('konten_akses')->insert([
             'tipe'      => $tipe,
@@ -206,11 +222,13 @@ class M_perpustakaan extends Model
 
     public function hapus_akses($id)
     {
+        // Menghapus user dari whitelist akses konten privat
         return $this->db->table('konten_akses')->where('id', $id)->delete();
     }
 
     public function semua_user()
     {
+        // Mengambil semua user aktif selain admin (untuk pilihan whitelist)
         return $this->db->table('users')->select('id_user, nama_lengkap, email')->whereNotIn('role', ['admin'])->where('is_active', 1)->get()->getResult();
     }
 }

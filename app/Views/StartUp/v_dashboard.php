@@ -255,13 +255,118 @@
 
 <!-- CSS dan JS DataTables untuk tabel interaktif dengan fitur pencarian dan paginasi -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:16px; border:1px solid #f1f5f9; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 style="font-size:15px; font-weight:700; color:#0f172a; margin:0;">Startup Terdaftar per Tahun</h4>
+                    <div class="d-flex align-items-center gap-1">
+                        <input type="text" id="start_year" class="form-control form-control-sm yearpicker-dash" style="width:72px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; text-align:center;" value="<?= date('Y') - 4 ?>" readonly>
+                        <span style="color:#94a3b8; font-size:13px;">—</span>
+                        <input type="text" id="end_year" class="form-control form-control-sm yearpicker-dash" style="width:72px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; text-align:center;" value="<?= date('Y') ?>" readonly>
+                    </div>
+                </div>
+                <div style="height:320px;">
+                    <canvas id="chart_per_tahun"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card" style="border-radius:16px; border:1px solid #f1f5f9; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 style="font-size:15px; font-weight:700; color:#0f172a; margin:0;">Startup Terdaftar per Bulan</h4>
+                    <div class="d-flex align-items-center gap-1">
+                        <input type="text" id="year_bulan" class="form-control form-control-sm yearpicker-dash" style="width:80px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; text-align:center;" value="<?= date('Y') ?>" readonly>
+                    </div>
+                </div>
+                <div style="height:320px;">
+                    <canvas id="chart_per_bulan"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 // Inisiasi Lucide Icons
 lucide.createIcons();
 
+var chartTahun = null;
+var chartBulan = null;
+var bulanLabel = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function loadChartTahun() {
+    var start = $('#start_year').val();
+    var end   = $('#end_year').val();
+    if (start && end && parseInt(start) > parseInt(end)) return;
+    $.get('<?= base_url('v_dashboard/chart_per_tahun') ?>', { start_year: start, end_year: end }, function(data) {
+        var labels = data.map(d => d.tahun);
+        var values = data.map(d => parseInt(d.total));
+        if (chartTahun) chartTahun.destroy();
+        chartTahun = new Chart(document.getElementById('chart_per_tahun'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Startup', data: values, backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 8, borderSkipped: false }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+            }
+        });
+    });
+}
+
+function loadChartBulan() {
+    var tahun = $('#year_bulan').val();
+    $.get('<?= base_url('v_dashboard/chart_per_bulan') ?>', { tahun: tahun }, function(data) {
+        var values = Array(12).fill(0);
+        data.forEach(d => { values[parseInt(d.bulan) - 1] = parseInt(d.total); });
+        if (chartBulan) chartBulan.destroy();
+        chartBulan = new Chart(document.getElementById('chart_per_bulan'), {
+            type: 'doughnut',
+            data: {
+                labels: bulanLabel,
+                datasets: [{ data: values, backgroundColor: [
+                    'rgba(99,102,241,0.8)','rgba(139,92,246,0.8)','rgba(59,130,246,0.8)',
+                    'rgba(16,185,129,0.8)','rgba(245,158,11,0.8)','rgba(239,68,68,0.8)',
+                    'rgba(236,72,153,0.8)','rgba(14,165,233,0.8)','rgba(168,85,247,0.8)',
+                    'rgba(34,197,94,0.8)','rgba(251,146,60,0.8)','rgba(100,116,139,0.8)'
+                ], borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } } },
+                cutout: '60%'
+            }
+        });
+    });
+}
+
+// Load chart saat halaman pertama kali dibuka
+loadChartTahun();
+loadChartBulan();
+
 $(document).ready(function() {
+    // Init yearpicker
+    $('.yearpicker-dash').datepicker({
+        format: 'yyyy',
+        viewMode: 'years',
+        minViewMode: 'years',
+        autoclose: true
+    });
+    $('#start_year, #end_year').on('changeDate', function() { loadChartTahun(); });
+    $('#year_bulan').on('changeDate', function() { loadChartBulan(); });
     // Inisialisasi DataTables pada tabel startup di dalam modal
     var tableStartup = $('#datatable-startup').DataTable({
         "autoWidth": false,

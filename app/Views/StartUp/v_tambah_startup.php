@@ -302,7 +302,7 @@
                 <div class="form-row-custom">
                     <label class="form-label-custom">Dosen Pembina</label>
                     <div>
-                        <select name="id_dosen_pembina" class="form-control-custom">
+                        <select name="id_dosen_pembina" class="form-control-custom select2-dosen">
                             <option value="">Pilih Dosen Pembina</option>
                             <?php foreach ($dosens as $row): ?>
                             <option value="<?= $row->id_dosen_pembina ?>"><?= esc($row->nama_lengkap) ?></option>
@@ -314,7 +314,7 @@
                 <div class="form-row-custom">
                     <label class="form-label-custom">Program Yang Diikuti</label>
                     <div>
-                        <select name="id_program" class="form-control-custom">
+                        <select name="id_program" class="form-control-custom select2-program">
                             <option value="">Pilih Program</option>
                             <?php foreach ($programs as $row): ?>
                             <option value="<?= $row->id_program ?>"><?= esc($row->nama_program) ?></option>
@@ -394,6 +394,8 @@ $(document).ready(function () {
     // Inisialisasi Select2 pada dropdown tahun
     $('.select2_tahun_berdiri').select2();
     $('.select2_tahun_daftar').select2();
+    $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true });
+    $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true });
 
     // Submit form tambah startup via AJAX dengan validasi nama dan logo
     $('#form_tambah').submit(function () {

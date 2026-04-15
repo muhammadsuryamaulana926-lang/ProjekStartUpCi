@@ -45,11 +45,11 @@ class Perpustakaan extends BaseController
 
         $semua_user = $role === 'admin' ? $this->m_perpus->semua_user() : [];
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_perpustakaan', ['videos' => $videos, 'ebooks' => $ebooks, 'semua_user' => $semua_user])
-            . view('Partials/v_footer');
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_perpustakaan', ['videos' => $videos, 'ebooks' => $ebooks, 'semua_user' => $semua_user])
+            . view('layout/v_footer');
     }
 
     // ── VIDEO ACTIONS ─────────────────────────────────────────────
@@ -79,6 +79,7 @@ class Perpustakaan extends BaseController
 
     public function ambil_video()
     {
+        // Mengambil data satu video untuk keperluan form edit
         $data['id_konten_video'] = $this->request->getPost('id_konten_video');
         $video = $this->m_perpus->video_by_id($data)->getRow();
         if ($video) {
@@ -89,6 +90,7 @@ class Perpustakaan extends BaseController
 
     public function ubah_video()
     {
+        // Memperbarui data video yang sudah ada
         $url   = $this->request->getPost('url_video');
         $yt_id = $this->ekstrak_youtube_id($url);
 
@@ -111,6 +113,7 @@ class Perpustakaan extends BaseController
 
     public function hapus_video()
     {
+        // Menghapus data video berdasarkan id
         $data['id_konten_video'] = $this->request->getPost('id_konten_video');
         $result = $this->m_perpus->hapus_video($data);
         echo json_encode(['status' => $result ? true : false]);
@@ -120,6 +123,7 @@ class Perpustakaan extends BaseController
 
     public function simpan_ebook()
     {
+        // Menyimpan data ebook baru beserta file PDF dan sampul
         $dir_pdf    = FCPATH . 'uploads/ebook/file/';
         $dir_sampul = FCPATH . 'uploads/ebook/sampul/';
 
@@ -164,6 +168,7 @@ class Perpustakaan extends BaseController
 
     public function ambil_ebook()
     {
+        // Mengambil data satu ebook untuk keperluan form edit
         $data['id_konten_ebook'] = $this->request->getPost('id_konten_ebook');
         $ebook = $this->m_perpus->ebook_by_id($data)->getRow();
         echo json_encode($ebook);
@@ -171,6 +176,7 @@ class Perpustakaan extends BaseController
 
     public function ubah_ebook()
     {
+        // Memperbarui data ebook yang sudah ada
         $data = [
             'id_konten_ebook' => $this->request->getPost('id_konten_ebook'),
             'judul_ebook'     => $this->request->getPost('judul_ebook'),
@@ -208,6 +214,7 @@ class Perpustakaan extends BaseController
 
     public function hapus_ebook()
     {
+        // Menghapus data ebook beserta file PDF dan sampulnya
         $data['id_konten_ebook'] = $this->request->getPost('id_konten_ebook');
         $ebook = $this->m_perpus->ebook_by_id($data)->getRow();
 
@@ -226,6 +233,7 @@ class Perpustakaan extends BaseController
 
     public function get_akses()
     {
+        // Mengambil daftar user yang punya akses ke konten privat
         $tipe      = $this->request->getPost('tipe');
         $id_konten = $this->request->getPost('id_konten');
         echo json_encode($this->m_perpus->get_akses($tipe, $id_konten));
@@ -233,6 +241,7 @@ class Perpustakaan extends BaseController
 
     public function tambah_akses()
     {
+        // Menambahkan user ke whitelist akses konten privat
         $tipe      = $this->request->getPost('tipe');
         $id_konten = $this->request->getPost('id_konten');
         $id_user   = $this->request->getPost('id_user');
@@ -242,6 +251,7 @@ class Perpustakaan extends BaseController
 
     public function hapus_akses()
     {
+        // Menghapus user dari whitelist akses konten privat
         $result = $this->m_perpus->hapus_akses($this->request->getPost('id'));
         echo json_encode(['status' => (bool)$result]);
     }
@@ -250,22 +260,58 @@ class Perpustakaan extends BaseController
     public function baca_ebook($uuid)
     {
         $ebook = $this->m_perpus->ebook_by_uuid(['uuid_konten_ebook' => $uuid])->getRow();
-        if (!$ebook) return redirect()->to(base_url('v_perpustakaan'));
+        if (!$ebook) throw new \CodeIgniter\Exceptions\PageNotFoundException();
 
         if ($ebook->status_ebook === 'Privat' && session()->get('user_role') !== 'admin') {
             if (!$this->m_perpus->cek_akses('ebook', $ebook->id_konten_ebook, session()->get('user_id'))) {
-                return redirect()->to(base_url('perpustakaan'));
+                throw new \CodeIgniter\Exceptions\PageNotFoundException();
             }
         }
 
         $path = FCPATH . 'uploads/ebook/file/' . $ebook->file_ebook;
-        if (!file_exists($path)) return redirect()->to(base_url('v_perpustakaan'));
+        if (!file_exists($path)) throw new \CodeIgniter\Exceptions\PageNotFoundException();
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_baca_ebook', ['ebook' => $ebook])
-            . view('Partials/v_footer');
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_baca_ebook', ['ebook' => $ebook])
+            . view('layout/v_footer');
+    }
+
+    public function full_vidio($uuid)
+    {
+        $video = $this->m_perpus->video_by_uuid(['uuid_konten_video' => $uuid])->getRow();
+        if (!$video) throw new \CodeIgniter\Exceptions\PageNotFoundException();
+
+        if ($video->status_video === 'Privat' && session()->get('user_role') !== 'admin') {
+            if (!$this->m_perpus->cek_akses('video', $video->id_konten_video, session()->get('user_id'))) {
+                throw new \CodeIgniter\Exceptions\PageNotFoundException();
+            }
+        }
+        
+        $video->youtube_id = $this->m_perpus->decode_kode_video($video->kode_video);
+        
+        // Ambil semua video untuk sidebar rekomendasi
+        $role    = session()->get('user_role');
+        $id_user = session()->get('user_id');
+        
+        $videos = $role === 'admin'
+            ? $this->m_perpus->semua_video()->getResult()
+            : $this->m_perpus->semua_video_publik_dan_akses($id_user)->getResult();
+
+        $rekomendasi = [];
+        foreach ($videos as $v) {
+            if ($v->id_konten_video !== $video->id_konten_video) {
+                $v->youtube_id  = $this->m_perpus->decode_kode_video($v->kode_video);
+                $rekomendasi[] = $v;
+            }
+        }
+
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_full_video', ['video' => $video, 'rekomendasi' => $rekomendasi])
+            . view('layout/v_footer');
     }
 
     // Stream file PDF mentah ke browser (digunakan oleh PDF.js di halaman reader)
@@ -294,6 +340,7 @@ class Perpustakaan extends BaseController
 
     private function ekstrak_youtube_id($url)
     {
+        // Mengekstrak YouTube ID dari berbagai format URL YouTube
         $pattern = '/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
         preg_match($pattern, $url, $matches);
         return $matches[1] ?? null;

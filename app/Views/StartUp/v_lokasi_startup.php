@@ -162,6 +162,27 @@
         transition: all 0.2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
     .panel-btn-detail:hover { background: #4f46e5; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35); }
+
+    /* Custom Cluster Color: Blue (Force with !important) */
+    .marker-cluster-small { background-color: rgba(99, 102, 241, 0.4) !important; }
+    .marker-cluster-small div { background-color: rgba(99, 102, 241, 0.8) !important; color: #fff !important; }
+    .marker-cluster-medium { background-color: rgba(79, 70, 229, 0.4) !important; }
+    .marker-cluster-medium div { background-color: rgba(79, 70, 229, 0.8) !important; color: #fff !important; }
+    .marker-cluster-large { background-color: rgba(67, 56, 202, 0.4) !important; }
+    .marker-cluster-large div { background-color: rgba(67, 56, 202, 0.8) !important; color: #fff !important; }
+    .marker-cluster div {
+        width: 30px !important;
+        height: 30px !important;
+        margin-left: 5px !important;
+        margin-top: 5px !important;
+        text-align: center !important;
+        border-radius: 15px !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
 </style>
 
 <div class="map-fullscreen-wrap">
@@ -278,12 +299,24 @@
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script>
-    var map = L.map('map-lokasi-all').setView([-6.9175, 107.6191], 12);
+    var map = L.map('map-lokasi-all').setView([-2.5, 118.0], 5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
+
+    // Inisialisasi Marker Cluster Group
+    var markerCluster = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        spiderfyOnMaxZoom: true,
+        animate: true,
+        animateAddingMarkers: true
+    });
 
     var markers = [];
     var data = <?= json_encode(array_values(array_filter($startups, fn($s) => !empty($s->latitude)))) ?>;
@@ -294,14 +327,16 @@
     data.forEach(function(s) {
         var markerHtml = `<div style="background:#6366f1; width:24px; height:24px; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 8px rgba(0,0,0,0.2);"></div>`;
         var customIcon = L.divIcon({ className: 'custom-pin', html: markerHtml, iconSize: [24, 24], iconAnchor: [12, 12] });
-        var m = L.marker([s.latitude, s.longitude], {icon: customIcon}).addTo(map);
+        var m = L.marker([s.latitude, s.longitude], {icon: customIcon});
         m.on('click', function() { bukaPanel(s); });
+        
+        // Simpan marker ke array dan tambahkan ke cluster
         markers.push(m);
+        markerCluster.addLayer(m);
     });
 
-    if (markers.length > 0) {
-        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
-    }
+    // Tambahkan cluster ke peta
+    map.addLayer(markerCluster);
 
     var urlParams = new URLSearchParams(window.location.search);
     var focusLat  = parseFloat(urlParams.get('lat'));

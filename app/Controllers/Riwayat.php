@@ -3,79 +3,75 @@
 namespace App\Controllers;
 
 use App\Models\M_riwayat;
-use App\Models\M_perpustakaan;
+use App\Models\M_user;
 
+// Controller untuk mengelola riwayat aktivitas user (video & ebook)
 class Riwayat extends BaseController
 {
     protected $m_riwayat;
+    protected $m_user;
 
     public function __construct()
     {
         $this->m_riwayat = new M_riwayat();
+        $this->m_user    = new M_user();
+        helper('time');
     }
 
+    // Menampilkan halaman log aktivitas seluruh user (khusus admin)
     public function index()
     {
-        // Pastikan user login dan adalah admin
-        if (!session()->get('user_logged_in')) {
-            return redirect()->to('/login');
-        }
+        $raw_user = $this->request->getGet('id_user');
+        $filters = [
+            'id_user'     => $raw_user ? base64_decode($raw_user) : null,
+            'raw_id_user' => $raw_user ?? '',
+            'timeframe'   => $this->request->getGet('timeframe'),
+        ];
 
-        if (session()->get('user_role') !== 'admin') {
-            return redirect()->to(base_url('v_dashboard'))->with('error', 'Akses ditolak.');
-        }
-
-        helper('time');
-
-        $data['title'] = 'Riwayat Aktivitas User';
-        $data['riwayat'] = $this->m_riwayat->get_semua_riwayat();
-
-        return view('v_history', $data);
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_riwayat_aktivitas', [
+                'riwayat'         => $this->m_riwayat->semua_riwayat($filters),
+                'users'           => $this->m_user->findAll(),
+                'current_filters' => $filters,
+            ])
+            . view('layout/v_footer');
     }
 
-    // Mendapat request AJAX untuk update video
-    public function update_video()
+    // Menyimpan atau memperbarui riwayat tonton video via AJAX
+    public function simpan_riwayat_video()
     {
-        if (!session()->get('user_logged_in')) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
-        }
-
-        $id_user = session()->get('user_id');
+        $id_user  = session()->get('user_id');
         $id_video = $this->request->getPost('id_video');
-        $durasi = $this->request->getPost('durasi');
+        $durasi   = $this->request->getPost('durasi');
 
         if ($id_video && $durasi !== null) {
-            $this->m_riwayat->update_riwayat_video([
+            $this->m_riwayat->simpan_video([
                 'id_user' => $id_user,
                 'id_item' => $id_video,
-                'durasi' => $durasi
+                'durasi'  => $durasi,
             ]);
-            return $this->response->setJSON(['status' => 'success']);
         }
 
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data']);
+        return $this->response->setJSON(['status' => 'success']);
     }
 
-    // Mendapat request AJAX untuk update ebook
-    public function update_ebook()
+    // Menyimpan atau memperbarui riwayat baca ebook via AJAX
+    public function simpan_riwayat_ebook()
     {
-        if (!session()->get('user_logged_in')) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
-        }
-
-        $id_user = session()->get('user_id');
+        $id_user  = session()->get('user_id');
         $id_ebook = $this->request->getPost('id_ebook');
-        $halaman = $this->request->getPost('halaman_terakhir');
+        $halaman  = $this->request->getPost('halaman_terakhir');
 
         if ($id_ebook && $halaman !== null) {
-            $this->m_riwayat->update_riwayat_ebook([
-                'id_user' => $id_user,
-                'id_item' => $id_ebook,
-                'halaman_terakhir' => $halaman
+            $this->m_riwayat->simpan_ebook([
+                'id_user'          => $id_user,
+                'id_item'          => $id_ebook,
+                'halaman_terakhir' => $halaman,
             ]);
-            return $this->response->setJSON(['status' => 'success']);
         }
 
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data']);
+        return $this->response->setJSON(['status' => 'success']);
     }
 }

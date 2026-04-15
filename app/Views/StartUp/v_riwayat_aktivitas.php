@@ -1,8 +1,17 @@
-<?= view('Partials/v_header') ?>
-<?= view('Partials/v_sidebar') ?>
-<?= view('Partials/v_topbar') ?>
+<?php /* View: History — log aktivitas baca ebook dan tonton video per user */ ?>
+<!-- Import Font Inter & Lucide Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
+    /* Global Typography & Background */
+    .app-content {
+        font-family: 'Inter', sans-serif !important;
+        background-color: #f8fafc !important;
+        padding: 32px 28px;
+    }
     .history-card {
         background: #fff;
         border-radius: 20px;
@@ -120,14 +129,105 @@
         width: 45px;
         height: 60px;
     }
+    /* Filter Bar Styles */
+    .filter-wrapper {
+        margin-bottom: 30px;
+        background: #fff;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+    }
+    @media (max-width: 991px) {
+        .filter-grid { grid-template-columns: 1fr; }
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .filter-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #B8A990;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .filter-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .filter-select {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid #E8DFD0;
+        background: #fff;
+        font-size: 14px;
+        color: #3D3426;
+        font-weight: 600;
+        min-width: 200px;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    .filter-select:focus {
+        border-color: #8B7355;
+        box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.05);
+    }
 </style>
+
 
 <div class="app-content">
     <div class="container-fluid">
+        <!-- Filter Bar -->
+        <div class="filter-wrapper">
+            <form id="filterForm" method="GET" action="<?= base_url('riwayat') ?>">
+                <input type="hidden" name="timeframe" id="timeframe_input" value="<?= $current_filters['timeframe'] ?? '' ?>">
+                
+                <div class="filter-grid" style="display:flex; align-items:flex-end; justify-content:flex-start; gap:24px;">
+                    <!-- Rentang Waktu sebagai dropdown -->
+                    <div class="filter-group">
+                        <span class="filter-label">Rentang Waktu</span>
+                        <select id="select-timeframe" class="filter-select" name="timeframe_select">
+                            <option value="" <?= empty($current_filters['timeframe']) ? 'selected' : '' ?>>Semua</option>
+                            <option value="day" <?= ($current_filters['timeframe'] ?? '') == 'day' ? 'selected' : '' ?>>Hari Ini</option>
+                            <option value="month" <?= ($current_filters['timeframe'] ?? '') == 'month' ? 'selected' : '' ?>>Bulan Ini</option>
+                            <option value="year" <?= ($current_filters['timeframe'] ?? '') == 'year' ? 'selected' : '' ?>>Tahun Ini</option>
+                        </select>
+                    </div>
+
+                    <!-- Pengguna di sebelah kanan -->
+                    <div class="filter-group">
+                        <span class="filter-label">Pengguna</span>
+                        <select name="id_user" id="select-user" class="filter-select">
+                            <option value="">Semua Pengguna</option>
+                            <?php foreach ($users as $user): ?>
+                                <option value="<?= base64_encode($user['id_user']) ?>" <?= ($current_filters['raw_id_user'] ?? '') == base64_encode($user['id_user']) ? 'selected' : '' ?>>
+                                    <?= esc($user['nama_lengkap']) ?> (<?= esc($user['role']) ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="history-card">
             <h2 class="history-title">
                 <i data-lucide="activity"></i>
                 Log Aktivitas
+                <?php if (!empty($current_filters['timeframe']) || !empty($current_filters['id_user'])): ?>
+                    <span style="font-size:12px; font-weight:600; color:#8B7355; background:rgba(139,115,85,0.1); padding:4px 12px; border-radius:20px; margin-left:10px;">
+                        Terfilter
+                    </span>
+                    <a href="<?= base_url('riwayat') ?>" style="font-size:11px; color:#ef4444; text-decoration:none; margin-left:5px;">[Reset]</a>
+                <?php endif; ?>
             </h2>
 
             <?php if (empty($riwayat)): ?>
@@ -222,7 +322,22 @@
 </div>
 
 <script>
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-</script>
+    $(document).ready(function() {
+        lucide.createIcons();
 
-<?= view('Partials/v_footer') ?>
+        $('#select-timeframe').select2({ minimumResultsForSearch: Infinity, placeholder: 'Semua Waktu' }).on('change', function() {
+            setFilter('timeframe', $(this).val());
+        });
+
+        $('#select-user').select2({ placeholder: 'Semua Pengguna', allowClear: true }).on('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+
+    function setFilter(name, value) {
+        if (name === 'timeframe') {
+            document.getElementById('timeframe_input').value = value;
+        }
+        document.getElementById('filterForm').submit();
+    }
+</script>

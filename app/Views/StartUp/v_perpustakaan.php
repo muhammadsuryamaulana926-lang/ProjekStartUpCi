@@ -619,22 +619,18 @@
     }
     .btn-add-video svg { width: 18px; height: 18px; }
 
-    /* Video Grid */
+    /* Video Grid — Konsisten 3 Kolom */
     .video-grid {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 24px;
     }
-    .vid-card { width: calc((100% - 48px) / 3); }
-    .vid-card:nth-child(7n+4),
-    .vid-card:nth-child(7n+5),
-    .vid-card:nth-child(7n+6),
-    .vid-card:nth-child(7n+7) { width: calc((100% - 72px) / 4); }
+    .vid-card { width: 100%; }
     @media (max-width: 992px) {
-        .vid-card { width: calc((100% - 24px) / 2) !important; }
+        .video-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 576px) {
-        .vid-card { width: 100% !important; }
+        .video-grid { grid-template-columns: 1fr; }
     }
 
     .vid-card {
@@ -702,9 +698,10 @@
         object-fit: cover;
         transition: opacity 0.3s ease;
         opacity: 1;
-        z-index: 0;
+        z-index: 5; /* Ensure above player while loading */
     }
-    .vid-thumb.playing:hover img { 
+    /* Hanya sembunyikan gambar jika video SUDAH 'playing' AND sedang di-hover */
+    .vid-thumb.playing.is-playing:hover img { 
         opacity: 0; 
         pointer-events: none; 
     }
@@ -722,9 +719,9 @@
         background: #000 !important;
         overflow: hidden !important;
     }
-    /* Hard Masking & Pointer Lockdown */
+    /* Minimal scale to crop YT watermark without visible zoom */
     .plyr__video-embed iframe { 
-        transform: scale(1.35) translateY(2%); 
+        transform: scale(1.05); 
         transform-origin: center center;
         pointer-events: none; /* Block all direct interaction with YT iframe */
         user-select: none;
@@ -732,11 +729,20 @@
     
     /* Ensure Plyr controls are always on top and clickable */
     .plyr__controls { z-index: 20 !important; }
-    .plyr--video .plyr__video-wrapper { z-index: 1; }
+    .plyr--video .plyr__video-wrapper { z-index: 1; position: relative; }
     
-    /* Shield removed as it blocks custom buttons */
+    /* Small overlay to cover YT watermark at bottom-right */
     .plyr__video-wrapper::after {
-        display: none !important;
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 120px;
+        height: 40px;
+        background: linear-gradient(135deg, transparent 30%, rgba(0,0,0,0.9) 100%);
+        z-index: 10;
+        pointer-events: none;
+        border-radius: 12px 0 0 0;
     }
 
     .vid-thumb-overlay {
@@ -1098,47 +1104,48 @@
         <!-- Video Grid -->
         <div class="video-grid" id="videoContainer">
             <?php foreach ($videos as $v): ?>
-            <div class="vid-card" onclick="<?= $v->punya_akses ? "putarVideo(" . $v->id_konten_video . ", '" . $v->youtube_id . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?>" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>" data-uuid="<?= $v->uuid_konten_video ?>">
-                <div class="vid-thumb" id="thumb_<?= $v->id_konten_video ?>">
+            <div class="vid-card" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>" data-uuid="<?= $v->uuid_konten_video ?>">
+                <!-- Area Thumbnail: Klik untuk Baca Video -->
+                <div class="vid-thumb" id="thumb_<?= $v->id_konten_video ?>" 
+                     onclick="if(!event.target.closest('.plyr__controls')) { <?= $v->punya_akses ? "bacaVideo('" . $v->uuid_konten_video . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?> }">
                     <img src="https://img.youtube.com/vi/<?= $v->youtube_id ?>/hqdefault.jpg" alt="<?= esc($v->judul_video) ?>">
                     <div class="vid-thumb-overlay"></div>
-
-                    <?php if (strtolower($v->status_video) !== 'publik'): ?>
-                    <span class="vid-badge <?= strtolower($v->status_video) ?>"><?= $v->status_video ?></span>
-                    <?php endif; ?>
-
-                    <!-- Redundant play button removed for clean UI -->
 
                     <div id="player_<?= $v->id_konten_video ?>" class="vid-player-placeholder" 
                          data-plyr-provider="youtube" 
                          data-plyr-embed-id="<?= $v->youtube_id ?>"></div>
-
-                    <!-- Redundant fullscreen button removed -->
                 </div>
 
-                <div class="vid-body">
+                <!-- Area Body: Klik untuk Lihat Detail Modal -->
+                <div class="vid-body" style="cursor: pointer; position: relative;"
+                     data-vid-id="<?= $v->id_konten_video ?>"
+                     data-title="<?= esc($v->judul_video) ?>"
+                     data-desc="<?= esc($v->deskripsi_video) ?>"
+                     data-status="<?= esc($v->status_video) ?>"
+                     data-yt-id="<?= esc($v->youtube_id) ?>"
+                     data-uuid="<?= esc($v->uuid_konten_video) ?>"
+                     onclick="if(!event.target.closest('.vid-actions')) bukaDetailVideoFromEl(this)">
                     <div class="vid-title"><?= strtolower(esc($v->judul_video)) ?></div>
                     <?php if ($v->deskripsi_video): ?>
                     <div class="vid-desc"><?= esc($v->deskripsi_video) ?></div>
                     <?php else: ?>
                     <div class="vid-desc" style="color:#D4C4A8; font-style:italic;">Belum ada deskripsi</div>
                     <?php endif; ?>
+                    
                     <div class="vid-footer">
-                        <div class="vid-meta">
-                            <!-- YouTube label removed -->
-                        </div>
+                        <div class="vid-meta"></div>
                         <?php if (session()->get('user_role') === 'admin'): ?>
                         <div class="vid-actions">
                             <?php if (strtolower($v->status_video) === 'privat'): ?>
-                            <button onclick="bukaModalAksesVideo(<?= $v->id_konten_video ?>, '<?= esc($v->judul_video) ?>')" class="vid-action-btn" title="Kelola Akses">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            <button onclick="event.stopPropagation(); bukaModalAksesVideo(<?= $v->id_konten_video ?>, '<?= esc($v->judul_video) ?>')" class="vid-action-btn" title="Kelola Akses">
+                                <i data-lucide="users" style="width:14px;"></i>
                             </button>
                             <?php endif; ?>
-                            <button onclick="bukaModalUbahVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn" title="Edit">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            <button onclick="event.stopPropagation(); bukaModalUbahVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn" title="Edit">
+                                <i data-lucide="edit-3" style="width:14px;"></i>
                             </button>
-                            <button onclick="hapusVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn danger" title="Hapus">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            <button onclick="event.stopPropagation(); hapusVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn danger" title="Hapus">
+                                <i data-lucide="trash-2" style="width:14px;"></i>
                             </button>
                         </div>
                         <?php endif; ?>
@@ -1325,6 +1332,8 @@
 </div>
 <?php endif; ?>
 
+<?= view('startup/v_modal_video') ?>
+
 <script>
     // ═══════════════════════════════════════════════
     // SECTION SWITCHER — Perpustakaan Filter Tabs
@@ -1404,7 +1413,8 @@
         if (!plyrPlayers[id]) {
             // Inisialisasi Plyr dengan pengaturan Full Hidden Branding
             const player = new Plyr('#player_' + id, {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume'],
+                muted: true,
                 tooltips: { controls: true, seek: true },
                 youtube: {
                     noCookie: true,
@@ -1421,6 +1431,14 @@
             // Start playing
             player.on('ready', event => {
                 player.play();
+            });
+
+            player.on('playing', event => {
+                thumb.classList.add('is-playing');
+            });
+            
+            player.on('pause', event => {
+                thumb.classList.remove('is-playing');
             });
 
             // Tracking Logic
@@ -1452,7 +1470,10 @@
         if (plyrPlayers[id]) {
             plyrPlayers[id].pause();
         }
-        if (thumb) thumb.classList.remove('playing');
+        if (thumb) {
+            thumb.classList.remove('playing');
+            thumb.classList.remove('is-playing');
+        }
     }
 
     // layarPenuh function removed
@@ -1498,28 +1519,9 @@
         }
     }
 
-    function layarPenuh(id) {
-        var player = ytPlayers[id];
-        
-        // Jika video belum diputar, putar dulu baru fullscreen
-        if (!player) {
-            var card = document.querySelector(`.vid-card[data-vid-id="${id}"]`);
-            if (card) {
-                putarVideo(id, card.dataset.ytId);
-                setTimeout(function() { layarPenuh(id); }, 1000);
-            }
-            return;
-        }
-
-        if (typeof player.getIframe === 'function') {
-            var iframe = player.getIframe();
-            if (iframe) {
-                if (iframe.requestFullscreen)       iframe.requestFullscreen();
-                else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-                else if (iframe.mozRequestFullScreen)    iframe.mozRequestFullScreen();
-                else if (iframe.msRequestFullscreen)     iframe.msRequestFullscreen();
-            }
-        }
+    // Buka halaman baca video (tab penuh ala YouTube)
+    function bacaVideo(uuid) {
+        window.location.href = '<?= base_url('perpustakaan/full_vidio/') ?>' + uuid;
     }
 
     // Search videos by title
@@ -1612,7 +1614,7 @@
             seksiEmpty.style.display = 'flex';
         }
     }
-
+//cari user untuk akses inline (tanpa modal terpisah)
     function cariUserInline(tipe, q) {
         var containerId = tipe === 'ebook' ? 'hasilCariUserEbook' : 'hasilCariUserVideo';
         var listId      = tipe === 'ebook' ? 'listAksesEbook'     : 'listAksesVideo';

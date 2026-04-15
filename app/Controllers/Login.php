@@ -14,7 +14,7 @@ class Login extends BaseController
         if (session()->get('user_logged_in')) {
             return redirect()->to(base_url('v_dashboard'));
         }
-        return view('Auth/v_login');
+        return view('auth/v_login');
     }
 
     // Memproses form login: validasi lockout, cek kredensial, dan set session

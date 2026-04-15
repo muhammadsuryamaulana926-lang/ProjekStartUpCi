@@ -11,16 +11,33 @@ $routes->get('/logout',         'Login::logout');
 
 // Protected routes (wajib login)
 $routes->group('', ['filter' => 'auth'], function($routes) {
+
+    // Dashboard
     $routes->get('/v_dashboard',                        'Dashboard_startup::index');
     $routes->post('/v_dashboard/get_data_startup',      'Dashboard_startup::get_data_startup');
+    $routes->get('/v_dashboard/chart_per_tahun',        'Dashboard_startup::chart_per_tahun');
+    $routes->get('/v_dashboard/chart_per_bulan',        'Dashboard_startup::chart_per_bulan');
+
+    // Data Startup
     $routes->get('/v_data_startup',                     'Startup::index');
-    $routes->get('/v_detail_lokasi_startup',             'Startup::detail_lokasi_startup');
-    $routes->get('/v_lokasi_startup_saya',               'Startup::lokasi_startup_saya');
-    $routes->get('/v_perpustakaan',                      'Perpustakaan::index');
-    $routes->get('/v_video',                             'Perpustakaan::index');
-    $routes->get('/v_buku',                              'Perpustakaan::index');
+    $routes->get('/v_tambah_startup',                   'Startup::tambah_startup');
+    $routes->post('/v_simpan_startup',                  'Startup::simpan_startup');
+    $routes->post('/v_hapus_startup',                   'Startup::hapus_startup');
+    $routes->get('/v_edit_startup/(:any)',               'Startup::edit_startup/$1');
+    $routes->post('/v_edit_startup',                    'Startup::edit_startup');
+    $routes->post('/v_update_startup',                  'Startup::proses_ubah_startup');
+    $routes->get('/v_detail_startup/(:any)',             'Startup::detail/$1');
+
+    // Lokasi Startup
+    $routes->get('/v_lokasi_startup',                   'Startup::detail_lokasi_startup');
+    $routes->get('/v_lokasi_startup_saya',              'Startup::lokasi_startup_saya');
+
+    // Perpustakaan
+    $routes->get('/v_perpustakaan',                     'Perpustakaan::index');
+    $routes->get('/perpustakaan',                       'Perpustakaan::index');
     $routes->get('/perpustakaan/baca_ebook/(:any)',      'Perpustakaan::baca_ebook/$1');
     $routes->get('/perpustakaan/stream_ebook/(:any)',    'Perpustakaan::stream_ebook/$1');
+    $routes->get('/perpustakaan/full_vidio/(:any)',      'Perpustakaan::full_vidio/$1');
     $routes->post('/perpustakaan/simpan_video',          'Perpustakaan::simpan_video');
     $routes->post('/perpustakaan/ambil_video',           'Perpustakaan::ambil_video');
     $routes->post('/perpustakaan/ubah_video',            'Perpustakaan::ubah_video');
@@ -29,16 +46,14 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/perpustakaan/ambil_ebook',           'Perpustakaan::ambil_ebook');
     $routes->post('/perpustakaan/ubah_ebook',            'Perpustakaan::ubah_ebook');
     $routes->post('/perpustakaan/hapus_ebook',           'Perpustakaan::hapus_ebook');
-    $routes->post('/perpustakaan/get_akses',              'Perpustakaan::get_akses');
-    $routes->post('/perpustakaan/tambah_akses',           'Perpustakaan::tambah_akses');
-    $routes->post('/perpustakaan/hapus_akses',            'Perpustakaan::hapus_akses');
-    $routes->get('/v_tambah_startup',                   'Startup::tambah_startup');
-    $routes->post('/v_simpan_startup',                  'Startup::simpan_startup');
-    $routes->post('/v_hapus_startup',                   'Startup::hapus_startup');
-    $routes->get('/v_edit_startup/(:any)',               'Startup::edit_startup/$1');
-    $routes->post('/v_edit_startup',                    'Startup::edit_startup');
-    $routes->post('/v_update_startup',                  'Startup::proses_ubah_startup');
-    $routes->get('/v_detail/(:any)',                    'Startup::detail/$1');
+    $routes->post('/perpustakaan/get_akses',             'Perpustakaan::get_akses');
+    $routes->post('/perpustakaan/tambah_akses',          'Perpustakaan::tambah_akses');
+    $routes->post('/perpustakaan/hapus_akses',           'Perpustakaan::hapus_akses');
+
+    // Riwayat Aktivitas
+    $routes->get('/v_riwayat_aktivitas',                'Riwayat::index');
+    $routes->post('/riwayat/update_video',              'Riwayat::simpan_riwayat_video');
+    $routes->post('/riwayat/update_ebook',              'Riwayat::simpan_riwayat_ebook');
 
     // Tim
     $routes->post('/v_simpan_tim',                      'Startup::simpan_tim');
@@ -84,7 +99,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 
     $routes->post('/keep-alive',                                'Login::keepAlive');
 
-    // Alias startup/ prefix untuk AJAX di v_detail_startup
+    // Alias prefix startup/ untuk AJAX di detail startup
     $routes->post('/startup/get_startup_tim',                           'Startup::get_startup_tim');
     $routes->post('/startup/proses_tambah_informasi_tim',               'Startup::proses_tambah_informasi_tim');
     $routes->post('/startup/proses_ubah_informasi_tim',                 'Startup::proses_ubah_informasi_tim');
@@ -109,9 +124,4 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/startup/proses_hapus_informasi_mentor',             'Startup::proses_hapus_informasi_mentor');
     $routes->post('/startup/proses_verifikasi_startup',                 'Startup::proses_verifikasi_startup');
     $routes->post('/startup/proses_tolak_startup',                      'Startup::proses_tolak_startup');
-
-    // Riwayat
-    $routes->get('/v_history',                           'Riwayat::index');
-    $routes->post('/riwayat/update_video',               'Riwayat::update_video');
-    $routes->post('/riwayat/update_ebook',               'Riwayat::update_ebook');
 });

@@ -105,15 +105,15 @@ $role = session()->get('user_role');
 
 <header class="topbar">
     <!-- Brand / Logo -->
-    <div class="topbar-brand">
+    <div class="topbar-brand" style="cursor:pointer;" onclick="window.location.href='<?= $role === 'pemilik_startup' ? base_url('v_detail_startup/' . session()->get('user_startup_uuid')) : base_url('v_dashboard') ?>'">
         <img src="<?= base_url('img/logo-dkst.png') ?>" alt="Logo SIMIK" style="height: 48px; width: auto;">
     </div>
 
     <!-- Navigation Menu (Centered) -->
     <nav class="topbar-nav">
         <?php if ($role === 'pemilik_startup'): ?>
-            <a href="<?= base_url('v_detail/' . session()->get('user_startup_uuid')) ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_detail') ? 'top-nav-active' : '' ?>">
+            <a href="<?= base_url('v_detail_startup/' . session()->get('user_startup_uuid')) ?>"
+               class="top-nav-link-item <?= ($currentPage == 'v_detail_startup') ? 'top-nav-active' : '' ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
@@ -127,7 +127,7 @@ $role = session()->get('user_role');
                 <span>Edit Startup</span>
             </a>
             <div class="perpus-dropdown">
-                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'v_video', 'v_buku']) ? 'top-nav-active' : '' ?>">
+                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
@@ -168,7 +168,7 @@ $role = session()->get('user_role');
                 <span>Data Startup</span>
             </a>
             <div class="perpus-dropdown">
-                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'v_video', 'v_buku']) ? 'top-nav-active' : '' ?>">
+                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
@@ -186,15 +186,15 @@ $role = session()->get('user_role');
                     </a>
                 </div>
             </div>
-            <a href="<?= base_url('v_history') ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_history') ? 'top-nav-active' : '' ?>">
+            <a href="<?= base_url('v_riwayat_aktivitas') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'v_riwayat_aktivitas') ? 'top-nav-active' : '' ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <span>Riwayat</span>
             </a>
-            <a href="<?= base_url('v_detail_lokasi_startup') ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_detail_lokasi_startup') ? 'top-nav-active' : '' ?>">
+            <a href="<?= base_url('v_lokasi_startup') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'v_lokasi_startup') ? 'top-nav-active' : '' ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/>
                 </svg>
@@ -205,7 +205,6 @@ $role = session()->get('user_role');
 
     <!-- ICONS & PROFILE -->
     <div class="topbar-actions">
-    <!-- Tombol notifikasi (ikon lonceng) -->
         <div class="d-none d-md-flex align-items-center gap-1">
             <button class="topbar-icon-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -214,7 +213,6 @@ $role = session()->get('user_role');
             </button>
         </div>
 
-        <!-- Dropdown profil user: menampilkan nama, role, dan tombol logout -->
         <div class="position-relative ms-2" id="profileDropdownContainer">
             <button onclick="toggleProfilDropdown()" class="profile-trigger">
                 <div class="profile-avatar">
@@ -229,7 +227,6 @@ $role = session()->get('user_role');
                 </svg>
             </button>
 
-            <!-- Logout Dropdown -->
             <div id="logoutDropdown" class="profile-dropdown">
                 <div class="profile-dropdown-header py-3 px-4">
                     <div class="profile-name mb-1" style="font-size: 13px;"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
@@ -249,20 +246,15 @@ $role = session()->get('user_role');
 <!-- MODAL SESSION TIMEOUT -->
 <div id="sessionModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.6);backdrop-filter:blur(10px);align-items:center;justify-content:center;font-family:'Inter', sans-serif;">
     <div style="background:#fff;border-radius:24px;padding:3rem;max-width:440px;width:90%;text-align:center;box-shadow:0 30px 60px -12px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;">
-        <!-- Background Subtle Pattern -->
         <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, #6366f1, #a855f7);"></div>
-        
         <div style="width:72px;height:72px;background:#fef2f2;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.75rem;transform:rotate(-5deg);">
             <i data-lucide="timer" style="width:36px;height:36px;color:#ef4444;"></i>
         </div>
-
         <h3 style="font-weight:800;color:#0f172a;margin-bottom:0.75rem;letter-spacing:-0.5px;font-size:24px;">Sesi Hampir Berakhir</h3>
         <p style="color:#64748b;font-size:15px;margin-bottom:2rem;line-height:1.6;">Anda telah tidak aktif cukup lama. Sesi Anda akan otomatis ditutup dalam waktu:</p>
-        
         <div style="background:#f8fafc;padding:1.5rem;border-radius:20px;margin-bottom:2rem;border:1px solid #f1f5f9;">
             <div id="sessionCountdown" style="font-size:4rem;font-weight:900;color:#0f172a;line-height:1;font-variant-numeric: tabular-nums;letter-spacing:-2px;">05:00</div>
         </div>
-
         <div style="display:flex;flex-direction:column;gap:12px;">
             <button onclick="keepAlive()" style="width:100%;padding:1rem;border-radius:14px;border:none;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);" onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">Tetap Masuk</button>
             <button onclick="doLogout()" style="width:100%;padding:1rem;border-radius:14px;border:1.5px solid #e2e8f0;background:transparent;font-weight:600;font-size:14px;cursor:pointer;color:#64748b;transition:all 0.2s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">Logout Sekarang</button>
@@ -271,14 +263,12 @@ $role = session()->get('user_role');
 </div>
 
 <script>
-    // Konfigurasi batas waktu idle dan durasi countdown (dalam detik)
-    const IDLE_LIMIT   = 25 * 60; // 25 menit tidak aktif → tampilkan modal peringatan
-    const WARNING_SECS = 5  * 60; // 5 menit countdown sebelum otomatis logout
+    const IDLE_LIMIT   = 25 * 60;
+    const WARNING_SECS = 5  * 60;
 
     let idleTimer, countdownTimer, secondsLeft;
     let lastActivity = Date.now();
 
-    // Reset timer idle setiap kali ada aktivitas dari user (mouse, keyboard, scroll, dll)
     ['mousemove','keydown','click','scroll','touchstart'].forEach(e =>
         document.addEventListener(e, resetIdle)
     );
@@ -291,7 +281,6 @@ $role = session()->get('user_role');
         }
     }
 
-    // Tampilkan modal peringatan sesi hampir habis dan mulai countdown
     function showModal() {
         secondsLeft = WARNING_SECS;
         document.getElementById('sessionModal').style.display = 'flex';
@@ -306,14 +295,12 @@ $role = session()->get('user_role');
         }, 1000);
     }
 
-    // Perbarui tampilan countdown di modal (format MM:SS)
     function updateCountdown() {
         const m = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
         const s = String(secondsLeft % 60).padStart(2, '0');
         document.getElementById('sessionCountdown').textContent = m + ':' + s;
     }
 
-    // Perpanjang sesi: tutup modal, kirim request keep-alive ke server, reset timer idle
     function keepAlive() {
         clearInterval(countdownTimer);
         document.getElementById('sessionModal').style.display = 'none';
@@ -321,15 +308,12 @@ $role = session()->get('user_role');
         resetIdle();
     }
 
-    // Arahkan user ke halaman logout
     function doLogout() {
         window.location.href = '<?= base_url('logout') ?>';
     }
 
-    // Mulai timer idle pertama kali saat halaman selesai dimuat
     idleTimer = setTimeout(showModal, IDLE_LIMIT * 1000);
 
-    // Toggle dropdown perpustakaan
     function togglePerpusDropdown(e) {
         e.stopPropagation();
         var m = document.getElementById('perpusDropdownMenu') || document.getElementById('perpusDropdownMenu1');
@@ -342,13 +326,11 @@ $role = session()->get('user_role');
         });
     });
 
-    // Toggle dropdown profil saat tombol avatar diklik
     function toggleProfilDropdown() {
         const d = document.getElementById('logoutDropdown');
         d.classList.toggle('show');
         if(d.classList.contains('show')) lucide.createIcons();
     }
-    // Tutup dropdown profil jika user klik di luar area dropdown
     window.addEventListener('click', function(e) {
         const c = document.getElementById('profileDropdownContainer');
         const d = document.getElementById('logoutDropdown');

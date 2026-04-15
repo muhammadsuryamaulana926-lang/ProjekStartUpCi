@@ -93,6 +93,42 @@ class M_startup extends Model
         return $this->db->table('startups')->select('nama_perusahaan, email_perusahaan, nomor_whatsapp, tahun_daftar, status_startup, status_ajuan')->get()->getResultArray();
     }
 
+    // Menghitung jumlah startup per status
+    public function startup_per_status(int $start, int $end): array
+    {
+        return $this->db->query(
+            "SELECT status_startup, COUNT(*) as total FROM startups WHERE tahun_daftar BETWEEN ? AND ? GROUP BY status_startup",
+            [$start, $end]
+        )->getResultArray();
+    }
+
+    // Menghitung jumlah startup per status ajuan
+    public function startup_per_ajuan(int $start, int $end): array
+    {
+        return $this->db->query(
+            "SELECT status_ajuan, COUNT(*) as total FROM startups WHERE tahun_daftar BETWEEN ? AND ? GROUP BY status_ajuan",
+            [$start, $end]
+        )->getResultArray();
+    }
+
+    // Menghitung jumlah startup per tahun (range tahun)
+    public function startup_per_tahun(int $start, int $end): array
+    {
+        return $this->db->query(
+            "SELECT tahun_daftar as tahun, COUNT(*) as total FROM startups WHERE tahun_daftar BETWEEN ? AND ? GROUP BY tahun_daftar ORDER BY tahun_daftar ASC",
+            [$start, $end]
+        )->getResultArray();
+    }
+
+    // Menghitung jumlah startup per bulan dalam 1 tahun
+    public function startup_per_bulan(int $tahun): array
+    {
+        return $this->db->query(
+            "SELECT MONTH(created_at) as bulan, COUNT(*) as total FROM startups WHERE YEAR(created_at) = ? GROUP BY MONTH(created_at) ORDER BY bulan ASC",
+            [$tahun]
+        )->getResultArray();
+    }
+
     // Mengambil data startup berdasarkan id_user pemiliknya
     public function startup_by_id_user($id_user)
     {

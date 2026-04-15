@@ -89,23 +89,23 @@ class Startup extends BaseController
     public function index()
     {
         $this->session = \Config\Services::session();
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_data_startup', [
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_data_startup', [
                 'startups' => $this->m_startup->semua_startup()->getResult(),
             ])
-            . view('Partials/v_footer');
+            . view('layout/v_footer');
     }
 
     public function tambah_startup()
     {
         $this->session = \Config\Services::session();
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_tambah_startup', $this->data_form())
-            . view('Partials/v_footer');
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_tambah_startup', $this->data_form())
+            . view('layout/v_footer');
     }
 
     public function simpan_startup()
@@ -203,7 +203,7 @@ class Startup extends BaseController
             : $this->m_startup->startup_by_uuid($data_cari)->getResult('array');
 
         if (!$startup) {
-            return redirect()->to('/startup');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $id_s = $startup[0]['id_startup'];
@@ -227,16 +227,16 @@ class Startup extends BaseController
             return $row;
         }, $this->m_program->semua_program()->getResult());
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_edit_startup', [
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_edit_startup', [
                 'data'                    => $startup,
                 'daftar_klaster'          => $this->m_klaster->semua_klaster()->getResult(),
                 'daftar_anggota'          => $daftar_anggota,
                 'daftar_program_startup'  => $daftar_program,
             ])
-            . view('Partials/v_footer');
+            . view('layout/v_footer');
     }
 
     public function proses_ubah_startup()
@@ -297,8 +297,11 @@ class Startup extends BaseController
                 $data_startup['logo_perusahaan'] = $logo['nama'];
             }
 
-            $result = $this->m_startup->ubah_startup($data_startup);
+            // Jalankan update. Kita abaikan return value false dari update() 
+            // karena CI4 mengembalikan false jika tidak ada data yang berubah.
+            $this->m_startup->ubah_startup($data_startup);
 
+            // Update Klaster (Hapus dulu baru insert kembali)
             $this->m_startup_klaster->hapus_klaster_by_startup(['id_startup' => $data_startup['id_startup']]);
             if ($klasters = $this->request->getPost('kluster')) {
                 foreach ($klasters as $id_klaster) {
@@ -309,23 +312,23 @@ class Startup extends BaseController
                 }
             }
 
-            // CI4 ubah_startup() returns false jika tidak ada baris yang berubah (data sama)
-            // Kita anggap berhasil selama tidak ada exception
+            // Proses upload logo jika ada file baru
             if ($logo['nama']) {
-                move_uploaded_file(
-                    $_FILES['logo_perusahaan']['tmp_name'],
-                    $logo_dir . $logo['nama']
-                );
-                if (file_exists($logo_dir . $logo_lama) && $logo_lama != '') {
-                    unlink($logo_dir . $logo_lama);
+                if (move_uploaded_file($_FILES['logo_perusahaan']['tmp_name'], $logo_dir . $logo['nama'])) {
+                    // Hapus logo lama jika berhasil upload yang baru
+                    if ($logo_lama && file_exists($logo_dir . $logo_lama)) {
+                        unlink($logo_dir . $logo_lama);
+                    }
                 }
             }
 
+            // Set status berhasil dan flashdata
             $data['status'] = true;
-            $this->session->setFlashdata('msg', ['success', 'Startup berhasil diubah']);
+            $this->session->setFlashdata('msg', ['success', 'Perubahan startup berhasil disimpan']);
         }
 
-        echo json_encode([
+        // Return JSON response untuk AJAX
+        return $this->response->setJSON([
             'status'                 => $data['status'],
             'status_nama_perusahaan' => $data['status_nama_perusahaan'],
             'msg_nama_perusahaan'    => $data['msg_nama_perusahaan'] ?? '',
@@ -341,7 +344,7 @@ class Startup extends BaseController
         $startup = $this->m_startup->startup_by_uuid($data_cari)->getResult('array');
 
         if (!$startup) {
-            return redirect()->to(base_url('v_data_startup'));
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Startup dengan UUID ' . $uuid . ' tidak ditemukan');
         }
 
         $id_startup = $startup[0]['id_startup'];
@@ -352,10 +355,10 @@ class Startup extends BaseController
         $selected                        = $this->m_startup_klaster->id_klaster_by_startup($data_id)->getResult('array');
         $startup[0]['selected_klasters'] = array_column($selected, 'id_klaster');
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_detail_startup', array_merge($this->data_form(), [
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_detail_startup', array_merge($this->data_form(), [
                 'data'                   => $startup,
                 'data_tim'               => $this->m_tim_startup->tim_by_startup($data_id)->getResult(),
                 'data_produk'            => $this->m_startup_produk->get_startup_produk_by_id_startup($data_id)->getResult(),
@@ -367,19 +370,19 @@ class Startup extends BaseController
                 'all_mentor'             => $this->m_mentor->get_mentor_all()->getResult(),
                 'id_startup'             => $id_startup,
             ]))
-            . view('Partials/v_footer');
+            . view('layout/v_footer');
     }
 
     // Menampilkan halaman peta lokasi semua startup (khusus admin)
     public function detail_lokasi_startup()
     {
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_detail_lokasi_startup', [
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_lokasi_startup', [
                 'startups' => $this->m_startup->semua_startup()->getResult(),
             ])
-            . view('Partials/v_footer');
+            . view('layout/v_footer');
     }
 
     // Menampilkan halaman peta lokasi khusus startup milik pemilik yang sedang login
@@ -389,34 +392,16 @@ class Startup extends BaseController
         $startup = $this->m_startup->startup_by_id_user($id_user);
         $startups = $startup ? $this->m_startup->startup_by_uuid(['uuid_startup' => $startup->uuid_startup])->getResult() : [];
 
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_detail_lokasi_startup', [
+        return view('layout/v_header')
+            . view('layout/v_sidebar')
+            . view('layout/v_topbar')
+            . view('startup/v_lokasi_startup', [
                 'startups' => $startups,
             ])
-            . view('Partials/v_footer');
+            . view('layout/v_footer');
     }
 
-    // Menampilkan halaman video pembelajaran untuk startup
-    public function video()
-    {
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_video')
-            . view('Partials/v_footer');
-    }
-
-    // Menampilkan halaman referensi buku untuk startup
-    public function buku()
-    {
-        return view('Partials/v_header')
-            . view('Partials/v_sidebar')
-            . view('Partials/v_topbar')
-            . view('Startup/v_buku')
-            . view('Partials/v_footer');
-    }
+    // Method video dan buku dihapus karena sudah digabung ke v_perpustakaan
 
     public function hapus_startup()
     {
@@ -623,7 +608,9 @@ class Startup extends BaseController
         if (!empty($_FILES['logo']['name'])) {
             $ext  = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
             $nama = uniqid('produk_', true) . '.' . $ext;
-            move_uploaded_file($_FILES['logo']['tmp_name'], 'public/uploads/file_produk_startup/logo_produk_startup/' . $nama);
+            $dir  = FCPATH . 'uploads/file_produk_startup/logo_produk_startup/';
+            if (!file_exists($dir)) mkdir($dir, 0777, true);
+            move_uploaded_file($_FILES['logo']['tmp_name'], $dir . $nama);
             $data_produk['logo'] = $nama;
         }
 
@@ -644,7 +631,9 @@ class Startup extends BaseController
         if (!empty($_FILES['logo']['name'])) {
             $ext  = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
             $nama = uniqid('produk_', true) . '.' . $ext;
-            move_uploaded_file($_FILES['logo']['tmp_name'], 'public/uploads/file_produk_startup/logo_produk_startup/' . $nama);
+            $dir  = FCPATH . 'uploads/file_produk_startup/logo_produk_startup/';
+            if (!file_exists($dir)) mkdir($dir, 0777, true);
+            move_uploaded_file($_FILES['logo']['tmp_name'], $dir . $nama);
             $data_produk['logo'] = $nama;
         }
 
@@ -759,7 +748,9 @@ class Startup extends BaseController
         if (!empty($_FILES['dokumentasi']['name'])) {
             $ext  = pathinfo($_FILES['dokumentasi']['name'], PATHINFO_EXTENSION);
             $nama = uniqid('prestasi_', true) . '.' . $ext;
-            move_uploaded_file($_FILES['dokumentasi']['tmp_name'], 'public/uploads/file_prestasi_startup/dokumentasi_prestasi_startup/' . $nama);
+            $dir  = FCPATH . 'uploads/file_prestasi_startup/dokumentasi_prestasi_startup/';
+            if (!file_exists($dir)) mkdir($dir, 0777, true);
+            move_uploaded_file($_FILES['dokumentasi']['tmp_name'], $dir . $nama);
             $data_in['dokumentasi'] = $nama;
         }
 
@@ -779,7 +770,9 @@ class Startup extends BaseController
         if (!empty($_FILES['dokumentasi']['name'])) {
             $ext  = pathinfo($_FILES['dokumentasi']['name'], PATHINFO_EXTENSION);
             $nama = uniqid('prestasi_', true) . '.' . $ext;
-            move_uploaded_file($_FILES['dokumentasi']['tmp_name'], 'public/uploads/file_prestasi_startup/dokumentasi_prestasi_startup/' . $nama);
+            $dir  = FCPATH . 'uploads/file_prestasi_startup/dokumentasi_prestasi_startup/';
+            if (!file_exists($dir)) mkdir($dir, 0777, true);
+            move_uploaded_file($_FILES['dokumentasi']['tmp_name'], $dir . $nama);
             $data_in['dokumentasi'] = $nama;
         }
 
