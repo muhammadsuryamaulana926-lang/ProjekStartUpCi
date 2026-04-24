@@ -34,6 +34,7 @@ class AuthFilter implements FilterInterface
                 'v_detail', 'v_edit_startup', 'v_update_startup', 'keep-alive',
                 'v_lokasi_startup_saya', 'v_perpustakaan', 'v_video', 'v_buku', 'konten',
                 'perpustakaan', 'riwayat', 'v_history', 'startup', 'get_startup_tim',
+                'program', 'peserta_program', 'kelas',
                 'proses_tambah_informasi_tim', 'proses_ubah_informasi_tim', 'proses_hapus_informasi_tim',
                 'get_startup_produk', 'proses_tambah_informasi_produk',
                 'proses_ubah_informasi_produk', 'proses_hapus_informasi_produk',

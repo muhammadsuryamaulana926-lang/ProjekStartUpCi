@@ -36,25 +36,34 @@ body {
 /* --- LAYOUT --- */
 .app-wrapper {
     display: flex;
+    flex-direction: column;
     height: 100vh;
     overflow: hidden;
 }
+
 
 .app-main {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
-    background: #F5F0E8;
+    background: #ffffff;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .app-content {
     flex: 1;
     overflow-y: auto;
-    padding: 3rem 2.5rem;
+    padding: 2rem 2.5rem;
+    background: #ffffff;
+}
+
+/* Halaman yang pakai .container-fluid langsung (tambah/edit) tetap bisa scroll */
+.app-main > .container-fluid {
+    flex: 1;
+    overflow-y: visible;
 }
 
 /* ============================================
@@ -215,9 +224,10 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0 2.5rem;
-    border-bottom: 1px solid var(--slate-50);
-    position: relative;
-    z-index: 40;
+    border-bottom: none;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
 }
 
 .topbar-brand {

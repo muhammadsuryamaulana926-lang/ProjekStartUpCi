@@ -62,49 +62,10 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 .plyr__video-embed iframe { 
     transform: scale(1.05); 
     transform-origin: center center;
-    pointer-events: none; /* Cegah interaksi langsung ke YT iframe */
-    user-select: none;
-}
-
-/* Ensure controls are clickable */
-.plyr__controls { z-index: 20 !important; }
-.plyr--video .plyr__video-wrapper { z-index: 1; position: relative; }
-
-/* Small overlay to cover YT watermark at bottom-right */
-.plyr__video-wrapper::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 120px;
-    height: 48px;
-    background: linear-gradient(135deg, transparent 20%, rgba(0,0,0,0.95) 100%);
-    z-index: 10;
-    pointer-events: none;
-    border-radius: 12px 0 0 0;
-}
-
-/* Top overlay to mask YouTube title/avatar when paused */
-.plyr__video-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 90px;
-    background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, transparent 100%);
-    z-index: 15;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-.plyr.plyr--paused .plyr__video-wrapper::before,
-.plyr.plyr--stopped .plyr__video-wrapper::before {
-    opacity: 1;
 }
 
 /* Title */
- .yt-title {
+.yt-title {
     font-size: 20px;
     font-weight: 700;
     color: #0f172a;
@@ -225,10 +186,10 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 .yt-desc-box {
     background: #f1f5f9;
     border-radius: 12px;
-    padding: 20px;
-    font-size: 15px;
+    padding: 16px;
+    font-size: 14px;
     color: #0f172a;
-    line-height: 1.7;
+    line-height: 1.6;
     margin-bottom: 24px;
     cursor: pointer;
     transition: background 0.2s;
@@ -499,6 +460,24 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
             <div class="yt-meta-row">
                 <div></div>
                 <div class="yt-actions">
+                    <div class="yt-action-btn-group">
+                        <button class="yt-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                            Like
+                        </button>
+                        <button class="yt-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" /></svg>
+                        </button>
+                    </div>
+                    <button class="yt-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                        Bagikan
+                    </button>
+                    <button class="yt-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Simpan
+                    </button>
+
                 </div>
             </div>
 

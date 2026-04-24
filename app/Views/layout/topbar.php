@@ -3,6 +3,14 @@
 $uri = service('uri');
 $currentPage = $uri->getSegment(1);
 $role = session()->get('user_role');
+
+$notif_list  = [];
+$notif_count = 0;
+if (in_array($role, ['admin', 'pemilik_startup'])) {
+    $m_notif     = new \App\Models\M_notifikasi();
+    $notif_list  = $m_notif->semua_belum_dibaca($role);
+    $notif_count = count($notif_list);
+}
 ?>
 <style>
 .topbar {
@@ -10,10 +18,11 @@ $role = session()->get('user_role');
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #fff;
+    background: #f6f7f9; /* Soft light background matching the image */
     height: 80px;
-    border-bottom: 1px solid var(--slate-50);
+    border-bottom: none;
     position: relative;
+    z-index: 1000;
 }
 .topbar-nav {
     position: absolute;
@@ -21,85 +30,165 @@ $role = session()->get('user_role');
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 4px; /* Small gap between items */
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 9999px; /* Pill shape */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.015); /* Very subtle shadow */
 }
 .topbar-nav .top-nav-link-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    color: var(--slate-500);
+    gap: 6px;
+    padding: 8px 18px;
+    color: #64748b; /* Neutral greyish text */
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 13px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
 }
 .topbar-nav .top-nav-link-item:hover {
-    background: var(--slate-50);
-    color: var(--primary);
-    transform: translateY(-2px);
+    color: #3b82f6;
+    background: #f8fafc;
 }
 .topbar-nav .top-nav-link-item.top-nav-active {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 97, 255, 0.2);
+    background: #448aff; /* Bright blue for active */
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(68, 138, 255, 0.25);
 }
-.topbar-nav .top-nav-link-item.top-nav-active .nav-icon {
-    color: #fff;
+.topbar-nav .top-nav-link-item.top-nav-active .nav-icon,
+.topbar-nav .top-nav-link-item.top-nav-active svg {
+    color: #ffffff;
 }
 .topbar-nav .nav-icon {
     width: 18px;
     height: 18px;
 }
+.topbar-nav .perpus-dropdown {
+    position: relative;
+    display: flex;
+}
 .topbar-nav .perpus-dropdown button.top-nav-link-item {
     border: none;
     background: transparent;
     cursor: pointer;
+    font-family: inherit;
+    outline: none;
 }
 .topbar-nav .perpus-dropdown button.top-nav-link-item.top-nav-active {
-    background: var(--primary);
-    color: #fff;
-}
-.topbar-nav .perpus-dropdown {
-    position: relative;
+    background: #448aff;
+    color: #ffffff;
 }
 .topbar-nav .perpus-dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 12px);
     left: 50%;
     transform: translateX(-50%);
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    border: 1px solid var(--slate-100);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
     min-width: 160px;
     overflow: hidden;
-    z-index: 999;
+    z-index: 10001;
+    padding: 8px;
 }
 .topbar-nav .perpus-dropdown-menu.show {
     display: block;
+    animation: fadeInDropdown 0.2s ease-out forwards;
+}
+@keyframes fadeInDropdown {
+    from { opacity: 0; transform: translate(-50%, -8px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
 }
 .topbar-nav .perpus-dropdown-menu a {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 18px;
+    padding: 10px 16px;
     font-size: 13px;
-    font-weight: 600;
-    color: var(--slate-600);
+    font-weight: 500;
+    color: #475569;
     text-decoration: none;
+    border-radius: 10px;
     transition: all 0.2s;
 }
 .topbar-nav .perpus-dropdown-menu a:hover {
-    background: var(--slate-50);
-    color: var(--primary);
+    background: #eff6ff;
+    color: #3b82f6;
 }
 .topbar-nav .perpus-dropdown-menu a svg {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+}
+
+/* User Profile & Right Icons */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.topbar-icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    position: relative;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+.topbar-icon-btn:hover {
+    color: #3b82f6;
+    transform: translateY(-1px);
+}
+.topbar-icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+.topbar-icon-btn .notif-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 1px solid #fff;
+}
+.profile-trigger {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.profile-trigger .profile-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #475569;
+    overflow: hidden;
+}
+.profile-trigger .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>
 
@@ -113,7 +202,7 @@ $role = session()->get('user_role');
     <nav class="topbar-nav">
         <?php if ($role === 'pemilik_startup'): ?>
             <a href="<?= base_url('v_detail_startup/' . session()->get('user_startup_uuid')) ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_detail_startup') ? 'top-nav-active' : '' ?>">
+               class="top-nav-link-item <?= ($currentPage == 'v_detail_startup' || $currentPage == 'v_detail') ? 'top-nav-active' : '' ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                 </svg>
@@ -137,9 +226,9 @@ $role = session()->get('user_role');
                 <div class="perpus-dropdown-menu" id="perpusDropdownMenu1">
                     <a href="<?= base_url('v_perpustakaan') ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        Ebook
+                        Buku Digital
                     </a>
-                    <a href="<?= base_url('v_perpustakaan') ?>?tab=video">
+                    <a href="<?= base_url('perpustakaan/video') ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
                         Video
                     </a>
@@ -152,6 +241,15 @@ $role = session()->get('user_role');
                 </svg>
                 <span>Peta Lokasi</span>
             </a>
+            <!-- Link Program Kelas untuk Pemilik Startup -->
+            <a href="<?= base_url('program') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'program') ? 'top-nav-active' : '' ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>Program</span>
+            </a>
+
         <?php else: ?>
             <a href="<?= base_url('v_dashboard') ?>"
                class="top-nav-link-item <?= ($currentPage == 'v_dashboard') ? 'top-nav-active' : '' ?>">
@@ -178,9 +276,9 @@ $role = session()->get('user_role');
                 <div class="perpus-dropdown-menu" id="perpusDropdownMenu">
                     <a href="<?= base_url('v_perpustakaan') ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        Ebook
+                        Buku Digital
                     </a>
-                    <a href="<?= base_url('v_perpustakaan') ?>?tab=video">
+                    <a href="<?= base_url('perpustakaan/video') ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
                         Video
                     </a>
@@ -200,71 +298,115 @@ $role = session()->get('user_role');
                 </svg>
                 <span>Peta Lokasi</span>
             </a>
+            <!-- Link Program Kelas untuk Admin -->
+            <a href="<?= base_url('program') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'program') ? 'top-nav-active' : '' ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>Program Kelas</span>
+            </a>
+
         <?php endif; ?>
     </nav>
 
     <!-- ICONS & PROFILE -->
     <div class="topbar-actions">
-        <div class="d-none d-md-flex align-items-center gap-1">
-            <button class="topbar-icon-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
+        <!-- Search Button -->
+        <!-- <button class="topbar-icon-btn d-none d-md-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+        </button> -->
+
+        <!-- Notification Button -->
+        <div class="dropdown" id="notifDropdownContainer">
+            <button class="topbar-icon-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                <?php if ($notif_count > 0): ?>
+                <div class="notif-badge"></div>
+                <?php endif; ?>
+                <i class="mdi mdi-bell-outline" style="font-size:20px;"></i>
             </button>
+            <div class="dropdown-menu dropdown-menu-end shadow-sm border" style="min-width:320px; padding:0; border-radius:4px;" id="notifDropdown">
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+                    <span class="fw-semibold">Notifikasi</span>
+                    <?php if ($notif_count > 0): ?>
+                    <button onclick="tandaiSemuaDibaca()" class="btn btn-link btn-sm p-0 text-decoration-none">Tandai semua dibaca</button>
+                    <?php endif; ?>
+                </div>
+                <div style="max-height:320px; overflow-y:auto;" id="notifList">
+                    <?php if (empty($notif_list)): ?>
+                    <div class="text-center text-muted py-4">
+                        <i class="mdi mdi-bell-off-outline d-block mb-2" style="font-size:28px;"></i>
+                        <small>Tidak ada notifikasi baru</small>
+                    </div>
+                    <?php else: ?>
+                    <?php foreach ($notif_list as $n): ?>
+                    <div class="notif-item dropdown-item px-3 py-2 border-bottom cursor-pointer" id="notif-<?= $n['id_notifikasi'] ?>" onclick="bukaNotif(<?= $n['id_notifikasi'] ?>, '<?= esc($n['url'] ?? '') ?>')" style="cursor:pointer; white-space:normal;">
+                        <div class="d-flex gap-2 align-items-start">
+                            <i class="mdi mdi-account-plus-outline text-primary mt-1" style="font-size:18px; flex-shrink:0;"></i>
+                            <div>
+                                <div class="fw-semibold small"><?= esc($n['judul']) ?></div>
+                                <div class="text-muted small"><?= esc($n['pesan']) ?></div>
+                                <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($n['dibuat_pada'])) ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
         <div class="position-relative ms-2" id="profileDropdownContainer">
-            <button onclick="toggleProfilDropdown()" class="profile-trigger">
+            <button class="dropdown-toggle profile-trigger" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                 <div class="profile-avatar">
                     <span><?= strtoupper(substr(session()->get('user_name') ?? 'A', 0, 1)) ?></span>
                 </div>
-                <div class="profile-info d-none d-sm-block text-start">
-                    <div class="profile-name"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
-                    <div class="profile-role"><?= esc(session()->get('user_role') ?? 'admin') ?></div>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--slate-400)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
             </button>
-
-            <div id="logoutDropdown" class="profile-dropdown">
-                <div class="profile-dropdown-header py-3 px-4">
-                    <div class="profile-name mb-1" style="font-size: 13px;"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
-                    <div class="profile-email" style="font-size: 11px; opacity: 0.8;"><?= esc(session()->get('user_email') ?? 'admin@startup.id') ?></div>
+            <div class="dropdown-menu dropdown-menu-end shadow-sm border" style="min-width:320px; border-radius:4px; padding:0;">
+                <div class="px-3 py-2 border-bottom">
+                    <div class="fw-semibold small"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
+                    <div class="text-muted" style="font-size:11px;"><?= esc(session()->get('user_email') ?? 'admin@startup.id') ?></div>
                 </div>
-                <div class="p-2 border-top">
-                    <button onclick="window.location.href='<?= base_url('logout') ?>'" class="logout-btn py-2">
-                        <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
-                        Logout
-                    </button>
+                <div class="p-1">
+                    <a href="<?= base_url('logout') ?>" class="dropdown-item text-danger d-flex align-items-center gap-2 rounded">
+                        <i class="mdi mdi-logout" style="font-size:16px;"></i> Logout
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
+<!-- Wrapper konten utama -->
+<div class="app-main" style="border-radius: 0;">
+
 <!-- MODAL SESSION TIMEOUT -->
-<div id="sessionModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.6);backdrop-filter:blur(10px);align-items:center;justify-content:center;font-family:'Inter', sans-serif;">
-    <div style="background:#fff;border-radius:24px;padding:3rem;max-width:440px;width:90%;text-align:center;box-shadow:0 30px 60px -12px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg, #6366f1, #a855f7);"></div>
-        <div style="width:72px;height:72px;background:#fef2f2;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.75rem;transform:rotate(-5deg);">
-            <i data-lucide="timer" style="width:36px;height:36px;color:#ef4444;"></i>
-        </div>
-        <h3 style="font-weight:800;color:#0f172a;margin-bottom:0.75rem;letter-spacing:-0.5px;font-size:24px;">Sesi Hampir Berakhir</h3>
-        <p style="color:#64748b;font-size:15px;margin-bottom:2rem;line-height:1.6;">Anda telah tidak aktif cukup lama. Sesi Anda akan otomatis ditutup dalam waktu:</p>
-        <div style="background:#f8fafc;padding:1.5rem;border-radius:20px;margin-bottom:2rem;border:1px solid #f1f5f9;">
-            <div id="sessionCountdown" style="font-size:4rem;font-weight:900;color:#0f172a;line-height:1;font-variant-numeric: tabular-nums;letter-spacing:-2px;">05:00</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-            <button onclick="keepAlive()" style="width:100%;padding:1rem;border-radius:14px;border:none;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;box-shadow:0 10px 15px -3px rgba(99,102,241,0.3);" onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">Tetap Masuk</button>
-            <button onclick="doLogout()" style="width:100%;padding:1rem;border-radius:14px;border:1.5px solid #e2e8f0;background:transparent;font-weight:600;font-size:14px;cursor:pointer;color:#64748b;transition:all 0.2s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='transparent';this.style.color='#64748b'">Logout Sekarang</button>
+<div class="modal fade" id="sessionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center" style="border-radius:8px;border:1px solid #e0e0e0;">
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <i class="mdi mdi-timer-outline text-danger" style="font-size:48px;"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Sesi Hampir Berakhir</h5>
+                <p class="text-muted mb-3">Anda telah tidak aktif cukup lama. Sesi akan otomatis ditutup dalam:</p>
+                <div class="bg-light rounded p-3 mb-4">
+                    <div id="sessionCountdown" class="fw-bold" style="font-size:3rem;letter-spacing:2px;">05:00</div>
+                </div>
+                <div class="d-grid gap-2">
+                    <button onclick="keepAlive()" class="btn btn-primary btn-modern">Tetap Masuk</button>
+                    <button onclick="doLogout()" class="btn btn-light btn-modern border">Logout Sekarang</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    const IDLE_LIMIT   = 25 * 60;
-    const WARNING_SECS = 5  * 60;
+    const IDLE_LIMIT   = 10 * 60;
+    const WARNING_SECS = 2  * 60;
 
     let idleTimer, countdownTimer, secondsLeft;
     let lastActivity = Date.now();
@@ -275,7 +417,8 @@ $role = session()->get('user_role');
 
     function resetIdle() {
         lastActivity = Date.now();
-        if (document.getElementById('sessionModal').style.display === 'none') {
+        var modalEl = document.getElementById('sessionModal');
+        if (!modalEl.classList.contains('show')) {
             clearTimeout(idleTimer);
             idleTimer = setTimeout(showModal, IDLE_LIMIT * 1000);
         }
@@ -283,7 +426,8 @@ $role = session()->get('user_role');
 
     function showModal() {
         secondsLeft = WARNING_SECS;
-        document.getElementById('sessionModal').style.display = 'flex';
+        var modal = new bootstrap.Modal(document.getElementById('sessionModal'));
+        modal.show();
         updateCountdown();
         countdownTimer = setInterval(() => {
             secondsLeft--;
@@ -303,7 +447,7 @@ $role = session()->get('user_role');
 
     function keepAlive() {
         clearInterval(countdownTimer);
-        document.getElementById('sessionModal').style.display = 'none';
+        bootstrap.Modal.getInstance(document.getElementById('sessionModal')).hide();
         fetch('<?= base_url('keep-alive') ?>', { method: 'POST', headers: { 'X-CSRF-TOKEN': '<?= csrf_hash() ?>' } });
         resetIdle();
     }
@@ -326,14 +470,51 @@ $role = session()->get('user_role');
         });
     });
 
-    function toggleProfilDropdown() {
-        const d = document.getElementById('logoutDropdown');
-        d.classList.toggle('show');
-        if(d.classList.contains('show')) lucide.createIcons();
-    }
+    function toggleProfilDropdown() {}
     window.addEventListener('click', function(e) {
         const c = document.getElementById('profileDropdownContainer');
-        const d = document.getElementById('logoutDropdown');
-        if (!c.contains(e.target)) d.classList.remove('show');
+        if (c && !c.contains(e.target)) {}
     });
+
+    function toggleNotifDropdown() {}
+    window.addEventListener('click', function(e) {
+        const c = document.getElementById('notifDropdownContainer');
+        const d = document.getElementById('notifDropdown');
+        if (c && d && !c.contains(e.target)) d.classList.remove('show');
+    });
+
+    const NOTIF_CSRF = '<?= csrf_hash() ?>';
+    const NOTIF_CSRF_NAME = '<?= csrf_token() ?>';
+
+    function bukaNotif(id, url) {
+        fetch('<?= base_url('notifikasi/tandai_dibaca') ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id_notifikasi=' + id + '&' + NOTIF_CSRF_NAME + '=' + NOTIF_CSRF
+        }).then(function() {
+            var el = document.getElementById('notif-' + id);
+            if (el) el.remove();
+            var badge = document.querySelector('.notif-badge');
+            var remaining = document.querySelectorAll('.notif-item').length;
+            if (remaining === 0) {
+                if (badge) badge.remove();
+                document.getElementById('notifList').innerHTML = '<div class="text-center text-muted py-4"><i class="mdi mdi-bell-off-outline d-block mb-2" style="font-size:28px;"></i><small>Tidak ada notifikasi baru</small></div>';
+            }
+            if (url) window.location.href = url;
+        });
+    }
+
+    function tandaiSemuaDibaca() {
+        fetch('<?= base_url('notifikasi/tandai_semua') ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: NOTIF_CSRF_NAME + '=' + NOTIF_CSRF
+        }).then(function() {
+            var badge = document.querySelector('.notif-badge');
+            if (badge) badge.remove();
+            document.getElementById('notifList').innerHTML = '<div class="text-center text-muted py-4"><i class="mdi mdi-bell-off-outline d-block mb-2" style="font-size:28px;"></i><small>Tidak ada notifikasi baru</small></div>';
+            var dd = bootstrap.Dropdown.getInstance(document.querySelector('#notifDropdownContainer [data-bs-toggle="dropdown"]'));
+            if (dd) dd.hide();
+        });
+    }
 </script>

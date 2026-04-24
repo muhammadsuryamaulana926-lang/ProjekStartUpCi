@@ -1,250 +1,78 @@
-<?php /* View: Edit Startup — form ubah data startup yang sudah ada beserta peta lokasi interaktif */ ?>
-<!-- Import Font Inter & Lucide Icons -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
-
 <style>
-    /* Global Typography & Background */
-    .app-content {
-        font-family: 'Inter', sans-serif !important;
-        background-color: #f8fafc !important;
-        padding: 32px 28px;
-    }
-    .page-header {
-        margin-bottom: 32px;
-        display: flex;
-        justify-content: center;
-        text-align: center;
-    }
-    .page-header h2 {
-        font-size: 24px;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 6px;
-        letter-spacing: -0.5px;
-    }
-    .page-header .subtitle {
-        font-size: 14px;
-        color: #64748b;
-        font-weight: 500;
-        margin: 0;
-    }
-
-    /* Card Wrapper Utama */
-    .card-premium {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
-        border: 1px solid #f1f5f9;
-        overflow: hidden;
-    }
-    .card-header-custom {
-        padding: 24px 32px;
-        border-bottom: 1px solid #f1f5f9;
-        background: #ffffff;
-    }
-    .section-title {
-        font-size: 16px;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.3px;
-    }
-
-    /* Modern Layout for Forms Grid */
-    .form-horizontal {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px 32px;
-    }
-    
-    @media (max-width: 992px) {
-        .form-horizontal { grid-template-columns: 1fr; }
-    }
-    
-    /* Make some inputs span full width */
-    .form-horizontal > .form-row-custom.full-width {
-        grid-column: 1 / -1;
-    }
-
-    .form-row-custom {
-        margin-bottom: 0;
-        display: flex;
-        flex-direction: column;
-    }
-    .form-label-custom {
-        font-size: 13px;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-    .form-label-custom .text-danger {
-        color: #ef4444;
-    }
-
-    /* Input modern minimalis */
-    .form-control-custom {
-        width: 100%;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-size: 14px;
-        color: #0f172a;
-        background: #fff;
-        transition: all 0.2s;
-        outline: none;
-        font-family: inherit;
-    }
-    .form-control-custom:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-    }
-    
-    select.form-control-custom {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2364748b'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        background-size: 14px;
-        padding-right: 36px;
-    }
-
-    /* Checkbox list klaster */
-    .checkbox-label-custom {
-        font-size: 14px;
-        color: #475569;
-        font-weight: 500;
-        cursor: pointer;
-    }
-    .form-check-input {
-        width: 18px;
-        height: 18px;
-        margin-top: 0;
-        border: 1.5px solid #cbd5e1;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .form-check-input:checked {
-        background-color: #6366f1;
-        border-color: #6366f1;
-    }
-
-    /* Action Buttons Area */
-    .form-actions {
-        grid-column: 1 / -1;
-        border-top: 1px solid #f1f5f9;
-        padding-top: 24px;
-        margin-top: 8px;
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-    }
-    
-    .btn-submit-primary {
-        background: #6366f1;
-        border: 1.5px solid #6366f1;
-        color: #ffffff !important;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 10px 32px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none;
-    }
-    .btn-submit-primary:hover {
-        background: #4f46e5;
-        border-color: #4f46e5;
-        box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
-        transform: translateY(-1px);
-    }
-    
-    .btn-secondary-modern {
-        background: #ffffff;
-        border: 1.5px solid #cbd5e1;
-        color: #475569 !important;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 10px 24px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none;
-    }
-    .btn-secondary-modern:hover {
-        background: #f1f5f9;
-        color: #0f172a !important;
-    }
-
-    /* Map info panel */
-    #koordinat-info {
-        background: #f8fafc;
-        border-radius: 8px;
-        padding: 10px 14px;
-        border: 1px solid #e2e8f0;
-        font-family: inherit;
-        font-size: 13px !important;
-        color: #64748b !important;
-    }
-
-    /* Select2 fixes for modern look */
-    .select2-container--default .select2-selection--single {
-        border: 1.5px solid #e2e8f0;
-        border-radius: 10px;
-        height: 42px;
-        display: flex;
-        align-items: center;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 40px;
-        right: 8px;
-    }
+body { background-color: #f5f5f5 !important; }
+.paper-wrapper { max-width: 900px; margin: 40px auto; }
+.paper-form {
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 40px;
+}
+.paper-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+.form-label { font-weight: 600; color: #555; margin-bottom: 8px; }
+.form-control, .form-select {
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 15px;
+    transition: all 0.3s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+}
+.btn-modern { padding: 10px 24px; border-radius: 6px; font-weight: 600; transition: all 0.3s; }
+.btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 </style>
 
-<div class="app-content">
-    <div class="page-header">
-        <div>
-            <h2>Edit Startup</h2>
-            <p class="subtitle">Ubah informasi dan perbarui data profil startup ini</p>
-        </div>
-    </div>
+<div class="container-fluid" style="background-color:#f5f5f5;padding-bottom:50px;">
+    <div class="paper-wrapper">
+        <div class="paper-form">
+            <h2 class="paper-title">Edit Startup</h2>
 
-    <div class="card-premium">
-        <div class="card-header-custom">
-            <span class="section-title mb-0">Informasi Startup</span>
-        </div>
-        <div class="p-4">
-            <form id="form_ubah" class="form-horizontal" enctype="multipart/form-data" action="" method="POST" novalidate>
+            <form id="form_ubah" enctype="multipart/form-data" action="" method="POST" novalidate>
                 <input type="hidden" name="id_startup" value="<?= $data[0]['id_startup'] ?>">
 
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Nama Perusahaan <span class="text-danger">*</span></label>
-                    <div>
-                        <input type="text" name="nama_perusahaan" class="form-control-custom" style="text-transform: capitalize;" onkeyup="cek_nama_perusahaan()" value="<?= esc($data[0]['nama_perusahaan']) ?>" autocomplete="off" required>
-                        <div class="invalid-name" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Mohon isi nama perusahaan</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nama Perusahaan <span class="text-danger">*</span></label>
+                        <input type="text" name="nama_perusahaan" class="form-control" style="text-transform:capitalize;" onkeyup="cek_nama_perusahaan()" value="<?= esc($data[0]['nama_perusahaan']) ?>" autocomplete="off" required>
+                        <div class="invalid-name text-danger" style="display:none;font-size:12px;margin-top:4px">Mohon isi nama perusahaan</div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Tahun Berdiri</label>
+                        <select name="tahun_berdiri" class="form-select select2_tahun_berdiri">
+                            <option value="">Pilih Tahun</option>
+                            <?php for ($i = 2000; $i <= date('Y') + 5; $i++): ?>
+                            <option value="<?= $i ?>" <?= $data[0]['tahun_berdiri'] == $i ? 'selected' : '' ?>><?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Tahun Daftar <span class="text-danger">*</span></label>
+                        <select name="tahun_daftar" class="form-select select2_tahun_daftar" required>
+                            <option value="">Pilih Tahun</option>
+                            <?php for ($i = 2000; $i <= date('Y') + 5; $i++): ?>
+                            <option value="<?= $i ?>" <?= $data[0]['tahun_daftar'] == $i ? 'selected' : '' ?>><?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
                     </div>
                 </div>
 
-                <div class="form-row-custom full-width">
-                    <label class="form-label-custom">Deskripsi Bidang Usaha <span class="text-danger">*</span></label>
-                    <div>
-                        <textarea name="deskripsi_bidang_usaha" class="form-control-custom" rows="4" onkeyup="cek_deskripsi()" required><?= esc($data[0]['deskripsi_bidang_usaha']) ?></textarea>
-                        <div class="invalid-deskripsi" style="display:none;color:#ef4444;font-size:12px;margin-top:4px">Mohon isi deskripsi bidang usaha</div>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi Bidang Usaha <span class="text-danger">*</span></label>
+                    <textarea name="deskripsi_bidang_usaha" class="form-control" rows="4" onkeyup="cek_deskripsi()" required><?= esc($data[0]['deskripsi_bidang_usaha']) ?></textarea>
+                    <div class="invalid-deskripsi text-danger" style="display:none;font-size:12px;margin-top:4px">Mohon isi deskripsi bidang usaha</div>
                 </div>
 
-                <div class="form-row-custom full-width">
-                    <label class="form-label-custom">Klaster <span class="text-danger">*</span></label>
+                <div class="mb-3">
+                    <label class="form-label">Klaster <span class="text-danger">*</span></label>
                     <div>
                         <?php
                         $klaster_aktif = [];
@@ -253,80 +81,51 @@
                         }
                         foreach ($daftar_klaster as $row):
                         ?>
-                        <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="form-check">
                             <input class="form-check-input" type="checkbox"
                                 id="klaster_<?= $row->id_klaster ?>"
                                 value="<?= $row->id_klaster ?>"
                                 name="kluster[]"
                                 onclick="cek_klaster()"
                                 <?= in_array($row->nama_klaster, $klaster_aktif) ? 'checked' : '' ?>>
-                            <label class="checkbox-label-custom" for="klaster_<?= $row->id_klaster ?>"><?= esc($row->nama_klaster) ?></label>
+                            <label class="form-check-label" for="klaster_<?= $row->id_klaster ?>"><?= esc($row->nama_klaster) ?></label>
                         </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Tahun Berdiri</label>
-                    <div>
-                        <select name="tahun_berdiri" class="form-control-custom select2_tahun_berdiri">
-                            <option value="">Pilih Tahun Berdiri</option>
-                            <?php for ($i = 2000; $i <= date('Y') + 5; $i++): ?>
-                            <option value="<?= $i ?>" <?= $data[0]['tahun_berdiri'] == $i ? 'selected' : '' ?>><?= $i ?></option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Tahun Daftar <span class="text-danger">*</span></label>
-                    <div>
-                        <select name="tahun_daftar" class="form-control-custom select2_tahun_daftar" required>
-                            <option value="">Pilih Tahun Daftar</option>
-                            <?php for ($i = 2000; $i <= date('Y') + 5; $i++): ?>
-                            <option value="<?= $i ?>" <?= $data[0]['tahun_daftar'] == $i ? 'selected' : '' ?>><?= $i ?></option>
-                            <?php endfor; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Status Startup <span class="text-danger">*</span></label>
-                    <div>
-                        <select name="status_startup" class="form-control-custom" required>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Status Startup <span class="text-danger">*</span></label>
+                        <select name="status_startup" class="form-select" required>
                             <?php foreach (['Aktif', 'Tidak Aktif', 'Lulus'] as $s): ?>
                             <option value="<?= $s ?>" <?= $data[0]['status_startup'] == $s ? 'selected' : '' ?>><?= $s ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Target Pemasaran</label>
+                        <input type="text" name="target_pemasaran" class="form-control" style="text-transform:capitalize;" value="<?= esc($data[0]['target_pemasaran']) ?>" autocomplete="off">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Fokus Pelanggan</label>
+                        <input type="text" name="fokus_pelanggan" class="form-control" style="text-transform:capitalize;" value="<?= esc($data[0]['fokus_pelanggan']) ?>" autocomplete="off">
+                    </div>
                 </div>
 
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Target Pemasaran</label>
-                    <input type="text" name="target_pemasaran" class="form-control-custom" style="text-transform: capitalize;" value="<?= esc($data[0]['target_pemasaran']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Fokus Pelanggan</label>
-                    <input type="text" name="fokus_pelanggan" class="form-control-custom" style="text-transform: capitalize;" value="<?= esc($data[0]['fokus_pelanggan']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Dosen Pembina</label>
-                    <div>
-                        <select name="id_dosen_pembina" class="form-control-custom select2-dosen">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Dosen Pembina</label>
+                        <select name="id_dosen_pembina" class="form-select select2-dosen">
                             <option value="">Pilih Dosen Pembina</option>
                             <?php foreach ($daftar_anggota as $row): ?>
                             <option value="<?= $row->id_anggota ?>" <?= $data[0]['id_dosen_pembina'] == $row->id_anggota ? 'selected' : '' ?>><?= esc($row->nama_lengkap) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Program Yang Diikuti</label>
-                    <div>
-                        <select name="id_program_kewirausahaan_startup" class="form-control-custom select2-program">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Program Yang Diikuti</label>
+                        <select name="id_program_kewirausahaan_startup" class="form-select select2-program">
                             <option value="">Pilih Program</option>
                             <?php foreach ($daftar_program_startup as $row): ?>
                             <option value="<?= $row->id_program_kewirausahaan_startup ?>" <?= $data[0]['id_program_kewirausahaan_startup'] == $row->id_program_kewirausahaan_startup ? 'selected' : '' ?>><?= esc($row->nama_program) ?></option>
@@ -335,90 +134,82 @@
                     </div>
                 </div>
 
-                <div class="form-row-custom full-width">
-                    <label class="form-label-custom">Alamat</label>
-                    <textarea name="alamat" class="form-control-custom" style="text-transform: capitalize;" rows="3"><?= esc($data[0]['alamat']) ?></textarea>
+                <div class="mb-3">
+                    <label class="form-label">Alamat</label>
+                    <textarea name="alamat" class="form-control" style="text-transform:capitalize;" rows="3"><?= esc($data[0]['alamat']) ?></textarea>
                 </div>
 
-                <div class="form-row-custom full-width">
-                    <label class="form-label-custom">Titik Lokasi</label>
-                    <div>
-                        <div style="font-size:12px;color:var(--slate-400);margin-bottom:8px;">Ketik alamat untuk mencari lokasi, atau klik langsung pada peta</div>
-                        <div class="d-flex gap-2 mb-2">
-                            <input type="text" id="search-lokasi" class="form-control-custom" placeholder="Cari alamat atau nama tempat..." style="flex:1;">
-                            <button type="button" onclick="cariLokasi()" class="btn-submit-primary" style="padding:10px 16px;white-space:nowrap;"><i class="mdi mdi-magnify"></i> Cari</button>
-                        </div>
-                        <div id="search-result" style="display:none;background:#fff;border:1px solid var(--slate-200);border-radius:8px;max-height:180px;overflow-y:auto;margin-bottom:8px;z-index:999;position:relative;"></div>
-                        <div id="map-edit" style="height:300px;border-radius:10px;border:1px solid var(--slate-200);z-index:0;"></div>
-                        <input type="hidden" name="latitude" id="input_lat" value="<?= $data[0]['latitude'] ?? '' ?>">
-                        <input type="hidden" name="longitude" id="input_lng" value="<?= $data[0]['longitude'] ?? '' ?>">
-                        <div id="koordinat-info" style="margin-top:6px;font-size:12px;color:var(--slate-500);">
-                            <?php if (!empty($data[0]['latitude'])): ?>
-                                <i class="mdi mdi-map-marker" style="color:var(--primary)"></i> Lat: <?= $data[0]['latitude'] ?>, Lng: <?= $data[0]['longitude'] ?>
-                            <?php else: ?>
-                                Belum ada titik dipilih
-                            <?php endif; ?>
-                        </div>
+                <div class="mb-3">
+                    <label class="form-label">Titik Lokasi</label>
+                    <small class="d-block text-muted mb-2">Ketik alamat untuk mencari lokasi, atau klik langsung pada peta</small>
+                    <div class="d-flex gap-2 mb-2">
+                        <input type="text" id="search-lokasi" class="form-control" placeholder="Cari alamat atau nama tempat...">
+                        <button type="button" onclick="cariLokasi()" class="btn btn-primary btn-modern" style="white-space:nowrap;"><i class="mdi mdi-magnify"></i> Cari</button>
                     </div>
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Nomor WhatsApp</label>
-                    <input name="no_whatsapp" type="text" class="form-control-custom" value="<?= esc($data[0]['no_whatsapp']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Email Perusahaan</label>
-                    <input name="email_perusahaan" type="text" class="form-control-custom" style="text-transform: lowercase;" value="<?= esc($data[0]['email_perusahaan']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Website Perusahaan</label>
-                        <input type="url" name="website_perusahaan" class="form-control-custom" style="text-transform: lowercase;" value="<?= esc($data[0]['website_perusahaan']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">LinkedIn Perusahaan</label>
-                    <input name="linkedin_perusahaan" type="text" class="form-control-custom" value="<?= esc($data[0]['linkedin_perusahaan']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom">
-                    <label class="form-label-custom">Instagram Perusahaan</label>
-                    <input name="instagram_perusahaan" type="text" class="form-control-custom" value="<?= esc($data[0]['instagram_perusahaan']) ?>" autocomplete="off">
-                </div>
-
-                <div class="form-row-custom full-width">
-                    <label class="form-label-custom">Logo Perusahaan</label>
-                    <div>
-                        <input class="form-control-custom" type="file" name="logo_perusahaan" accept=".jpg,.jpeg,.png">
-                        <div class="invalid-logo_perusahaan" style="display:none;color:#ef4444;font-size:12px;margin-top:4px"></div>
-                        <small class="text-slate-400" style="font-size:11px">Format: .jpg, .jpeg, .png</small>
-                        <?php 
-                        $logo_name = $data[0]['logo_perusahaan'] ?? '';
-                        $logo_path_main = 'uploads/file_startup/logo_startup/' . $logo_name;
-                        // Cek fisik file di folder public/uploads/...
-                        if (!empty($logo_name) && file_exists(FCPATH . $logo_path_main)): 
-                        ?>
-                            <div class="mt-2">
-                                <img src="<?= base_url($logo_path_main) ?>" style="height:60px;width:auto;border-radius:8px;border:1px solid #f1f5f9;box-shadow:0 2px 4px rgba(0,0,0,0.05)">
-                            </div>
-                        <?php elseif (!empty($logo_name)): ?>
-                            <div class="mt-2">
-                                <span class="text-danger" style="font-size:11px"><i class="mdi mdi-alert-circle"></i> File logo tidak ditemukan di folder uploads</span>
-                            </div>
+                    <div id="search-result" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:6px;max-height:180px;overflow-y:auto;margin-bottom:8px;z-index:999;position:relative;"></div>
+                    <div id="map-edit" style="height:300px;border-radius:6px;border:1px solid #cbd5e1;z-index:0;"></div>
+                    <input type="hidden" name="latitude" id="input_lat" value="<?= $data[0]['latitude'] ?? '' ?>">
+                    <input type="hidden" name="longitude" id="input_lng" value="<?= $data[0]['longitude'] ?? '' ?>">
+                    <div id="koordinat-info" class="mt-2 text-muted" style="font-size:13px;">
+                        <?php if (!empty($data[0]['latitude'])): ?>
+                            <i class="mdi mdi-map-marker"></i> Lat: <?= $data[0]['latitude'] ?>, Lng: <?= $data[0]['longitude'] ?>
+                        <?php else: ?>
+                            Belum ada titik dipilih
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="form-actions">
-                    <?php 
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nomor WhatsApp</label>
+                        <input name="no_whatsapp" type="text" class="form-control" value="<?= esc($data[0]['no_whatsapp']) ?>" autocomplete="off">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email Perusahaan</label>
+                        <input name="email_perusahaan" type="text" class="form-control" style="text-transform:lowercase;" value="<?= esc($data[0]['email_perusahaan']) ?>" autocomplete="off">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Website Perusahaan</label>
+                        <input type="url" name="website_perusahaan" class="form-control" style="text-transform:lowercase;" value="<?= esc($data[0]['website_perusahaan']) ?>" autocomplete="off">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">LinkedIn Perusahaan</label>
+                        <input name="linkedin_perusahaan" type="text" class="form-control" value="<?= esc($data[0]['linkedin_perusahaan']) ?>" autocomplete="off">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Instagram Perusahaan</label>
+                        <input name="instagram_perusahaan" type="text" class="form-control" value="<?= esc($data[0]['instagram_perusahaan']) ?>" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Logo Perusahaan</label>
+                    <input class="form-control" type="file" name="logo_perusahaan" accept=".jpg,.jpeg,.png">
+                    <div class="invalid-logo_perusahaan text-danger" style="display:none;font-size:12px;margin-top:4px"></div>
+                    <small class="text-muted">Format: .jpg, .jpeg, .png</small>
+                    <?php
+                    $logo_name = $data[0]['logo_perusahaan'] ?? '';
+                    $logo_path_main = 'uploads/file_startup/logo_startup/' . $logo_name;
+                    if (!empty($logo_name) && file_exists(FCPATH . $logo_path_main)):
+                    ?>
+                        <div class="mt-2">
+                            <img src="<?= base_url($logo_path_main) ?>" style="height:60px;width:auto;border-radius:6px;border:1px solid #e0e0e0;">
+                        </div>
+                    <?php elseif (!empty($logo_name)): ?>
+                        <div class="mt-2">
+                            <span class="text-danger" style="font-size:11px"><i class="mdi mdi-alert-circle"></i> File logo tidak ditemukan di folder uploads</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <?php
                     $role = session()->get('user_role');
                     $user_uuid = session()->get('user_startup_uuid');
-                    // Jika pemilik, redirect ke detail miliknya. Jika admin, ke daftar startup.
                     $cancel_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup');
                     ?>
-                    <a href="<?= $cancel_url ?>" class="btn-secondary-modern">Batal</a>
-                    <button type="submit" class="submit btn-submit-primary"><i class="mdi mdi-content-save"></i> Simpan Perubahan</button>
+                    <a href="<?= $cancel_url ?>" class="btn btn-light btn-modern border">Batal</a>
+                    <button type="submit" class="submit btn btn-primary btn-modern"><i class="mdi mdi-content-save"></i> Simpan Perubahan</button>
                 </div>
 
             </form>
@@ -428,8 +219,6 @@
 
 <script>
 $(document).ready(function () {
-    lucide.createIcons();
-    // Set nilai awal dropdown
     $('select[name="tahun_berdiri"]').val('<?= $data[0]['tahun_berdiri'] ?>');
     $('select[name="id_dosen_pembina"]').val('<?= $data[0]['id_dosen_pembina'] ?>');
     $('select[name="status_startup"]').val('<?= $data[0]['status_startup'] ?>');
@@ -445,7 +234,7 @@ $(document).ready(function () {
         e.preventDefault();
         var forms = $('#form_ubah');
         var formData = new FormData(this);
-        
+
         $('.submit').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Menyimpan...');
         $('body').css('cursor', 'wait');
 
@@ -461,10 +250,7 @@ $(document).ready(function () {
                 if (data.status) {
                     Toast.fire({ icon: 'success', title: 'Perubahan berhasil disimpan' });
                     setTimeout(function(){
-                        <?php 
-                            // Tentukan tujuan redirect di sisi PHP agar JS tinggal mengeksekusi
-                            $redirect_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup');
-                        ?>
+                        <?php $redirect_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup'); ?>
                         window.location.href = "<?= $redirect_url ?>";
                     }, 1000);
                 } else {
@@ -517,7 +303,6 @@ function cek_klaster() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Ambil koordinat yang sudah tersimpan sebelumnya (null jika belum ada)
     var existingLat = <?= !empty($data[0]['latitude'])  ? $data[0]['latitude']  : 'null' ?>;
     var existingLng = <?= !empty($data[0]['longitude']) ? $data[0]['longitude'] : 'null' ?>;
 
@@ -526,24 +311,19 @@ function cek_klaster() {
     var zoomLevel = existingLat ? 15 : 13;
 
     var mapEdit = L.map('map-edit').setView([centerLat, centerLng], zoomLevel);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(mapEdit);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapEdit);
 
-    // Auto fokus ke lokasi user jika belum ada koordinat
     if (!existingLat && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
             mapEdit.setView([pos.coords.latitude, pos.coords.longitude], 15);
         });
     }
 
-    // Tampilkan marker di peta jika koordinat sudah ada
     var marker = null;
     if (existingLat && existingLng) {
         marker = L.marker([existingLat, existingLng]).addTo(mapEdit);
     }
 
-    // Saat peta diklik, pindahkan/pasang marker dan perbarui input koordinat
     mapEdit.on('click', function(e) {
         var lat = e.latlng.lat.toFixed(7);
         var lng = e.latlng.lng.toFixed(7);
@@ -551,8 +331,7 @@ function cek_klaster() {
         else marker = L.marker(e.latlng).addTo(mapEdit);
         document.getElementById('input_lat').value = lat;
         document.getElementById('input_lng').value = lng;
-        document.getElementById('koordinat-info').innerHTML =
-            '<i class="mdi mdi-map-marker" style="color:var(--primary)"></i> Lat: ' + lat + ', Lng: ' + lng;
+        document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> Lat: ' + lat + ', Lng: ' + lng;
     });
 
     function cariLokasi() {
@@ -562,10 +341,10 @@ function cek_klaster() {
             .then(r => r.json())
             .then(results => {
                 var box = document.getElementById('search-result');
-                if (!results.length) { box.style.display='block'; box.innerHTML='<div style="padding:10px;font-size:13px;color:var(--slate-400);">Lokasi tidak ditemukan</div>'; return; }
+                if (!results.length) { box.style.display='block'; box.innerHTML='<div style="padding:10px;font-size:13px;color:#94a3b8;">Lokasi tidak ditemukan</div>'; return; }
                 box.style.display = 'block';
                 box.innerHTML = results.map(function(r) {
-                    return '<div onclick="pilihLokasi(' + r.lat + ',' + r.lon + ',\'' + r.display_name.replace(/'/g,"\\'") + '\')" style="padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--slate-100);" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'#fff\'">' + r.display_name + '</div>';
+                    return '<div onclick="pilihLokasi(' + r.lat + ',' + r.lon + ',\'' + r.display_name.replace(/'/g,"\\'") + '\')" style="padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid #f1f5f9;" onmouseover="this.style.background=\'#f1f5f9\'" onmouseout="this.style.background=\'#fff\'">' + r.display_name + '</div>';
                 }).join('');
             });
     }
@@ -577,7 +356,7 @@ function cek_klaster() {
         mapEdit.setView(latlng, 16);
         document.getElementById('input_lat').value = parseFloat(lat).toFixed(7);
         document.getElementById('input_lng').value = parseFloat(lng).toFixed(7);
-        document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker" style="color:var(--primary)"></i> ' + nama;
+        document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> ' + nama;
         document.getElementById('search-result').style.display = 'none';
         document.getElementById('search-lokasi').value = '';
     }

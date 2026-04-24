@@ -67,6 +67,7 @@ class M_perpustakaan extends Model
             'judul_video'       => $data['judul_video'],
             'deskripsi_video'   => $data['deskripsi_video'] ?? null,
             'kode_video'        => base64_encode($data['kode_video']),
+            'kategori_video'    => $data['kategori_video'] ?? null,
             'status_video'      => $data['status_video'] ?? 'Publik',
             'uuid_konten_video' => bin2hex(random_bytes(16)),
         ];
@@ -82,6 +83,7 @@ class M_perpustakaan extends Model
             'judul_video'     => $data['judul_video'],
             'deskripsi_video' => $data['deskripsi_video'] ?? null,
             'kode_video'      => base64_encode($data['kode_video']),
+            'kategori_video'  => $data['kategori_video'] ?? null,
             'status_video'    => $data['status_video'],
         ];
         return $this->db->table('konten_video')->where('id_konten_video', $data['id_konten_video'])->update($update);
@@ -161,6 +163,7 @@ class M_perpustakaan extends Model
             'penulis_ebook'     => $data['penulis_ebook'] ?? null,
             'file_ebook'        => $data['file_ebook'],
             'sampul_ebook'      => $data['sampul_ebook'] ?? null,
+            'kategori_ebook'    => $data['kategori_ebook'] ?? null,
             'status_ebook'      => $data['status_ebook'] ?? 'Publik',
             'uuid_konten_ebook' => bin2hex(random_bytes(16)),
         ];
@@ -176,6 +179,7 @@ class M_perpustakaan extends Model
             'judul_ebook'    => $data['judul_ebook'],
             'deskripsi_ebook'=> $data['deskripsi_ebook'] ?? null,
             'penulis_ebook'  => $data['penulis_ebook'] ?? null,
+            'kategori_ebook' => $data['kategori_ebook'] ?? null,
             'status_ebook'   => $data['status_ebook'],
         ];
         if (!empty($data['file_ebook']))   $update['file_ebook']   = $data['file_ebook'];

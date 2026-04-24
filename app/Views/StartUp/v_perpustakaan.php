@@ -1,128 +1,20 @@
-<?php /* View: Perpustakaan — halaman gabungan ebook & video di satu tempat */ ?>
+<?php /* View: Perpustakaan — halaman khusus ebook/buku digital */ ?>
+<?php $isVideoPage = !empty($video_only); ?>
 <style>
     /* ============================================
        PERPUSTAKAAN UI — Combined Library Theme
        ============================================ */
 
     /* Memaksa background dashboard menjadi putih seragam */
-    body, #content-wrapper, #content, .container-fluid, .app-content {
+    body, #content-wrapper, #content, .container-fluid, .app-content, .app-main, .app-wrapper {
         background-color: #ffffff !important;
-    }
-
-    /* ── Section Filter Bar (di bawah topbar) ── */
-    .perpus-filter-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 28px;
-        background: #fff;
-        border-radius: 16px;
-        padding: 6px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        border: 1px solid rgba(0,0,0,0.06);
-    }
-    .perpus-filter-tabs {
-        display: flex;
-        gap: 4px;
-        flex: 1;
-    }
-    .perpus-filter-tab {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 14px 20px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: transparent;
-        color: #9C8E7A;
-        position: relative;
-        overflow: hidden;
-    }
-    .perpus-filter-tab::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    .perpus-filter-tab:hover:not(.active) {
-        color: #3D3426;
-        background: #f8f5f0;
-    }
-    .perpus-filter-tab.active {
-        background: #3D3426;
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(61,52,38,0.2);
-    }
-    .perpus-filter-tab svg {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-        transition: transform 0.3s;
-    }
-
-    #tabEbook:hover svg, #tabEbook.active svg {
-        animation: flipIcon 2.5s infinite ease-in-out;
-    }
-    #tabVideo:hover svg, #tabVideo.active svg {
-        animation: pulseIcon 2s infinite ease-in-out;
-    }
-
-    @keyframes flipIcon {
-        0% { transform: perspective(200px) rotateY(0deg); }
-        40% { transform: perspective(200px) rotateY(180deg); }
-        50% { transform: perspective(200px) rotateY(180deg); }
-        90% { transform: perspective(200px) rotateY(360deg); }
-        100% { transform: perspective(200px) rotateY(360deg); }
-    }
-    @keyframes pulseIcon {
-        0% { transform: scale(1); }
-        25% { transform: scale(1.18) rotate(5deg); }
-        50% { transform: scale(1); }
-        75% { transform: scale(1.18) rotate(-5deg); }
-        100% { transform: scale(1); }
-    }
-    .perpus-filter-tab .tab-count {
-        font-size: 11px;
-        font-weight: 800;
-        padding: 2px 8px;
-        border-radius: 20px;
-        background: rgba(0,0,0,0.08);
-        transition: all 0.3s;
-    }
-    .perpus-filter-tab.active .tab-count {
-        background: rgba(255,255,255,0.2);
-    }
-
-    /* ── Content Sections ── */
-    .perpus-section {
-        display: none;
-        animation: fadeInSection 0.4s ease;
-    }
-    .perpus-section.active {
-        display: block;
-    }
-    @keyframes fadeInSection {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
     }
 
     /* ============================
        BOOKSHELF STYLES (EBOOK)
        ============================ */
-    .library-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 32px;
-    }
+   
+    
     .library-header h2 {
         font-size: 28px;
         font-weight: 800;
@@ -227,6 +119,7 @@
         position: relative;
         padding: 24px 20px 0 20px;
         min-height: 220px;
+        padding-bottom: 20px;
     }
     .bookshelf::after {
         content: '';
@@ -254,7 +147,7 @@
         display: flex;
         align-items: flex-end;
         gap: 12px;
-        padding-bottom: 20px;
+        padding-bottom: 28px;
         overflow-x: auto;
         scrollbar-width: none;
     }
@@ -275,20 +168,20 @@
     }
 
     .book-title-label {
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 700;
         color: #3D3426;
         text-align: center;
-        margin-top: 12px;
-        width: 220px;
+        margin-top: 10px;
+        width: 160px;
         line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-transform: capitalize;
-        opacity: 0.85;
-        height: 32.2px;
+        opacity: 0.9;
+        flex-shrink: 0;
     }
 
     .book-cover {
@@ -490,28 +383,37 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         cursor: pointer;
         transition: all 0.3s;
         flex-shrink: 0;
+        box-shadow: 4px 4px 12px rgba(0,0,0,0.06), 1px 1px 3px rgba(0,0,0,0.05);
     }
     .book-add-btn:hover {
         border-color: #8B7355;
-        background: rgba(255,255,255,0.8);
-        transform: translateY(-4px);
+        background: rgba(255,255,255,0.85);
+        transform: translateY(-6px);
+        box-shadow: 4px 10px 20px rgba(0,0,0,0.1);
     }
     .book-add-btn svg {
-        width: 24px;
-        height: 24px;
-        color: #B8A990;
+        width: 28px;
+        height: 28px;
+        color: #C4B8A8;
+        transition: color 0.3s;
     }
+    .book-add-btn:hover svg { color: #8B7355; }
     .book-add-btn span {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
-        color: #B8A990;
+        color: #C4B8A8;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
+        text-align: center;
+        padding: 0 16px;
+        line-height: 1.5;
+        transition: color 0.3s;
     }
+    .book-add-btn:hover span { color: #8B7355; }
 
     /* Modal PDF Viewer */
     #modalPdf { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.95); backdrop-filter: blur(12px); align-items:center; justify-content:center; }
@@ -738,11 +640,30 @@
         bottom: 0;
         right: 0;
         width: 120px;
-        height: 40px;
-        background: linear-gradient(135deg, transparent 30%, rgba(0,0,0,0.9) 100%);
+        height: 48px;
+        background: linear-gradient(135deg, transparent 20%, rgba(0,0,0,0.95) 100%);
         z-index: 10;
         pointer-events: none;
         border-radius: 12px 0 0 0;
+    }
+
+    /* Top overlay to mask YouTube title/avatar when paused */
+    .plyr__video-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, transparent 100%);
+        z-index: 15;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .plyr.plyr--paused .plyr__video-wrapper::before,
+    .plyr.plyr--stopped .plyr__video-wrapper::before {
+        opacity: 1;
     }
 
     .vid-thumb-overlay {
@@ -762,6 +683,17 @@
         display: none !important;
         opacity: 0 !important;
         visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* Pastikan klik selalu bisa menembus ke handler onclick */
+    .vid-thumb .plyr,
+    .vid-thumb .plyr__video-wrapper,
+    .vid-thumb .plyr__video-embed {
+        pointer-events: none !important;
+    }
+    .vid-thumb .plyr__controls {
+        pointer-events: auto !important;
     }
 
     .vid-badge {
@@ -936,21 +868,89 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     .grid-2 .form-row-custom { margin-bottom: 0px; }
     @media (max-width: 576px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── Filter Chip Bar ── */
+    .filter-chip-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+        padding: 14px 20px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.06);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .filter-chip-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #9C8E7A;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 4px;
+        flex-shrink: 0;
+    }
+    .filter-chip {
+        padding: 6px 16px;
+        border-radius: 20px;
+        border: 1.5px solid #E8DFD0;
+        background: #fff;
+        color: #6B5B45;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .filter-chip:hover:not(.active) {
+        border-color: #C4B8A8;
+        background: #FAFAF9;
+        color: #3D3426;
+    }
+    .filter-chip.active {
+        background: #3D3426;
+        border-color: #3D3426;
+        color: #fff;
+    }
+    .filter-chip.active:hover {
+        background: #3D3426;
+        border-color: #3D3426;
+        color: #fff;
+    }
+    .filter-chip-divider {
+        width: 1px;
+        height: 20px;
+        background: #E8DFD0;
+        margin: 0 4px;
+        flex-shrink: 0;
+    }
 </style>
 
 <div class="app-content">
+    <?php if (session()->getFlashdata('success')): ?>
+    <script>document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', showConfirmButton: false, timer: 2000 });
+    });</script>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+    <script>document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>', confirmButtonColor: '#d33' });
+    });</script>
+    <?php endif; ?>
+    <?php if (!$isVideoPage): ?>
 
-    <!-- ═══════════════════════════════════════════════
-         SECTION: EBOOK (Bookshelf)
-         ═══════════════════════════════════════════════ -->
-    <div class="perpus-section active" id="sectionEbook">
+    <?php if (session()->get('user_role') === 'admin'): ?>
+    <?php endif; ?>
 
-        <!-- Stats -->
-        <?php if (session()->get('user_role') === 'admin'): ?>
+    <!-- Stats -->
+    <?php if (session()->get('user_role') === 'admin'): ?>
         <div class="library-stats">
             <div class="library-stat">
                 <div class="library-stat-icon" style="background: #F0EBE0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#8B7355"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#8B7355">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
                 </div>
                 <div>
                     <div class="library-stat-value"><?= count($ebooks ?? []) ?></div>
@@ -959,7 +959,10 @@
             </div>
             <div class="library-stat">
                 <div class="library-stat-icon" style="background: #E8F5E9;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#4CAF50"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#4CAF50">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
                 </div>
                 <div>
                     <div class="library-stat-value"><?= count(array_filter($ebooks ?? [], fn($e) => strtolower($e->status_ebook) === 'publik')) ?></div>
@@ -968,7 +971,9 @@
             </div>
             <div class="library-stat">
                 <div class="library-stat-icon" style="background: #FFF3E0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#FF9800"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#FF9800">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
                 </div>
                 <div>
                     <div class="library-stat-value"><?= count(array_filter($ebooks ?? [], fn($e) => strtolower($e->status_ebook) === 'privat')) ?></div>
@@ -976,197 +981,237 @@
                 </div>
             </div>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
 
-        <!-- Search Bar -->
-        <div class="library-search">
-            <div class="library-search-input" style="border-left: none; padding-left: 0;">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" id="searchEbook" placeholder="Cari ebook di perpustakaan..." oninput="searchBooks(this.value)">
+    <!-- Search Bar -->
+    <div class="library-search">
+        <div class="library-search-input" style="border-left: none; padding-left: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" id="searchEbook" placeholder="Cari ebook di perpustakaan..." oninput="searchBooks(this.value)">
+        </div>
+    </div>
+
+    <!-- Filter Chip Ebook -->
+    <div class="filter-chip-bar" id="filterChipEbook">
+        <span class="filter-chip-label">Filter</span>
+        <button class="filter-chip active" onclick="filterEbook('kategori', '', this)">Semua</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Teknologi', this)">Teknologi</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Marketing', this)">Marketing</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Keuangan', this)">Keuangan</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Manajemen', this)">Manajemen</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
+        <button class="filter-chip" onclick="filterEbook('kategori', 'Motivasi', this)">Motivasi</button>
+        <div class="filter-chip-divider"></div>
+        <button class="filter-chip" onclick="filterEbook('status', 'publik', this)">Publik</button>
+        <button class="filter-chip" onclick="filterEbook('status', 'privat', this)">Privat</button>
+    </div>
+
+    <?php if (empty($ebooks)): ?>
+            <div class="empty-library">
+                <div class="empty-library-icon">??</div>
+                <h3>Perpustakaan Masih Kosong</h3>
+                <p>Belum ada ebook yang ditambahkan ke koleksi perpustakaan.</p>
             </div>
-        </div>
-
-        <?php if (empty($ebooks)): ?>
-        <div class="empty-library">
-            <div class="empty-library-icon">📖</div>
-            <h3>Perpustakaan Masih Kosong</h3>
-            <p>Belum ada ebook yang ditambahkan ke koleksi perpustakaan.</p>
-        </div>
         <?php else: ?>
 
-        <?php
+            <?php
             $colorPalettes = ['cover-palette-1','cover-palette-2','cover-palette-3','cover-palette-4','cover-palette-5','cover-palette-6'];
-        ?>
+            ?>
 
-        <div class="shelf-section" id="shelf-all">
-            <div class="shelf-section-header">
-                <div>
-                    <span class="shelf-section-count" style="margin-left: 0; font-size: 14px; color: #3D3426;"><?= count($ebooks) ?> buku terdaftar</span>
+            <div class="shelf-section" id="shelf-all">
+                <div class="shelf-section-header">
+                    <div>
+                        <span class="shelf-section-count" style="margin-left: 0; font-size: 14px; color: #3D3426;"><?= count($ebooks) ?> buku terdaftar</span>
+                    </div>
+                </div>
+                <div class="bookshelf">
+                    <div class="books-row" id="booksContainer">
+                        <?php foreach ($ebooks as $idx => $e): ?>
+                            <div class="book-item" data-title="<?= strtolower(esc($e->judul_ebook)) ?>" data-status="<?= strtolower($e->status_ebook) ?>" data-kategori="<?= esc($e->kategori_ebook ?? '') ?>" onclick="<?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" style="cursor:pointer;">
+                                <?php if (strtolower($e->status_ebook) !== 'publik'): ?>
+                                    <span class="book-badge <?= strtolower($e->status_ebook) ?>"><?= $e->status_ebook ?></span>
+                                <?php endif; ?>
+                                <div class="book-cover">
+                                    <?php if ($e->sampul_ebook && file_exists(FCPATH . 'uploads/ebook/sampul/' . $e->sampul_ebook)): ?>
+                                        <img src="<?= base_url('uploads/ebook/sampul/' . $e->sampul_ebook) ?>" alt="<?= esc($e->judul_ebook) ?>">
+                                    <?php else: ?>
+                                        <div class="book-cover-default <?= $colorPalettes[$idx % count($colorPalettes)] ?>">
+                                            <div class="book-emoji">??</div>
+                                            <div class="book-def-title"><?= strtolower(esc(substr($e->judul_ebook, 0, 40))) ?></div>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="book-overlay">
+                                        <div class="book-overlay-title"><?= strtolower(esc($e->judul_ebook)) ?></div>
+                                        <?php if ($e->penulis_ebook): ?>
+                                            <div class="book-overlay-author"><?= strtolower(esc($e->penulis_ebook)) ?></div>
+                                        <?php endif; ?>
+                                        <div class="book-overlay-actions">
+                                            <button onclick="event.stopPropagation(); <?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" class="book-overlay-btn btn-read" title="Baca">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                                </svg>
+                                            </button>
+                                            <?php if (session()->get('user_role') === 'admin'): ?>
+                                                <?php if (strtolower($e->status_ebook) === 'privat'): ?>
+                                                    <button onclick="event.stopPropagation(); bukaModalAksesEbook(<?= $e->id_konten_ebook ?>, '<?= esc($e->judul_ebook) ?>')" class="book-overlay-btn btn-edit" title="Kelola Akses" style="background:rgba(99,102,241,0.25);color:#fff;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                                        </svg>
+                                                    </button>
+                                                <?php endif; ?>
+                                                <button onclick="event.stopPropagation(); window.location.href='<?= base_url('perpustakaan/edit_buku/' . $e->id_konten_ebook) ?>'" class="book-overlay-btn btn-edit" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="event.stopPropagation(); hapusEbook(<?= $e->id_konten_ebook ?>)" class="book-overlay-btn btn-del" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="book-title-label"><?= strtolower(esc($e->judul_ebook)) ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php if (session()->get('user_role') === 'admin'): ?>
+                        <div class="book-item" onclick="window.location.href='<?= base_url('perpustakaan/tambah_buku') ?>'" style="cursor:pointer;">
+                            <div class="book-add-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Tambah Buku Digital</span>
+                            </div>
+                            <div class="book-title-label" style="opacity:0;">-</div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-            <div class="bookshelf">
-                <div class="books-row" id="booksContainer">
-                    <?php foreach ($ebooks as $idx => $e): ?>
-                    <div class="book-item" data-title="<?= strtolower(esc($e->judul_ebook)) ?>" data-status="<?= strtolower($e->status_ebook) ?>" onclick="<?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" style="cursor:pointer;">
-                        <?php if (strtolower($e->status_ebook) !== 'publik'): ?>
-                        <span class="book-badge <?= strtolower($e->status_ebook) ?>"><?= $e->status_ebook ?></span>
-                        <?php endif; ?>
-                        <div class="book-cover">
-                            <?php if ($e->sampul_ebook && file_exists(FCPATH . 'uploads/ebook/sampul/' . $e->sampul_ebook)): ?>
-                                <img src="<?= base_url('uploads/ebook/sampul/' . $e->sampul_ebook) ?>" alt="<?= esc($e->judul_ebook) ?>">
-                            <?php else: ?>
-                                <div class="book-cover-default <?= $colorPalettes[$idx % count($colorPalettes)] ?>">
-                                    <div class="book-emoji">📕</div>
-                                    <div class="book-def-title"><?= strtolower(esc(substr($e->judul_ebook, 0, 40))) ?></div>
-                                </div>
-                            <?php endif; ?>
 
-                            <div class="book-overlay">
-                                <div class="book-overlay-title"><?= strtolower(esc($e->judul_ebook)) ?></div>
-                                <?php if ($e->penulis_ebook): ?>
-                                <div class="book-overlay-author"><?= strtolower(esc($e->penulis_ebook)) ?></div>
+    <?php endif; ?>
+    <?php endif; ?>
+
+    <?php if ($isVideoPage): ?>
+        <div class="perpus-section" id="sectionVideo">
+            <!-- Search Bar -->
+            <div class="cinema-search" style="margin-top: 10px; margin-bottom: 8px;">
+                <div class="cinema-search-input" style="border-left: none; padding-left: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B8A990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <input type="text" id="searchVideo" placeholder="Cari video pembelajaran..." oninput="searchVideos(this.value)">
+                </div>
+            </div>
+
+            <!-- Filter Chip Video -->
+            <div class="filter-chip-bar" id="filterChipVideo">
+                <span class="filter-chip-label">Filter</span>
+                <button class="filter-chip active" onclick="filterVideo('kategori', '', this)">Semua</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Teknologi', this)">Teknologi</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Marketing', this)">Marketing</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Keuangan', this)">Keuangan</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Manajemen', this)">Manajemen</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Motivasi', this)">Motivasi</button>
+                <button class="filter-chip" onclick="filterVideo('kategori', 'Podcast', this)">Podcast</button>
+                <div class="filter-chip-divider"></div>
+                <button class="filter-chip" onclick="filterVideo('status', 'publik', this)">Publik</button>
+                <button class="filter-chip" onclick="filterVideo('status', 'privat', this)">Privat</button>
+            </div>
+
+            <div class="d-flex justify-content-end" style="padding: 10px 0; margin-bottom: 24px;">
+                <?php if (session()->get('user_role') === 'admin'): ?>
+                    <a href="<?= base_url('perpustakaan/tambah_video') ?>" class="btn-add-video" style="padding: 8px 16px; text-decoration:none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px; height:16px; margin-right:6px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Video
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <?php if (empty($videos)): ?>
+                <div class="empty-cinema">
+                    <div class="empty-cinema-icon">??</div>
+                    <h3>Belum Ada Video</h3>
+                    <p>Belum ada konten video yang ditambahkan ke galeri pembelajaran.</p>
+                </div>
+            <?php else: ?>
+
+                <!-- Video Grid -->
+                <div class="video-grid" id="videoContainer">
+                    <?php foreach ($videos as $v): ?>
+                        <div class="vid-card" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-kategori="<?= esc($v->kategori_video ?? '') ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>" data-uuid="<?= $v->uuid_konten_video ?>">
+                            <!-- Area Thumbnail: Klik untuk Baca Video -->
+                            <div class="vid-thumb" id="thumb_<?= $v->id_konten_video ?>"
+                                 data-action="<?= $v->punya_akses ? "bacaVideo('" . $v->uuid_konten_video . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?>">
+                                <img src="https://img.youtube.com/vi/<?= $v->youtube_id ?>/hqdefault.jpg" alt="<?= esc($v->judul_video) ?>">
+                                <div class="vid-thumb-overlay"></div>
+
+                                <div id="player_<?= $v->id_konten_video ?>" class="vid-player-placeholder"
+                                     data-plyr-provider="youtube"
+                                     data-plyr-embed-id="<?= $v->youtube_id ?>"></div>
+                            </div>
+
+                            <!-- Area Body: Klik untuk Lihat Detail Modal -->
+                            <div class="vid-body" style="cursor: pointer; position: relative;"
+                                 data-action="<?= $v->punya_akses ? "bacaVideo('" . $v->uuid_konten_video . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?>">
+                                <div class="vid-title"><?= strtolower(esc($v->judul_video)) ?></div>
+                                <?php if ($v->deskripsi_video): ?>
+                                    <div class="vid-desc"><?= esc($v->deskripsi_video) ?></div>
+                                <?php else: ?>
+                                    <div class="vid-desc" style="color:#D4C4A8; font-style:italic;">Belum ada deskripsi</div>
                                 <?php endif; ?>
-                                <div class="book-overlay-actions">
-                                    <button onclick="event.stopPropagation(); <?= $e->punya_akses ? "bacaEbook('" . $e->uuid_konten_ebook . "')" : "aksesPrivat('ebook', " . $e->id_konten_ebook . ", '" . esc($e->judul_ebook) . "')" ?>" class="book-overlay-btn btn-read" title="Baca">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                    </button>
+
+                                <div class="vid-footer">
+                                    <div class="vid-meta"></div>
                                     <?php if (session()->get('user_role') === 'admin'): ?>
-                                    <?php if (strtolower($e->status_ebook) === 'privat'): ?>
-                                    <button onclick="event.stopPropagation(); bukaModalAksesEbook(<?= $e->id_konten_ebook ?>, '<?= esc($e->judul_ebook) ?>')" class="book-overlay-btn btn-edit" title="Kelola Akses" style="background:rgba(99,102,241,0.25);color:#fff;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                    </button>
-                                    <?php endif; ?>
-                                    <button onclick="event.stopPropagation(); bukaModalUbahEbook(<?= $e->id_konten_ebook ?>)" class="book-overlay-btn btn-edit" title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                    </button>
-                                    <button onclick="event.stopPropagation(); hapusEbook(<?= $e->id_konten_ebook ?>)" class="book-overlay-btn btn-del" title="Hapus">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
+                                        <div class="vid-actions">
+                                            <?php if (strtolower($v->status_video) === 'privat'): ?>
+                                                <button onclick="event.stopPropagation(); bukaModalAksesVideo(<?= $v->id_konten_video ?>, '<?= esc($v->judul_video) ?>')" class="vid-action-btn" title="Kelola Akses">
+                                                    <i data-lucide="users" style="width:14px;"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                            <a href="<?= base_url('perpustakaan/edit_video/' . $v->id_konten_video) ?>" onclick="event.stopPropagation();" class="vid-action-btn" title="Edit" style="display:flex;align-items:center;justify-content:center;">
+                                                <i data-lucide="edit-3" style="width:14px;"></i>
+                                            </a>
+                                            <button onclick="event.stopPropagation(); hapusVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn danger" title="Hapus">
+                                                <i data-lucide="trash-2" style="width:14px;"></i>
+                                            </button>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
-                        <div class="book-title-label">
-                            <?= strtolower(esc($e->judul_ebook)) ?>
-                        </div>
-                    </div>
                     <?php endforeach; ?>
-
-                    <?php if (session()->get('user_role') === 'admin'): ?>
-                    <div class="book-add-btn" onclick="bukaModalTambahEbook()" style="margin-bottom: 44.2px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        <span>Tambah</span>
-                    </div>
-                    <?php endif; ?>
                 </div>
-            </div>
-        </div>
 
-        <!-- No results state -->
-        <div id="noResults" style="display:none; text-align:center; padding: 60px 20px;">
-            <div style="font-size: 48px; margin-bottom: 12px;">🔍</div>
-            <h4 style="font-size: 16px; color: #3D3426; font-weight: 700; margin-bottom: 6px;">Tidak ditemukan</h4>
-            <p style="font-size: 13px; color: #9C8E7A;">Coba kata kunci lain untuk pencarian Anda.</p>
-        </div>
+                <!-- No results state -->
+                <div id="noVideoResults" style="display:none; text-align:center; padding: 60px 20px;">
+                    <div style="font-size: 48px; margin-bottom: 12px;">??</div>
+                    <h4 style="font-size: 16px; color: #3D3426; font-weight: 700; margin-bottom: 6px;">Tidak ditemukan</h4>
+                    <p style="font-size: 13px; color: #9C8E7A;">Coba kata kunci lain untuk pencarian Anda.</p>
+                </div>
 
-        <?php endif; ?>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════
-         SECTION: VIDEO (Cinema)
-         ═══════════════════════════════════════════════ -->
-    <div class="perpus-section" id="sectionVideo">
-        <!-- Search Bar -->
-        <div class="cinema-search" style="margin-top: 10px; margin-bottom: 8px;">
-            <div class="cinema-search-input" style="border-left: none; padding-left: 0;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B8A990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" id="searchVideo" placeholder="Cari video pembelajaran..." oninput="searchVideos(this.value)">
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-end" style="padding: 10px 0; margin-bottom: 24px;">
-            <?php if (session()->get('user_role') === 'admin'): ?>
-            <button onclick="bukaModalTambahVideo()" class="btn-add-video" style="padding: 8px 16px;">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px; height:16px; margin-right:6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Tambah Video
-            </button>
             <?php endif; ?>
         </div>
-
-        <?php if (empty($videos)): ?>
-        <div class="empty-cinema">
-            <div class="empty-cinema-icon">🎬</div>
-            <h3>Belum Ada Video</h3>
-            <p>Belum ada konten video yang ditambahkan ke galeri pembelajaran.</p>
-        </div>
-        <?php else: ?>
-
-        <!-- Video Grid -->
-        <div class="video-grid" id="videoContainer">
-            <?php foreach ($videos as $v): ?>
-            <div class="vid-card" data-title="<?= strtolower(esc($v->judul_video)) ?>" data-status="<?= strtolower($v->status_video) ?>" data-vid-id="<?= $v->id_konten_video ?>" data-yt-id="<?= $v->youtube_id ?>" data-uuid="<?= $v->uuid_konten_video ?>">
-                <!-- Area Thumbnail: Klik untuk Baca Video -->
-                <div class="vid-thumb" id="thumb_<?= $v->id_konten_video ?>" 
-                     onclick="if(!event.target.closest('.plyr__controls')) { <?= $v->punya_akses ? "bacaVideo('" . $v->uuid_konten_video . "')" : "aksesPrivat('video', " . $v->id_konten_video . ", '" . esc($v->judul_video) . "')" ?> }">
-                    <img src="https://img.youtube.com/vi/<?= $v->youtube_id ?>/hqdefault.jpg" alt="<?= esc($v->judul_video) ?>">
-                    <div class="vid-thumb-overlay"></div>
-
-                    <div id="player_<?= $v->id_konten_video ?>" class="vid-player-placeholder" 
-                         data-plyr-provider="youtube" 
-                         data-plyr-embed-id="<?= $v->youtube_id ?>"></div>
-                </div>
-
-                <!-- Area Body: Klik untuk Lihat Detail Modal -->
-                <div class="vid-body" style="cursor: pointer; position: relative;"
-                     data-vid-id="<?= $v->id_konten_video ?>"
-                     data-title="<?= esc($v->judul_video) ?>"
-                     data-desc="<?= esc($v->deskripsi_video) ?>"
-                     data-status="<?= esc($v->status_video) ?>"
-                     data-yt-id="<?= esc($v->youtube_id) ?>"
-                     data-uuid="<?= esc($v->uuid_konten_video) ?>"
-                     onclick="if(!event.target.closest('.vid-actions')) bukaDetailVideoFromEl(this)">
-                    <div class="vid-title"><?= strtolower(esc($v->judul_video)) ?></div>
-                    <?php if ($v->deskripsi_video): ?>
-                    <div class="vid-desc"><?= esc($v->deskripsi_video) ?></div>
-                    <?php else: ?>
-                    <div class="vid-desc" style="color:#D4C4A8; font-style:italic;">Belum ada deskripsi</div>
-                    <?php endif; ?>
-                    
-                    <div class="vid-footer">
-                        <div class="vid-meta"></div>
-                        <?php if (session()->get('user_role') === 'admin'): ?>
-                        <div class="vid-actions">
-                            <?php if (strtolower($v->status_video) === 'privat'): ?>
-                            <button onclick="event.stopPropagation(); bukaModalAksesVideo(<?= $v->id_konten_video ?>, '<?= esc($v->judul_video) ?>')" class="vid-action-btn" title="Kelola Akses">
-                                <i data-lucide="users" style="width:14px;"></i>
-                            </button>
-                            <?php endif; ?>
-                            <button onclick="event.stopPropagation(); bukaModalUbahVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn" title="Edit">
-                                <i data-lucide="edit-3" style="width:14px;"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); hapusVideo(<?= $v->id_konten_video ?>)" class="vid-action-btn danger" title="Hapus">
-                                <i data-lucide="trash-2" style="width:14px;"></i>
-                            </button>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-
-        <!-- No results state -->
-        <div id="noVideoResults" style="display:none; text-align:center; padding: 60px 20px;">
-            <div style="font-size: 48px; margin-bottom: 12px;">🔍</div>
-            <h4 style="font-size: 16px; color: #3D3426; font-weight: 700; margin-bottom: 6px;">Tidak ditemukan</h4>
-            <p style="font-size: 13px; color: #9C8E7A;">Coba kata kunci lain untuk pencarian Anda.</p>
-        </div>
-
-        <?php endif; ?>
-    </div>
+    <?php endif; ?>
 
 </div>
 
+
+
+<?php if (!$isVideoPage): ?>
 <!-- Modal PDF Viewer -->
 <div id="modalPdf">
     <div class="pdf-wrap">
@@ -1174,6 +1219,7 @@
         <iframe id="iframePdf" src=""></iframe>
     </div>
 </div>
+<?php endif; ?>
 
 <?php if (session()->get('user_role') === 'admin'): ?>
 <!-- Modal Kelola Akses Privat -->
@@ -1202,6 +1248,7 @@
     </div>
 </div>
 
+<?php if (!$isVideoPage): ?>
 <!-- Modal Tambah/Edit Ebook -->
 <div id="modalEbook" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -1226,6 +1273,22 @@
                                     <label class="form-label-custom">Penulis</label>
                                     <input type="text" name="penulis_ebook" id="penulis_ebook" class="form-control-custom" style="text-transform:capitalize;" placeholder="Nama penulis" autocomplete="off">
                                 </div>
+                                <div class="form-row-custom">
+                                    <label class="form-label-custom">Kategori</label>
+                                    <select name="kategori_ebook" id="kategori_ebook" class="form-control-custom">
+                                        <option value="">-- Pilih Kategori --</option>
+                                        <option value="Bisnis & Startup">Bisnis &amp; Startup</option>
+                                        <option value="Teknologi">Teknologi</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Keuangan">Keuangan</option>
+                                        <option value="Manajemen">Manajemen</option>
+                                        <option value="Hukum & Legalitas">Hukum &amp; Legalitas</option>
+                                        <option value="Desain & Produk">Desain &amp; Produk</option>
+                                        <option value="Motivasi">Motivasi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-2">
                                 <div class="form-row-custom">
                                     <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
                                     <select name="status_ebook" id="status_ebook" class="form-control-custom" required onchange="toggleAksesEbook(this.value)">
@@ -1272,78 +1335,26 @@
         </div>
     </div>
 </div>
-
-<!-- Modal Tambah/Edit Video -->
-<div id="modalVideo" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-            <form id="formVideo" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="judulModalVideo">Tambah Video Baru</h5>
-                    <div class="modal-subtitle" id="subjudulModalVideo">Lengkapi informasi di bawah untuk menambahkan konten video.</div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4 pb-2">
-                    <input type="hidden" name="id_konten_video" id="id_konten_video">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-                        <!-- Kiri: Form -->
-                        <div>
-                            <div class="form-row-custom">
-                                <label class="form-label-custom">Judul Video <span class="text-danger">*</span></label>
-                                <input type="text" name="judul_video" id="judul_video" class="form-control-custom" style="text-transform:capitalize;" placeholder="Masukkan judul video..." autocomplete="off" required>
-                            </div>
-                            <div class="form-row-custom">
-                                <label class="form-label-custom">URL YouTube <span class="text-danger">*</span></label>
-                                <input type="url" name="url_video" id="url_video" class="form-control-custom" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" required>
-                                <span class="form-helper">Pastikan URL video disalin secara penuh dari address bar browser.</span>
-                            </div>
-                            <div class="form-row-custom">
-                                <label class="form-label-custom">Deskripsi <span style="color:#94a3b8;font-weight:500;font-size:11px;">(Opsional)</span></label>
-                                <textarea name="deskripsi_video" id="deskripsi_video" class="form-control-custom" rows="3" placeholder="Tambahkan deskripsi singkat mengenai isi konten video ini..."></textarea>
-                            </div>
-                            <div class="form-row-custom mb-0">
-                                <label class="form-label-custom">Status Akses <span class="text-danger">*</span></label>
-                                <select name="status_video" id="status_video" class="form-control-custom" required onchange="toggleAksesVideo(this.value)">
-                                    <option value="Publik">Publik</option>
-                                    <option value="Privat">Privat</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Kanan: Akses -->
-                        <div id="seksiAksesVideo" style="display:none; border-left:1.5px solid #f1f5f9; padding-left:24px;">
-                            <div class="form-label-custom mb-2">Cari & Tambah User</div>
-                            <input type="text" id="cari_user_video" class="form-control-custom" placeholder="Ketik nama atau email..." autocomplete="off" oninput="cariUserInline('video', this.value)" style="margin-bottom:8px;">
-                            <div id="hasilCariUserVideo" style="max-height:180px; overflow-y:auto; margin-bottom:16px;"></div>
-                            <div class="form-label-custom mb-2" style="font-size:12px;">Sudah Punya Akses</div>
-                            <div id="listAksesVideo" style="max-height:180px; overflow-y:auto;"></div>
-                        </div>
-                        <div id="seksiAksesVideoEmpty" style="border-left:1.5px solid #f1f5f9; padding-left:24px; display:flex; align-items:center; justify-content:center;">
-                            <p style="font-size:13px; color:#C4B8A8; text-align:center;">Pilih status <b>Privat</b><br>untuk mengatur akses user.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions mt-3">
-                    <button type="button" class="btn-secondary-modern" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-submit-primary">Simpan Data</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <?php endif; ?>
 
-<?= view('startup/v_modal_video') ?>
+
+<?php endif; ?>
+
 
 <script>
     // ═══════════════════════════════════════════════
     // SECTION SWITCHER — Perpustakaan Filter Tabs
     // ═══════════════════════════════════════════════
     function switchSection(section) {
+        var sectionEbook = document.getElementById('sectionEbook');
+        var sectionVideo = document.getElementById('sectionVideo');
+        if (!sectionEbook && !sectionVideo) return;
+
         document.querySelectorAll('.perpus-section').forEach(s => s.classList.remove('active'));
-        if (section === 'ebook') {
-            document.getElementById('sectionEbook').classList.add('active');
-        } else {
-            document.getElementById('sectionVideo').classList.add('active');
+        if (section === 'ebook' && sectionEbook) {
+            sectionEbook.classList.add('active');
+        } else if (sectionVideo) {
+            sectionVideo.classList.add('active');
             initVideoHoverListeners();
         }
         if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -1354,49 +1365,131 @@
     // ═══════════════════════════════════════════════
 
     // Buka halaman baca ebook (tab baru dengan efek flip buku)
+    // PDF MODAL FUNCTIONS
+    function tutupPdf() {
+        var modal = document.getElementById('modalPdf');
+        if (modal) {
+            modal.classList.remove('show');
+            document.getElementById('iframePdf').src = '';
+        }
+    }
+
     function bacaEbook(uuid) {
         window.open('<?= base_url('perpustakaan/baca_ebook/') ?>' + uuid, '_blank');
     }
 
-    // Filter books by status
-    function filterBooks(status, btn) {
-        document.querySelectorAll('.library-tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
+    // Filter ebook by kategori atau status
+    var _filterEbookKategori = '';
+    var _filterEbookStatus   = '';
 
-        const books = document.querySelectorAll('.book-item');
-        let visibleCount = 0;
-        books.forEach(b => {
-            if (status === 'all' || b.dataset.status === status) {
-                b.style.display = '';
-                visibleCount++;
-            } else {
-                b.style.display = 'none';
-            }
+    function applyEbookFilters() {
+        var query = (document.getElementById('searchEbook')?.value || '').toLowerCase().trim();
+        var books = document.querySelectorAll('.book-item[data-title]');
+        var visibleCount = 0;
+
+        books.forEach(function(book) {
+            var matchTitle  = !query || book.dataset.title.includes(query);
+            var matchKat    = !_filterEbookKategori || book.dataset.kategori === _filterEbookKategori;
+            var matchStatus = !_filterEbookStatus   || book.dataset.status   === _filterEbookStatus;
+            var show = matchTitle && matchKat && matchStatus;
+            book.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
         });
 
-        document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        // Update counter
+        var counter = document.querySelector('.shelf-section-count');
+        if (counter) counter.textContent = visibleCount + ' buku terdaftar';
+
         var shelf = document.querySelector('.bookshelf');
         if (shelf) shelf.style.display = visibleCount === 0 ? 'none' : '';
     }
 
-    // Search books by title
-    function searchBooks(query) {
-        const q = query.toLowerCase().trim();
-        const books = document.querySelectorAll('.book-item');
-        let visibleCount = 0;
-        books.forEach(b => {
-            if (!q || b.dataset.title.includes(q)) {
-                b.style.display = '';
-                visibleCount++;
-            } else {
-                b.style.display = 'none';
-            }
+    function filterEbook(tipe, val, btn) {
+        var bar = document.getElementById('filterChipEbook');
+        if (!bar) return;
+
+        // Reset semua chip sesuai tipe
+        var passedDivider = false;
+        bar.querySelectorAll('button.filter-chip').forEach(function(c) {
+            if (c.previousElementSibling && c.previousElementSibling.classList.contains('filter-chip-divider')) passedDivider = true;
+            if (tipe === 'kategori' && !passedDivider) c.classList.remove('active');
+            if (tipe === 'status'   &&  passedDivider) c.classList.remove('active');
         });
 
-        document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
-        var shelf = document.querySelector('.bookshelf');
-        if (shelf) shelf.style.display = visibleCount === 0 ? 'none' : '';
+        if (tipe === 'kategori') {
+            if (_filterEbookKategori === val) {
+                _filterEbookKategori = '';
+                bar.querySelector('button.filter-chip').classList.add('active'); // aktifkan Semua
+            } else {
+                _filterEbookKategori = val;
+                btn.classList.add('active');
+            }
+        } else {
+            if (_filterEbookStatus === val) {
+                _filterEbookStatus = '';
+            } else {
+                _filterEbookStatus = val;
+                btn.classList.add('active');
+            }
+        }
+        applyEbookFilters();
     }
+
+    function searchBooks(query) { applyEbookFilters(); }
+
+    // VIDEO FILTER
+    var _filterVideoKategori = '';
+    var _filterVideoStatus   = '';
+
+    function applyFilterVideo() {
+        var query = (document.getElementById('searchVideo')?.value || '').toLowerCase().trim();
+        var cards = document.querySelectorAll('.vid-card');
+        var visible = 0;
+        cards.forEach(function(c) {
+            var matchTitle  = !query || c.dataset.title.includes(query);
+            var matchKat    = !_filterVideoKategori || c.dataset.kategori === _filterVideoKategori;
+            var matchStatus = !_filterVideoStatus   || c.dataset.status   === _filterVideoStatus;
+            var show = matchTitle && matchKat && matchStatus;
+            c.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        var noRes = document.getElementById('noVideoResults');
+        if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+        var grid = document.querySelector('.video-grid');
+        if (grid) grid.style.display = visible === 0 ? 'none' : '';
+    }
+
+    function filterVideo(tipe, val, btn) {
+        var bar = document.getElementById('filterChipVideo');
+        if (!bar) return;
+
+        var passedDivider = false;
+        bar.querySelectorAll('button.filter-chip').forEach(function(c) {
+            if (c.previousElementSibling && c.previousElementSibling.classList.contains('filter-chip-divider')) passedDivider = true;
+            if (tipe === 'kategori' && !passedDivider) c.classList.remove('active');
+            if (tipe === 'status'   &&  passedDivider) c.classList.remove('active');
+        });
+
+        if (tipe === 'kategori') {
+            if (_filterVideoKategori === val) {
+                _filterVideoKategori = '';
+                bar.querySelector('button.filter-chip').classList.add('active');
+            } else {
+                _filterVideoKategori = val;
+                btn.classList.add('active');
+            }
+        } else {
+            if (_filterVideoStatus === val) {
+                _filterVideoStatus = '';
+            } else {
+                _filterVideoStatus = val;
+                btn.classList.add('active');
+            }
+        }
+        applyFilterVideo();
+    }
+
+    function searchVideos(query) { applyFilterVideo(); }
 
     // ═══════════════════════════════════════════════
     // VIDEO FUNCTIONS (WITH TRACKING)
@@ -1480,7 +1573,6 @@
 
     function initVideoHoverListeners() {
         document.querySelectorAll('.vid-card').forEach(function(card) {
-            // Only add listeners once
             if (card.dataset.hoverInit) return;
             card.dataset.hoverInit = 'true';
 
@@ -1497,49 +1589,43 @@
                 var vidId = card.dataset.vidId;
                 stopVideo(vidId);
             });
+
+            // Handle klik pada thumb dan body — navigasi ke halaman video
+            var thumb = card.querySelector('.vid-thumb');
+            var body  = card.querySelector('.vid-body');
+            var uuid  = card.dataset.uuid;
+
+            if (thumb) {
+                thumb.addEventListener('click', function(e) {
+                    if (e.target.closest('.plyr__controls') || e.target.closest('.vid-actions')) return;
+                    var onclickAttr = thumb.getAttribute('data-action');
+                    if (onclickAttr) { eval(onclickAttr); }
+                });
+            }
+            if (body) {
+                body.addEventListener('click', function(e) {
+                    if (e.target.closest('.vid-actions')) return;
+                    var onclickAttr = body.getAttribute('data-action');
+                    if (onclickAttr) { eval(onclickAttr); }
+                });
+            }
         });
     }
-    // Initialize on page load
-    initVideoHoverListeners();
 
-    // Auto switch ke tab video jika URL mengandung ?tab=video
+    var IS_VIDEO_PAGE = <?= $isVideoPage ? 'true' : 'false' ?>;
+    if (IS_VIDEO_PAGE) {
+        initVideoHoverListeners();
+    }
+
+    // Backward compatibility for old link pattern: /v_perpustakaan?tab=video
     var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('tab') === 'video') {
-        switchSection('video');
-        var playId = urlParams.get('play');
-        if (playId) {
-            // Logic to find and play specific video if needed from history
-            setTimeout(() => {
-                var card = document.querySelector(`.vid-card[data-uuid="${playId}"]`);
-                if (card) {
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    putarVideo(card.dataset.vidId, card.dataset.ytId);
-                }
-            }, 600);
-        }
+    if (!IS_VIDEO_PAGE && urlParams.get('tab') === 'video') {
+        window.location.href = '<?= base_url('perpustakaan/video') ?>';
     }
 
     // Buka halaman baca video (tab penuh ala YouTube)
     function bacaVideo(uuid) {
         window.location.href = '<?= base_url('perpustakaan/full_vidio/') ?>' + uuid;
-    }
-
-    // Search videos by title
-    function searchVideos(query) {
-        const q = query.toLowerCase().trim();
-        const cards = document.querySelectorAll('.vid-card');
-        let visible = 0;
-        cards.forEach(c => {
-            if (!q || c.dataset.title.includes(q)) {
-                c.style.display = '';
-                visible++;
-            } else {
-                c.style.display = 'none';
-            }
-        });
-        document.getElementById('noVideoResults').style.display = visible === 0 ? 'block' : 'none';
-        var grid = document.querySelector('.video-grid');
-        if (grid) grid.style.display = visible === 0 ? 'none' : '';
     }
 
     // ═══════════════════════════════════════════════
@@ -1572,6 +1658,7 @@
                 document.getElementById('penulis_ebook').value    = d.penulis_ebook || '';
                 document.getElementById('deskripsi_ebook').value  = d.deskripsi_ebook || '';
                 document.getElementById('status_ebook').value     = d.status_ebook;
+                document.getElementById('kategori_ebook').value   = d.kategori_ebook || '';
                 document.getElementById('judulModalEbook').innerHTML = 'Edit Ebook';
                 document.getElementById('pdf_required').style.display = 'none';
                 document.getElementById('hasilCariUserEbook').innerHTML = '';
@@ -1601,19 +1688,6 @@
         }
     }
 
-    function toggleAksesVideo(val) {
-        var seksi      = document.getElementById('seksiAksesVideo');
-        var seksiEmpty = document.getElementById('seksiAksesVideoEmpty');
-        if (val === 'Privat') {
-            seksi.style.display      = 'block';
-            seksiEmpty.style.display = 'none';
-            var id = document.getElementById('id_konten_video').value;
-            if (id) muatListAksesInline('video', id, 'listAksesVideo');
-        } else {
-            seksi.style.display      = 'none';
-            seksiEmpty.style.display = 'flex';
-        }
-    }
 //cari user untuk akses inline (tanpa modal terpisah)
     function cariUserInline(tipe, q) {
         var containerId = tipe === 'ebook' ? 'hasilCariUserEbook' : 'hasilCariUserVideo';
@@ -1749,75 +1823,6 @@
         });
     }
 
-    // ── Video CRUD ──
-    function bukaModalTambahVideo() {
-        document.getElementById('formVideo').reset();
-        document.getElementById('id_konten_video').value = '';
-        document.getElementById('judulModalVideo').innerHTML = 'Tambah Video Baru';
-        document.getElementById('subjudulModalVideo').innerHTML = 'Lengkapi informasi di bawah untuk menambahkan konten video.';
-        document.getElementById('seksiAksesVideo').style.display = 'none';
-        document.getElementById('seksiAksesVideoEmpty').style.display = 'flex';
-        document.getElementById('listAksesVideo').innerHTML = '';
-        document.getElementById('hasilCariUserVideo').innerHTML = '';
-        _pendingAkses = [];
-        new bootstrap.Modal(document.getElementById('modalVideo')).show();
-    }
-
-    function bukaModalUbahVideo(id) {
-        $.ajax({
-            url: '<?= base_url('perpustakaan/ambil_video') ?>',
-            type: 'POST',
-            data: { id_konten_video: id, [CSRF_NAME]: CSRF_HASH },
-            success: function(res) {
-                var d = typeof res === 'string' ? JSON.parse(res) : res;
-                document.getElementById('id_konten_video').value = d.id_konten_video;
-                document.getElementById('judul_video').value     = d.judul_video;
-                document.getElementById('url_video').value       = 'https://www.youtube.com/watch?v=' + d.kode_video;
-                document.getElementById('deskripsi_video').value = d.deskripsi_video || '';
-                document.getElementById('status_video').value    = d.status_video;
-                document.getElementById('judulModalVideo').innerHTML = 'Edit Data Video';
-                document.getElementById('subjudulModalVideo').innerHTML = 'Ubah informasi detail untuk konten video ini.';
-                document.getElementById('hasilCariUserVideo').innerHTML = '';
-                document.getElementById('cari_user_video').value = '';
-                _pendingAkses = [];
-                if (d.status_video === 'Privat') {
-                    document.getElementById('seksiAksesVideo').style.display = 'block';
-                    muatListAksesInline('video', d.id_konten_video, 'listAksesVideo');
-                } else {
-                    document.getElementById('seksiAksesVideo').style.display = 'none';
-                }
-                new bootstrap.Modal(document.getElementById('modalVideo')).show();
-            }
-        });
-    }
-
-    $('#formVideo').submit(function(e) {
-        e.preventDefault();
-        var formData = new FormData(this);
-        formData.append(CSRF_NAME, CSRF_HASH);
-        var isEdit = document.getElementById('id_konten_video').value !== '';
-        var url = isEdit ? '<?= base_url('perpustakaan/ubah_video') ?>' : '<?= base_url('perpustakaan/simpan_video') ?>';
-        $.ajax({
-            url: url, type: 'POST', data: formData, cache: false, contentType: false, processData: false,
-            success: function(res) {
-                var d = typeof res === 'string' ? JSON.parse(res) : res;
-                if (d.status) {
-                    var id_konten = d.id_konten || document.getElementById('id_konten_video').value;
-                    var pending = _pendingAkses.slice();
-                    _pendingAkses = [];
-                    var tasks = pending.map(p => $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: 'video', id_konten: id_konten, id_user: p.id_user, [CSRF_NAME]: CSRF_HASH }));
-                    $.when.apply($, tasks.length ? tasks : [$.when()]).then(function() {
-                        bootstrap.Modal.getInstance(document.getElementById('modalVideo')).hide();
-                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Video berhasil disimpan', showConfirmButton: false, timer: 1500 })
-                            .then(() => location.reload());
-                    });
-                } else {
-                    Swal.fire('Gagal!', d.msg || 'Terjadi kesalahan', 'error');
-                }
-            }
-        });
-    });
-
     function hapusVideo(id) {
         Swal.fire({ title: 'Hapus Video?', text: 'Data tidak dapat dikembalikan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal' })
         .then((r) => {
@@ -1932,7 +1937,7 @@
     // ── Notif akses privat untuk user biasa ──
     function aksesPrivat(tipe, id, judul) {
         Swal.fire({
-            icon: 'lock',
+            icon: 'warning',
             title: 'Konten Terbatas',
             text: '"' + judul + '" hanya dapat diakses oleh akun tertentu. Hubungi admin untuk mendapatkan akses.',
             confirmButtonText: 'Mengerti',
@@ -1940,3 +1945,4 @@
         });
     }
 </script>
+

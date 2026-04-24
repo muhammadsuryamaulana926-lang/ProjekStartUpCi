@@ -15,7 +15,7 @@ class Riwayat extends BaseController
     {
         $this->m_riwayat = new M_riwayat();
         $this->m_user    = new M_user();
-        helper('time');
+        require_once APPPATH . 'Helpers/hitung_waktu_riwayat.php';
     }
 
     // Menampilkan halaman log aktivitas seluruh user (khusus admin)
@@ -28,15 +28,14 @@ class Riwayat extends BaseController
             'timeframe'   => $this->request->getGet('timeframe'),
         ];
 
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_riwayat_aktivitas', [
                 'riwayat'         => $this->m_riwayat->semua_riwayat($filters),
                 'users'           => $this->m_user->findAll(),
                 'current_filters' => $filters,
             ])
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     // Menyimpan atau memperbarui riwayat tonton video via AJAX

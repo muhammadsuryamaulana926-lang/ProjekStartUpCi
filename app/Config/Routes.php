@@ -12,6 +12,31 @@ $routes->get('/logout',         'Login::logout');
 // Protected routes (wajib login)
 $routes->group('', ['filter' => 'auth'], function($routes) {
 
+    // --- Rute Startup Kelas ---
+    // Program
+    $routes->get('/program',                              'Program_startup::index');
+    $routes->get('/program/tambah_program',               'Program_startup::tambah_program');
+    $routes->post('/program/simpan_program',              'Program_startup::simpan_program');
+    $routes->get('/program/edit_program/(:any)',          'Program_startup::edit_program/$1');
+    $routes->post('/program/ubah_program',                'Program_startup::ubah_program');
+    $routes->get('/program/hapus_program/(:any)',         'Program_startup::hapus_program/$1');
+    $routes->get('/program/detail_program/(:any)',        'Program_startup::detail_program/$1');
+
+    // Kelas
+    $routes->get('/program/tambah_kelas/(:any)',          'Kelas_startup::tambah_kelas/$1');
+    $routes->post('/kelas/simpan_kelas',                  'Kelas_startup::simpan_kelas');
+    $routes->get('/program/edit_kelas/(:any)',            'Kelas_startup::edit_kelas/$1');
+    $routes->post('/kelas/ubah_kelas',                    'Kelas_startup::ubah_kelas');
+    $routes->get('/program/hapus_kelas/(:any)',           'Kelas_startup::hapus_kelas/$1');
+    $routes->get('/program/nonton_kelas/(:any)',          'Kelas_startup::nonton_kelas/$1');
+
+    // Peserta Program
+    $routes->get('/program/tambah_peserta_program/(:any)', 'Peserta_program::tambah_peserta_program/$1');
+    $routes->post('/peserta_program/simpan_peserta_program','Peserta_program::simpan_peserta_program');
+    $routes->post('/peserta_program/hapus_peserta_program', 'Peserta_program::hapus_peserta_program');
+    // --------------------------
+
+
     // Dashboard
     $routes->get('/v_dashboard',                        'Dashboard_startup::index');
     $routes->post('/v_dashboard/get_data_startup',      'Dashboard_startup::get_data_startup');
@@ -27,17 +52,28 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/v_edit_startup',                    'Startup::edit_startup');
     $routes->post('/v_update_startup',                  'Startup::proses_ubah_startup');
     $routes->get('/v_detail_startup/(:any)',             'Startup::detail/$1');
+    $routes->get('/v_detail/(:any)',                    'Startup::detail/$1');
 
     // Lokasi Startup
     $routes->get('/v_lokasi_startup',                   'Startup::detail_lokasi_startup');
+    $routes->get('/v_detail_lokasi_startup',            'Startup::detail_lokasi_startup');
     $routes->get('/v_lokasi_startup_saya',              'Startup::lokasi_startup_saya');
 
     // Perpustakaan
     $routes->get('/v_perpustakaan',                     'Perpustakaan::index');
     $routes->get('/perpustakaan',                       'Perpustakaan::index');
+    $routes->get('/perpustakaan/video',                 'Perpustakaan::video');
+    $routes->get('/perpustakaan/tambah_buku',            'Perpustakaan::tambah_buku');
+    $routes->get('/perpustakaan/edit_buku/(:num)',          'Perpustakaan::edit_buku/$1');
+    $routes->post('/perpustakaan/simpan_buku_page',         'Perpustakaan::simpan_buku_page');
+    $routes->post('/perpustakaan/ubah_buku_page',           'Perpustakaan::ubah_buku_page');
     $routes->get('/perpustakaan/baca_ebook/(:any)',      'Perpustakaan::baca_ebook/$1');
     $routes->get('/perpustakaan/stream_ebook/(:any)',    'Perpustakaan::stream_ebook/$1');
     $routes->get('/perpustakaan/full_vidio/(:any)',      'Perpustakaan::full_vidio/$1');
+    $routes->get('/perpustakaan/tambah_video',           'Perpustakaan::tambah_video');
+    $routes->get('/perpustakaan/edit_video/(:any)',      'Perpustakaan::edit_video/$1');
+    $routes->post('/perpustakaan/simpan_video_page',     'Perpustakaan::simpan_video_page');
+    $routes->post('/perpustakaan/ubah_video_page',       'Perpustakaan::ubah_video_page');
     $routes->post('/perpustakaan/simpan_video',          'Perpustakaan::simpan_video');
     $routes->post('/perpustakaan/ambil_video',           'Perpustakaan::ambil_video');
     $routes->post('/perpustakaan/ubah_video',            'Perpustakaan::ubah_video');
@@ -98,6 +134,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/proses_tolak_startup',                      'Startup::proses_tolak_startup');
 
     $routes->post('/keep-alive',                                'Login::keepAlive');
+    $routes->post('/notifikasi/tandai_dibaca',               'Startup::notif_tandai_dibaca');
+    $routes->post('/notifikasi/tandai_semua',                'Startup::notif_tandai_semua');
 
     // Alias prefix startup/ untuk AJAX di detail startup
     $routes->post('/startup/get_startup_tim',                           'Startup::get_startup_tim');

@@ -37,9 +37,8 @@ class M_program extends Model
     // Menyimpan data program baru dan mengembalikan ID yang baru dibuat
     public function tambah_program($data)
     {
-        $db = \Config\Database::connect();
-        $db->table('programs')->insert($data);
-        return $db->insertID();
+        $this->db->table('programs')->insert($data);
+        return $this->db->insertID();
     }
 
     // Mengupdate data program berdasarkan id_program

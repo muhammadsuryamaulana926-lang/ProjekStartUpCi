@@ -20,11 +20,10 @@ class Dashboard_startup extends BaseController
     {
         $data['total_startup'] = $this->m_startup->hitung_semua_startup();
 
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_dashboard', $data)
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     // Mengembalikan data startup dalam format JSON untuk keperluan chart/tabel di dashboard (AJAX)

@@ -5,7 +5,7 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 // Model untuk mengelola data anggota tim dari setiap startup
-class M_tim_startup extends Model
+class M_startup_tim extends Model
 {
     // Mengambil semua anggota tim dari satu startup diurutkan berdasarkan nama
     public function tim_by_startup($data)

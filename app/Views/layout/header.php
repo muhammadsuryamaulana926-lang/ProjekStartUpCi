@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMIK StartUp</title>
+    <title><?= (isset($title) ? $title . ' | ' : '') ?>SIMIK StartUp</title>
     <!-- Import Font Inter & Lucide Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,6 +34,18 @@
         /* Global Font Override */
         body, .app-wrapper, .app-main, .sidebar, .topbar {
             font-family: 'Inter', sans-serif !important;
+        }
+
+        /* Hapus semua pemisah antara topbar dan konten */
+        header, header.topbar {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            margin: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .app-main {
+            gap: 0 !important;
         }
 
         /* Modern Scrollbar Minimalis */

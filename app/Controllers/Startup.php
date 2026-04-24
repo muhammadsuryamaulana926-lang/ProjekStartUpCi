@@ -6,7 +6,7 @@ use App\Models\M_startup;
 use App\Models\M_klaster;
 use App\Models\M_dosen_pembina;
 use App\Models\M_program;
-use App\Models\M_tim_startup;
+use App\Models\M_startup_tim;
 use App\Models\M_startup_klaster;
 use App\Models\M_startup_produk;
 use App\Models\M_startup_pendanaan_itb;
@@ -15,6 +15,7 @@ use App\Models\M_startup_prestasi;
 use App\Models\M_startup_histori_status;
 use App\Models\M_startup_mentor;
 use App\Models\M_mentor;
+use App\Models\M_notifikasi;
 
 class Startup extends BaseController
 {
@@ -39,7 +40,7 @@ class Startup extends BaseController
         $this->m_klaster                  = new M_klaster();
         $this->m_dosen_pembina            = new M_dosen_pembina();
         $this->m_program                  = new M_program();
-        $this->m_tim_startup              = new M_tim_startup();
+        $this->m_tim_startup              = new M_startup_tim();
         $this->m_startup_klaster          = new M_startup_klaster();
         $this->m_startup_produk           = new M_startup_produk();
         $this->m_startup_pendanaan_itb    = new M_startup_pendanaan_itb();
@@ -89,23 +90,21 @@ class Startup extends BaseController
     public function index()
     {
         $this->session = \Config\Services::session();
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_data_startup', [
                 'startups' => $this->m_startup->semua_startup()->getResult(),
             ])
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     public function tambah_startup()
     {
         $this->session = \Config\Services::session();
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_tambah_startup', $this->data_form())
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     public function simpan_startup()
@@ -227,16 +226,15 @@ class Startup extends BaseController
             return $row;
         }, $this->m_program->semua_program()->getResult());
 
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_edit_startup', [
                 'data'                    => $startup,
                 'daftar_klaster'          => $this->m_klaster->semua_klaster()->getResult(),
                 'daftar_anggota'          => $daftar_anggota,
                 'daftar_program_startup'  => $daftar_program,
             ])
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     public function proses_ubah_startup()
@@ -355,9 +353,8 @@ class Startup extends BaseController
         $selected                        = $this->m_startup_klaster->id_klaster_by_startup($data_id)->getResult('array');
         $startup[0]['selected_klasters'] = array_column($selected, 'id_klaster');
 
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_detail_startup', array_merge($this->data_form(), [
                 'data'                   => $startup,
                 'data_tim'               => $this->m_tim_startup->tim_by_startup($data_id)->getResult(),
@@ -370,19 +367,18 @@ class Startup extends BaseController
                 'all_mentor'             => $this->m_mentor->get_mentor_all()->getResult(),
                 'id_startup'             => $id_startup,
             ]))
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     // Menampilkan halaman peta lokasi semua startup (khusus admin)
     public function detail_lokasi_startup()
     {
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_lokasi_startup', [
                 'startups' => $this->m_startup->semua_startup()->getResult(),
             ])
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     // Menampilkan halaman peta lokasi khusus startup milik pemilik yang sedang login
@@ -392,13 +388,12 @@ class Startup extends BaseController
         $startup = $this->m_startup->startup_by_id_user($id_user);
         $startups = $startup ? $this->m_startup->startup_by_uuid(['uuid_startup' => $startup->uuid_startup])->getResult() : [];
 
-        return view('layout/v_header')
-            . view('layout/v_sidebar')
-            . view('layout/v_topbar')
+        return view('layout/header')
+            . view('layout/topbar')
             . view('startup/v_lokasi_startup', [
                 'startups' => $startups,
             ])
-            . view('layout/v_footer');
+            . view('layout/footer');
     }
 
     // Method video dan buku dihapus karena sudah digabung ke v_perpustakaan
@@ -439,6 +434,7 @@ class Startup extends BaseController
         $data_tim['linkedin']             = $this->request->getPost('linkedin');
         $data_tim['instagram']            = $this->request->getPost('instagram');
         $data_tim['nama_perguruan_tinggi'] = $this->request->getPost('nama_perguruan_tinggi');
+        $data_tim['uuid_tim']             = bin2hex(random_bytes(16));
         $result = $this->m_tim_startup->tambah_tim($data_tim);
 
         $data['status'] = false;
@@ -557,6 +553,7 @@ class Startup extends BaseController
         $data_tim['linkedin']             = $this->request->getPost('linkedin');
         $data_tim['instagram']            = $this->request->getPost('instagram');
         $data_tim['nama_perguruan_tinggi'] = $this->request->getPost('nama_perguruan_tinggi');
+        $data_tim['uuid_tim']             = bin2hex(random_bytes(16));
         $result = $this->m_tim_startup->tambah_tim($data_tim);
 
         $data['status'] = $result ? true : false;
@@ -805,5 +802,19 @@ class Startup extends BaseController
         $result = $this->m_startup_mentor->hapus_startup_mentor($data_hapus);
         $data['status'] = $result ? true : false;
         echo json_encode($data);
+    }
+
+    public function notif_tandai_dibaca()
+    {
+        $id = $this->request->getPost('id_notifikasi');
+        (new M_notifikasi())->tandai_dibaca($id);
+        echo json_encode(['status' => true]);
+    }
+
+    public function notif_tandai_semua()
+    {
+        $role = session()->get('user_role');
+        (new M_notifikasi())->tandai_semua_dibaca($role);
+        echo json_encode(['status' => true]);
     }
 }
