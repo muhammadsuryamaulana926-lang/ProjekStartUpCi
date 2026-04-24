@@ -541,7 +541,7 @@ class Perpustakaan extends BaseController
                 return view('layout/header', ['title' => 'Nonton Video'])
 
             . view('layout/topbar')
-            . view('startup/v_full_video', ['video' => $video, 'rekomendasi' => $rekomendasi])
+            . view('startup/v_vidio_full', ['video' => $video, 'rekomendasi' => $rekomendasi])
             . view('layout/footer');
     }
 

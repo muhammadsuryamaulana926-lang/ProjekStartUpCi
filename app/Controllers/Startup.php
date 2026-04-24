@@ -16,6 +16,7 @@ use App\Models\M_startup_histori_status;
 use App\Models\M_startup_mentor;
 use App\Models\M_mentor;
 use App\Models\M_notifikasi;
+use App\Models\M_log_aktivitas;
 
 class Startup extends BaseController
 {
@@ -816,5 +817,14 @@ class Startup extends BaseController
         $role = session()->get('user_role');
         (new M_notifikasi())->tandai_semua_dibaca($role);
         echo json_encode(['status' => true]);
+    }
+
+    public function log_aktivitas()
+    {
+        $logs = (new M_log_aktivitas())->semua_log(200);
+        return view('layout/header', ['title' => 'Log Aktivitas'])
+            . view('layout/topbar')
+            . view('startup/v_log_aktivitas', ['logs' => $logs])
+            . view('layout/footer');
     }
 }

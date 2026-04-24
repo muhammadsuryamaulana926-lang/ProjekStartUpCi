@@ -25,6 +25,25 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
     border-radius: 12px; overflow: hidden; margin-bottom: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative;
 }
+/* Overlay hitung mundur */
+#overlay_hitung_mundur {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 30;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-radius: 12px;
+}
+#overlay_hitung_mundur.tampil { display: flex; }
+#overlay_hitung_mundur .angka { font-size: 64px; font-weight: 800; color: #fff; line-height: 1; }
+#overlay_hitung_mundur .teks  { font-size: 14px; color: rgba(255,255,255,0.8); }
+#overlay_hitung_mundur .judul_berikutnya { font-size: 15px; font-weight: 600; color: #fff; text-align: center; padding: 0 24px; }
+#overlay_hitung_mundur .btn-batal { font-size: 12px; color: rgba(255,255,255,0.6); background: none; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 4px 14px; cursor: pointer; }
+#overlay_hitung_mundur .btn-batal:hover { color: #fff; border-color: #fff; }
 .plyr--full-ui.plyr--video { --plyr-color-main: #8B7355; height: 100%; width: 100%; }
 .yt-player-container .plyr__video-wrapper { height: 100% !important; padding-bottom: 0 !important; background: #000 !important; overflow: hidden !important; }
 .plyr__video-embed iframe { transform: scale(1.05); transform-origin: center center; pointer-events: none; user-select: none; }
@@ -75,6 +94,13 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
             <div class="yt-main">
                 <div class="yt-player-container">
                     <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="<?= esc($active_yt_id) ?>"></div>
+                    <!-- Overlay hitung mundur -->
+                    <div id="overlay_hitung_mundur">
+                        <div class="judul_berikutnya" id="judul_vid_berikutnya"></div>
+                        <div class="teks">Video berikutnya dalam</div>
+                        <div class="angka" id="angka_mundur">5</div>
+                        <button class="btn-batal" onclick="batal_lanjut()">Tonton Nanti</button>
+                    </div>
                 </div>
 
                 <h1 class="yt-title" id="videoTitle"><?= esc($first_video['judul_sesi'] ?? $kelas_aktif['nama_kelas']) ?></h1>

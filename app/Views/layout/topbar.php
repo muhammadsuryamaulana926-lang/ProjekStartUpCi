@@ -319,6 +319,13 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
             </svg>
         </button> -->
 
+        <!-- Log Aktivitas (khusus admin) -->
+        <?php if ($role === 'admin'): ?>
+        <a href="<?= base_url('log_aktivitas') ?>" class="topbar-icon-btn <?= $currentPage === 'log_aktivitas' ? 'text-primary' : '' ?>" title="Log Aktivitas">
+            <i class="mdi mdi-shield-account-outline" style="font-size:20px;"></i>
+        </a>
+        <?php endif; ?>
+
         <!-- Notification Button -->
         <div class="dropdown" id="notifDropdownContainer">
             <button class="topbar-icon-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">

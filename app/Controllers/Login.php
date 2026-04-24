@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\M_user;
 use App\Models\M_login;
+use App\Models\M_log_aktivitas;
 
 // Controller untuk menangani autentikasi pengguna (login, logout, dan session)
 class Login extends BaseController
@@ -58,6 +59,17 @@ class Login extends BaseController
         ]);
         session()->setFlashdata('first_login', true);
 
+        // Catat log aktivitas login
+        (new M_log_aktivitas())->catat([
+            'id_user'    => $user['id_user'],
+            'nama_user'  => $user['nama_lengkap'],
+            'role'       => $user['role'],
+            'aksi'       => 'Login',
+            'halaman'    => 'Halaman Login',
+            'ip_address' => $ip,
+            'user_agent' => $this->request->getUserAgent()->getAgentString(),
+        ]);
+
         // Jika pemilik startup, simpan uuid startup miliknya ke session lalu redirect ke detail startup
         if ($user['role'] === 'pemilik_startup') {
             $startup = (new \App\Models\M_startup())->startup_by_id_user($user['id_user']);
@@ -71,6 +83,17 @@ class Login extends BaseController
     // Menghancurkan session dan redirect ke halaman utama (logout)
     public function logout()
     {
+        if (session()->get('user_logged_in')) {
+            (new M_log_aktivitas())->catat([
+                'id_user'    => session()->get('user_id'),
+                'nama_user'  => session()->get('user_name'),
+                'role'       => session()->get('user_role'),
+                'aksi'       => 'Logout',
+                'halaman'    => session()->get('halaman_terakhir') ?? '-',
+                'ip_address' => $this->request->getIPAddress(),
+                'user_agent' => $this->request->getUserAgent()->getAgentString(),
+            ]);
+        }
         session()->destroy();
         return redirect()->to(base_url('/'));
     }

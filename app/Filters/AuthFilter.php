@@ -54,5 +54,20 @@ class AuthFilter implements FilterInterface
         }
     }
 
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {}
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    {
+        // Catat hanya request GET (bukan AJAX/POST) dan hanya jika sudah login
+        if (strtolower($request->getMethod()) !== 'get') return;
+        if (!session()->get('user_logged_in')) return;
+
+        $uri = (string) $request->getUri();
+
+        // Abaikan halaman yang tidak perlu dicatat
+        $abaikan = ['keep-alive', 'log_aktivitas', 'notifikasi', 'riwayat'];
+        $segment1 = service('uri')->getSegment(1);
+        if (in_array($segment1, $abaikan)) return;
+
+        // Update halaman terakhir di session
+        session()->set('halaman_terakhir', $uri);
+    }
 }

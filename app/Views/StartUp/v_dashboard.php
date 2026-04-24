@@ -29,9 +29,10 @@ body { background-color: #f5f5f5 !important; }
 .btn-modern { border-radius: 6px; font-weight: 500; transition: all 0.3s; }
 .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 #modalDetailStartup div.dataTables_wrapper div.dataTables_filter,
-#modalDetailStartup div.dataTables_wrapper div.dataTables_length { margin-bottom: 16px; }
+#modalDetailStartup div.dataTables_wrapper div.dataTables_length { margin-bottom: 12px; }
 #modalDetailStartup div.dataTables_wrapper div.dataTables_info,
-#modalDetailStartup div.dataTables_wrapper div.dataTables_paginate { margin-top: 16px; }
+#modalDetailStartup div.dataTables_wrapper div.dataTables_paginate { margin-top: 12px; }
+#modalDetailStartup div.dataTables_wrapper { padding: 0 4px; }
 </style>
 
 <div class="container-fluid py-4" style="background-color:#f5f5f5;">
@@ -85,26 +86,25 @@ body { background-color: #f5f5f5 !important; }
 <!-- Modal Detail Startup -->
 <div class="modal fade" id="modalDetailStartup" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content" style="border-radius:8px;border:1px solid #e0e0e0;">
+        <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title fw-bold">Daftar Startup Terdaftar</h5>
+                    <h5 class="modal-title fw-bold mb-1">Daftar Startup Terdaftar</h5>
                     <small class="text-muted">Total <?= $total_startup ?> startup terdaftar di sistem</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3">
                 <div class="table-responsive">
-                    <table id="datatable-startup" class="table table-hover align-middle w-100">
+                    <table id="datatable-startup" class="table table-hover table-bordered mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th width="5%">No</th>
+                                <th class="text-center" style="width:50px;">No</th>
                                 <th>Nama Perusahaan</th>
                                 <th>Email</th>
                                 <th>No WhatsApp</th>
                                 <th class="text-center">Tahun Daftar</th>
                                 <th class="text-center">Status Startup</th>
-                                <th class="text-center">Status Ajuan</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -174,18 +174,13 @@ $(document).ready(function() {
         language: { emptyTable: "Tidak ada data startup", search: "Cari:", lengthMenu: "Tampilkan _MENU_ baris", info: "Menampilkan _START_–_END_ dari _TOTAL_ data", paginate: { previous: "Sebelumnya", next: "Selanjutnya" } },
         columns: [
             { data: null, className: 'text-center', render: function(d, t, r, meta) { return meta.row + 1; } },
-            { data: 'nama_perusahaan', render: function(d) { return '<strong>' + d + '</strong>'; } },
+            { data: 'nama_perusahaan', render: function(d) { return d; } },
             { data: 'email_perusahaan' },
             { data: 'nomor_whatsapp' },
             { data: 'tahun_daftar', className: 'text-center' },
             { data: 'status_startup', className: 'text-center', render: function(d) {
                 var cls = d && d.toLowerCase() === 'aktif' ? 'bg-success' : 'bg-secondary';
-                return '<span class="badge ' + cls + ' px-3 py-2">' + d + '</span>';
-            }},
-            { data: 'status_ajuan', className: 'text-center', render: function(d) {
-                var map = { 'pending': 'bg-warning text-dark', 'diterima': 'bg-success', 'ditolak': 'bg-danger' };
-                var cls = map[(d || '').toLowerCase()] || 'bg-warning text-dark';
-                return '<span class="badge ' + cls + ' px-3 py-2">' + d + '</span>';
+                return '<span class="badge ' + cls + '">' + d + '</span>';
             }}
         ]
     });

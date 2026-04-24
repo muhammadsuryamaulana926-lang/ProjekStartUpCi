@@ -136,6 +136,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/keep-alive',                                'Login::keepAlive');
     $routes->post('/notifikasi/tandai_dibaca',               'Startup::notif_tandai_dibaca');
     $routes->post('/notifikasi/tandai_semua',                'Startup::notif_tandai_semua');
+    $routes->get('/log_aktivitas',                           'Startup::log_aktivitas');
 
     // Alias prefix startup/ untuk AJAX di detail startup
     $routes->post('/startup/get_startup_tim',                           'Startup::get_startup_tim');
