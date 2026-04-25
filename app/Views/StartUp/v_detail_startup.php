@@ -126,6 +126,7 @@ body { background-color: #f5f5f5 !important; }
                         <ul class="nav nav-tabs nav-bordered mb-4">
                             <li class="nav-item"><a href="#startup" data-bs-toggle="tab" class="nav-link active"><i class="mdi mdi-home me-1"></i>Startup</a></li>
                             <li class="nav-item"><a href="#lokasi" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-map-marker me-1"></i>Lokasi</a></li>
+                            <li class="nav-item"><a href="#globe" data-bs-toggle="tab" class="nav-link"><i class="mdi mdi-earth me-1"></i>Globe</a></li>
                         </ul>
 
                         <div class="tab-content">
@@ -230,6 +231,108 @@ body { background-color: #f5f5f5 !important; }
                                 <?php else: ?>
                                     <p class="text-center text-muted py-5">Titik koordinat lokasi startup belum ditentukan</p>
                                 <?php endif; ?>
+                            </div>
+
+                            <!-- Tab Globe -->
+                            <div class="tab-pane" id="globe">
+                                <div class="section-header"><span><i class="mdi mdi-earth me-1"></i> Globe Interaktif — Siklus Siang &amp; Malam</span></div>
+                                <style>
+                                    .globe-marker-detail-wrap {
+                                        width: 30px; height: 30px;
+                                        display: flex; align-items: center; justify-content: center;
+                                        cursor: pointer;
+                                        pointer-events: all !important;
+                                    }
+                                    .globe-marker-detail {
+                                        width: 14px; height: 14px;
+                                        border-radius: 50%;
+                                        background: #818cf8;
+                                        box-shadow: 0 0 8px 3px rgba(129,140,248,0.9);
+                                        position: relative;
+                                        pointer-events: none;
+                                    }
+                                    .globe-marker-detail::after {
+                                        content: '';
+                                        position: absolute;
+                                        inset: -5px;
+                                        border-radius: 50%;
+                                        background: rgba(129,140,248,0.35);
+                                        animation: pulse-ring-d 1.6s ease-out infinite;
+                                    }
+                                    @keyframes pulse-ring-d {
+                                        0%   { transform: scale(0.6); opacity: 1; }
+                                        100% { transform: scale(2.4); opacity: 0; }
+                                    }
+                                    #globe-detail-tooltip {
+                                        position: fixed;
+                                        background: rgba(0,0,0,0.82);
+                                        color: #fff;
+                                        padding: 6px 12px;
+                                        border-radius: 8px;
+                                        font-size: 12px;
+                                        font-weight: 600;
+                                        pointer-events: none;
+                                        display: none;
+                                        z-index: 99999;
+                                        white-space: nowrap;
+                                        transform: translate(12px, -50%);
+                                    }
+                                </style>
+                                <div id="globe-detail-tooltip"></div>
+                                <div id="globe-detail-wrap" style="width:100%;height:420px;background:#000d1a;border-radius:8px;overflow:hidden;"></div>
+                                <script src="//unpkg.com/globe.gl"></script>
+                                <script>
+                                    document.querySelector('a[href="#globe"]').addEventListener('shown.bs.tab', function() {
+                                        if (window.globeDetail) return;
+                                        var el = document.getElementById('globe-detail-wrap');
+                                        <?php
+                                            $hasLoc = !empty($data[0]['latitude']) && !empty($data[0]['longitude']);
+                                            $lat = $hasLoc ? (float)$data[0]['latitude'] : -2.5;
+                                            $lng = $hasLoc ? (float)$data[0]['longitude'] : 118.0;
+                                            $points = $hasLoc ? json_encode([[
+                                                'lat'  => (float)$data[0]['latitude'],
+                                                'lng'  => (float)$data[0]['longitude'],
+                                                'name' => $data[0]['nama_perusahaan'],
+                                            ]]) : '[]';
+                                        ?>
+                                        var points = <?= $points ?>;
+                                        window.globeDetail = Globe()(el)
+                                            .width(el.offsetWidth)
+                                            .height(420)
+                                            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg')
+                                            .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+                                            .atmosphereAltitude(0.18)
+                                            .htmlElementsData(points)
+                                            .htmlLat('lat')
+                                            .htmlLng('lng')
+                                            .htmlAltitude(0.01)
+                                            .htmlElement(function(d) {
+                                                var wrap = document.createElement('div');
+                                                wrap.className = 'globe-marker-detail-wrap';
+                                                var dot = document.createElement('div');
+                                                dot.className = 'globe-marker-detail';
+                                                wrap.appendChild(dot);
+                                                var tip = document.getElementById('globe-detail-tooltip');
+                                                wrap.addEventListener('mouseenter', function(e) {
+                                                    tip.textContent = d.name;
+                                                    tip.style.display = 'block';
+                                                    tip.style.left = (e.clientX + 14) + 'px';
+                                                    tip.style.top  = e.clientY + 'px';
+                                                });
+                                                wrap.addEventListener('mousemove', function(e) {
+                                                    tip.style.left = (e.clientX + 14) + 'px';
+                                                    tip.style.top  = e.clientY + 'px';
+                                                });
+                                                wrap.addEventListener('mouseleave', function() {
+                                                    tip.style.display = 'none';
+                                                });
+                                                return wrap;
+                                            });
+                                        window.globeDetail.pointOfView({ lat: <?= $lat ?>, lng: <?= $lng ?>, altitude: 1.5 }, 1000);
+                                        window.globeDetail.controls().autoRotate = true;
+                                        window.globeDetail.controls().autoRotateSpeed = 0.4;
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>

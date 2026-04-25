@@ -14,12 +14,12 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
 ?>
 <style>
 .topbar {
-    padding: 0 2.5rem;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f6f7f9; /* Soft light background matching the image */
-    height: 80px;
+    background: #f6f7f9;
+    height: 56px;
     border-bottom: none;
     position: relative;
     z-index: 1000;
@@ -30,21 +30,22 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 4px; /* Small gap between items */
+    gap: 2px;
     background: #ffffff;
-    padding: 6px;
-    border-radius: 9999px; /* Pill shape */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.015); /* Very subtle shadow */
+    padding: 4px;
+    border-radius: 9999px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    white-space: nowrap;
 }
 .topbar-nav .top-nav-link-item {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 18px;
-    color: #64748b; /* Neutral greyish text */
+    padding: 7px 14px;
+    color: #64748b;
     text-decoration: none;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12.5px;
     border-radius: 9999px;
     transition: all 0.2s ease;
 }
@@ -216,7 +217,7 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                 <span>Edit Startup</span>
             </a>
             <div class="perpus-dropdown">
-                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
+                <button onclick="togglePerpusDropdown(event, 'perpusDropdownMenu1')" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
@@ -234,13 +235,25 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                     </a>
                 </div>
             </div>
-            <a href="<?= base_url('v_lokasi_startup_saya') ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_lokasi_startup_saya') ? 'top-nav-active' : '' ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/>
-                </svg>
-                <span>Peta Lokasi</span>
-            </a>
+            <div class="perpus-dropdown">
+                <button onclick="togglePerpusDropdown(event, 'petaDropdownPemilik')" class="top-nav-link-item <?= in_array($currentPage, ['v_lokasi_startup_saya', 'v_globe']) ? 'top-nav-active' : '' ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/>
+                    </svg>
+                    <span>Peta Lokasi</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="perpus-dropdown-menu" id="petaDropdownPemilik">
+                    <a href="<?= base_url('v_lokasi_startup_saya') ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Peta Lokal
+                    </a>
+                    <a href="<?= base_url('v_globe') ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Globe Global
+                    </a>
+                </div>
+            </div>
             <!-- Link Program Kelas untuk Pemilik Startup -->
             <a href="<?= base_url('program') ?>"
                class="top-nav-link-item <?= ($currentPage == 'program') ? 'top-nav-active' : '' ?>">
@@ -266,7 +279,7 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                 <span>Data Startup</span>
             </a>
             <div class="perpus-dropdown">
-                <button onclick="togglePerpusDropdown(event)" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
+                <button onclick="togglePerpusDropdown(event, 'perpusDropdownMenu')" class="top-nav-link-item <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'top-nav-active' : '' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
                     </svg>
@@ -291,14 +304,25 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                 </svg>
                 <span>Riwayat</span>
             </a>
-            <a href="<?= base_url('v_lokasi_startup') ?>"
-               class="top-nav-link-item <?= ($currentPage == 'v_lokasi_startup') ? 'top-nav-active' : '' ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/>
-                </svg>
-                <span>Peta Lokasi</span>
-            </a>
-            <!-- Link Program Kelas untuk Admin -->
+            <div class="perpus-dropdown">
+                <button onclick="togglePerpusDropdown(event, 'petaDropdownAdmin')" class="top-nav-link-item <?= in_array($currentPage, ['v_lokasi_startup', 'v_globe']) ? 'top-nav-active' : '' ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"/>
+                    </svg>
+                    <span>Peta Lokasi</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="perpus-dropdown-menu" id="petaDropdownAdmin">
+                    <a href="<?= base_url('v_lokasi_startup') ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Peta Lokal
+                    </a>
+                    <a href="<?= base_url('v_globe') ?>">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Globe Global
+                    </a>
+                </div>
+            </div>
             <a href="<?= base_url('program') ?>"
                class="top-nav-link-item <?= ($currentPage == 'program') ? 'top-nav-active' : '' ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -465,13 +489,21 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
 
     idleTimer = setTimeout(showModal, IDLE_LIMIT * 1000);
 
-    function togglePerpusDropdown(e) {
+    function togglePerpusDropdown(e, id) {
         e.stopPropagation();
-        var m = document.getElementById('perpusDropdownMenu') || document.getElementById('perpusDropdownMenu1');
+        var targetId = id || 'perpusDropdownMenu';
+        var allMenus = ['perpusDropdownMenu', 'perpusDropdownMenu1', 'petaDropdownAdmin', 'petaDropdownPemilik'];
+        allMenus.forEach(function(menuId) {
+            if (menuId !== targetId) {
+                var m = document.getElementById(menuId);
+                if (m) m.classList.remove('show');
+            }
+        });
+        var m = document.getElementById(targetId);
         if (m) m.classList.toggle('show');
     }
     window.addEventListener('click', function() {
-        ['perpusDropdownMenu','perpusDropdownMenu1'].forEach(function(id) {
+        ['perpusDropdownMenu','perpusDropdownMenu1','petaDropdownAdmin','petaDropdownPemilik'].forEach(function(id) {
             var m = document.getElementById(id);
             if (m) m.classList.remove('show');
         });

@@ -58,6 +58,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/v_lokasi_startup',                   'Startup::detail_lokasi_startup');
     $routes->get('/v_detail_lokasi_startup',            'Startup::detail_lokasi_startup');
     $routes->get('/v_lokasi_startup_saya',              'Startup::lokasi_startup_saya');
+    $routes->get('/v_globe',                            'Startup::globe');
 
     // Perpustakaan
     $routes->get('/v_perpustakaan',                     'Perpustakaan::index');

@@ -163,6 +163,17 @@
     }
     .panel-btn-detail:hover { background: #4f46e5; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35); }
 
+    /* Globe Dropdown */
+    #ddGlobal { width: 420px; }
+    #ddGlobal .map-dropdown-body { max-height: none; overflow: hidden; padding: 0; }
+    #globe-container {
+        width: 100%; height: 380px;
+        background: #000d1a;
+        position: relative;
+        overflow: hidden;
+    }
+    #globe-container > div { width: 100% !important; height: 100% !important; }
+
     /* Custom Cluster Color: Blue (Force with !important) */
     .marker-cluster-small { background-color: rgba(99, 102, 241, 0.4) !important; }
     .marker-cluster-small div { background-color: rgba(99, 102, 241, 0.8) !important; color: #fff !important; }
@@ -271,6 +282,7 @@
                 </div>
             </div>
         </div>
+
     </div>
     <?php endif; ?>
 

@@ -819,6 +819,16 @@ class Startup extends BaseController
         echo json_encode(['status' => true]);
     }
 
+    public function globe()
+    {
+        return view('layout/header', ['title' => 'Globe Interaktif'])
+            . view('layout/topbar')
+            . view('startup/v_globe', [
+                'startups' => $this->m_startup->semua_startup()->getResult(),
+            ])
+            . view('layout/footer');
+    }
+
     public function log_aktivitas()
     {
         $logs = (new M_log_aktivitas())->semua_log(200);
