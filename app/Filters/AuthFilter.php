@@ -1,11 +1,39 @@
 <?php
+
 namespace App\Filters;
+
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Models\M_izin_akses;
 
 class AuthFilter implements FilterInterface
 {
+    // Peta segment URI ke nama modul di tabel izin_akses
+    protected $peta_modul = [
+        'v_dashboard'          => 'dashboard',
+        'v_data_startup'       => 'data_startup',
+        'v_tambah_startup'     => 'data_startup',
+        'v_edit_startup'       => 'data_startup',
+        'v_detail_startup'     => 'data_startup',
+        'v_detail'             => 'data_startup',
+        'v_hapus_startup'      => 'data_startup',
+        'program'              => 'program',
+        'peserta_program'      => 'program',
+        'kelas'                => 'kelas',
+        'v_perpustakaan'       => 'perpustakaan',
+        'perpustakaan'         => 'perpustakaan',
+        'v_riwayat_aktivitas'  => 'riwayat',
+        'riwayat'              => 'riwayat',
+        'v_lokasi_startup'     => 'peta_lokasi',
+        'v_lokasi_startup_saya'=> 'peta_lokasi',
+        'v_globe'              => 'peta_lokasi',
+        'jadwal_kelas'          => 'kalender',
+        'log_aktivitas'        => 'log_aktivitas',
+        'manajemen_user'       => 'manajemen_user',
+        'izin_akses'           => 'izin_akses',
+    ];
+
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
@@ -16,41 +44,37 @@ class AuthFilter implements FilterInterface
         }
 
         // Session timeout: 30 menit tidak aktif
-        $lastActivity = $session->get('last_activity');
-        if ($lastActivity && (time() - $lastActivity) > 1800) {
+        $last_activity = $session->get('last_activity');
+        if ($last_activity && (time() - $last_activity) > 1800) {
             $session->destroy();
             return redirect()->to(base_url('login'))->with('error', 'Sesi Anda telah berakhir. Silakan login kembali.');
         }
 
         $session->set('last_activity', time());
 
-        // Batasi akses pemilik_startup hanya ke halaman startup miliknya
-        if ($session->get('user_role') === 'pemilik_startup') {
-            $uri      = service('uri');
-            $segment1 = $uri->getSegment(1);
+        $role     = $session->get('user_role');
+        $uri      = service('uri');
+        $segment1 = $uri->getSegment(1);
 
-            // Daftar URI yang boleh diakses oleh pemilik_startup
-            $allowed = [
-                'v_detail', 'v_edit_startup', 'v_update_startup', 'keep-alive',
-                'v_lokasi_startup_saya', 'v_perpustakaan', 'v_video', 'v_buku', 'konten',
-                'perpustakaan', 'riwayat', 'v_history', 'startup', 'get_startup_tim',
-                'program', 'peserta_program', 'kelas',
-                'proses_tambah_informasi_tim', 'proses_ubah_informasi_tim', 'proses_hapus_informasi_tim',
-                'get_startup_produk', 'proses_tambah_informasi_produk',
-                'proses_ubah_informasi_produk', 'proses_hapus_informasi_produk',
-                'get_startup_pendanaan_itb', 'proses_tambah_informasi_pendanaan_itb',
-                'proses_ubah_informasi_pendanaan_itb', 'proses_hapus_informasi_pendanaan_itb',
-                'get_startup_pendanaan_non_itb', 'proses_tambah_informasi_pendanaan_non_itb',
-                'proses_ubah_informasi_pendanaan_non_itb', 'proses_hapus_informasi_pendanaan_non_itb',
-                'get_startup_prestasi', 'proses_tambah_informasi_prestasi',
-                'proses_ubah_informasi_prestasi', 'proses_hapus_informasi_prestasi',
-                'proses_tambah_informasi_mentor', 'proses_hapus_informasi_mentor',
-            ];
+        // Superadmin: akses penuh tanpa cek
+        if ($role === 'superadmin') {
+            return;
+        }
 
-            if (!in_array($segment1, $allowed)) {
-                // Redirect ke halaman detail startup miliknya
+        // Cek apakah segment URI termasuk modul yang dikontrol
+        if (!isset($this->peta_modul[$segment1])) {
+            return;
+        }
+
+        $nama_modul = $this->peta_modul[$segment1];
+        $izin       = (new M_izin_akses())->izin_by_role_modul($role, $nama_modul);
+
+        // Jika tidak ada data izin atau tidak boleh lihat, tolak akses
+        if (!$izin || !$izin['bisa_lihat']) {
+            if ($role === 'pemilik_startup') {
                 return redirect()->to(base_url('v_detail/' . $session->get('user_startup_uuid')));
             }
+            return redirect()->to(base_url('v_dashboard'))->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
         }
     }
 
@@ -60,14 +84,13 @@ class AuthFilter implements FilterInterface
         if (strtolower($request->getMethod()) !== 'get') return;
         if (!session()->get('user_logged_in')) return;
 
-        $uri = (string) $request->getUri();
+        $uri      = (string) $request->getUri();
+        $segment1 = service('uri')->getSegment(1);
 
         // Abaikan halaman yang tidak perlu dicatat
         $abaikan = ['keep-alive', 'log_aktivitas', 'notifikasi', 'riwayat'];
-        $segment1 = service('uri')->getSegment(1);
         if (in_array($segment1, $abaikan)) return;
 
-        // Update halaman terakhir di session
         session()->set('halaman_terakhir', $uri);
     }
 }

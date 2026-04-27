@@ -53,16 +53,20 @@ class Kelas_startup extends BaseController
         $id_program = $this->request->getPost('id_program');
 
         $data = [
-            'id_program'   => $id_program,
-            'nama_kelas'   => $this->request->getPost('nama_kelas'),
-            'deskripsi'    => $this->request->getPost('deskripsi'),
-            'status_kelas' => $this->request->getPost('status_kelas'),
-            'tanggal'      => $this->request->getPost('tanggal'),
-            'jam_mulai'    => $this->request->getPost('jam_mulai'),
-            'jam_selesai'  => $this->request->getPost('jam_selesai'),
-            'link_youtube' => $this->request->getPost('link_youtube'),
-            'link_zoom'    => $this->request->getPost('link_zoom'),
-            'nama_dosen'   => $this->request->getPost('nama_dosen'),
+            'id_program'      => $id_program,
+            'nama_kelas'      => $this->request->getPost('nama_kelas'),
+            'deskripsi'       => $this->request->getPost('deskripsi'),
+            'status_kelas'    => $this->request->getPost('status_kelas'),
+            'tipe_kelas'      => $this->request->getPost('tipe_kelas'),
+            'platform_online' => $this->request->getPost('platform_online'),
+            'link_meeting'    => $this->request->getPost('link_meeting'),
+            'lokasi_offline'  => $this->request->getPost('lokasi_offline'),
+            'tanggal'         => $this->request->getPost('tanggal'),
+            'jam_mulai'       => $this->request->getPost('jam_mulai'),
+            'jam_selesai'     => $this->request->getPost('jam_selesai'),
+            'link_youtube'    => $this->request->getPost('link_youtube'),
+            'link_zoom'       => $this->request->getPost('link_zoom'),
+            'nama_dosen'      => $this->request->getPost('nama_dosen'),
         ];
 
         if ($this->m_kelas->tambah_kelas($data)) {
@@ -108,15 +112,19 @@ class Kelas_startup extends BaseController
         $id_kelas   = $this->request->getPost('id_kelas');
 
         $data_kelas = [
-            'id_kelas'     => $id_kelas,
-            'nama_kelas'   => $this->request->getPost('nama_kelas'),
-            'deskripsi'    => $this->request->getPost('deskripsi'),
-            'status_kelas' => $this->request->getPost('status_kelas'),
-            'tanggal'      => $this->request->getPost('tanggal'),
-            'jam_mulai'    => $this->request->getPost('jam_mulai'),
-            'jam_selesai'  => $this->request->getPost('jam_selesai'),
-            'link_zoom'    => $this->request->getPost('link_zoom'),
-            'nama_dosen'   => $this->request->getPost('nama_dosen'),
+            'id_kelas'        => $id_kelas,
+            'nama_kelas'      => $this->request->getPost('nama_kelas'),
+            'deskripsi'       => $this->request->getPost('deskripsi'),
+            'status_kelas'    => $this->request->getPost('status_kelas'),
+            'tipe_kelas'      => $this->request->getPost('tipe_kelas'),
+            'platform_online' => $this->request->getPost('platform_online'),
+            'link_meeting'    => $this->request->getPost('link_meeting'),
+            'lokasi_offline'  => $this->request->getPost('lokasi_offline'),
+            'tanggal'         => $this->request->getPost('tanggal'),
+            'jam_mulai'       => $this->request->getPost('jam_mulai'),
+            'jam_selesai'     => $this->request->getPost('jam_selesai'),
+            'link_zoom'       => $this->request->getPost('link_zoom'),
+            'nama_dosen'      => $this->request->getPost('nama_dosen'),
         ];
 
         $judul_sesi    = $this->request->getPost('judul_sesi')      ?? [];

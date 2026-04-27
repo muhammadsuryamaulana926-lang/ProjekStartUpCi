@@ -262,6 +262,13 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                 </svg>
                 <span>Program</span>
             </a>
+            <a href="<?= base_url('jadwal_kelas') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'jadwal_kelas') ? 'top-nav-active' : '' ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Kalender</span>
+            </a>
 
         <?php else: ?>
             <a href="<?= base_url('v_dashboard') ?>"
@@ -330,6 +337,13 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
                 </svg>
                 <span>Program Kelas</span>
             </a>
+            <a href="<?= base_url('jadwal_kelas') ?>"
+               class="top-nav-link-item <?= ($currentPage == 'jadwal_kelas') ? 'top-nav-active' : '' ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Kalender</span>
+            </a>
 
         <?php endif; ?>
     </nav>
@@ -343,10 +357,13 @@ if (in_array($role, ['admin', 'pemilik_startup'])) {
             </svg>
         </button> -->
 
-        <!-- Log Aktivitas (khusus admin) -->
-        <?php if ($role === 'admin'): ?>
+        <!-- Log Aktivitas & Manajemen (khusus admin/superadmin) -->
+        <?php if (in_array($role, ['admin', 'superadmin'])): ?>
         <a href="<?= base_url('log_aktivitas') ?>" class="topbar-icon-btn <?= $currentPage === 'log_aktivitas' ? 'text-primary' : '' ?>" title="Log Aktivitas">
             <i class="mdi mdi-shield-account-outline" style="font-size:20px;"></i>
+        </a>
+        <a href="<?= base_url('manajemen_user') ?>" class="topbar-icon-btn <?= in_array($currentPage, ['manajemen_user', 'izin_akses']) ? 'text-primary' : '' ?>" title="Manajemen User & Izin Akses">
+            <i class="mdi mdi-account-cog-outline" style="font-size:20px;"></i>
         </a>
         <?php endif; ?>
 

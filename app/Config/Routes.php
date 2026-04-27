@@ -36,6 +36,35 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/peserta_program/hapus_peserta_program', 'Peserta_program::hapus_peserta_program');
     // --------------------------
 
+    // Manajemen User
+    $routes->get('/manajemen_user',                        'Manajemen_user::index');
+    $routes->get('/manajemen_user/tambah_user',            'Manajemen_user::tambah_user');
+    $routes->post('/manajemen_user/simpan_user',           'Manajemen_user::simpan_user');
+    $routes->get('/manajemen_user/edit_user/(:num)',        'Manajemen_user::edit_user/$1');
+    $routes->post('/manajemen_user/ubah_user',             'Manajemen_user::ubah_user');
+    $routes->post('/manajemen_user/toggle_aktif',          'Manajemen_user::toggle_aktif');
+    $routes->post('/manajemen_user/hapus_user',             'Manajemen_user::hapus_user');
+    $routes->get('/manajemen_user/get_izin_by_role',        'Manajemen_user::get_izin_by_role');
+
+    // Presensi Kelas
+    $routes->get('/presensi_kelas/detail_kelas/(:any)',    'Presensi_kelas::detail_kelas/$1');
+    $routes->post('/presensi_kelas/simpan_presensi',       'Presensi_kelas::simpan_presensi');
+    $routes->post('/presensi_kelas/hapus_presensi',        'Presensi_kelas::hapus_presensi');
+
+    // Jadwal Kelas (Kalender)
+    $routes->get('/jadwal_kelas',                          'Jadwal_kelas::index');
+    $routes->get('/jadwal_kelas/get_events',               'Jadwal_kelas::get_events');
+
+    // Materi Kelas
+    $routes->get('/materi_kelas/(:any)',                   'Materi_kelas::index/$1');
+    $routes->post('/materi_kelas/simpan_materi',           'Materi_kelas::simpan_materi');
+    $routes->post('/materi_kelas/hapus_materi',            'Materi_kelas::hapus_materi');
+    $routes->get('/materi_kelas/download_materi/(:any)',   'Materi_kelas::download_materi/$1');
+
+    // Izin Akses
+    $routes->get('/izin_akses',                            'Izin_akses::index');
+    $routes->post('/izin_akses/simpan_izin',               'Izin_akses::simpan_izin');
+
 
     // Dashboard
     $routes->get('/v_dashboard',                        'Dashboard_startup::index');

@@ -72,6 +72,7 @@ body {
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Status Kelas</label>
                         <select name="status_kelas" class="form-select">
+                            <option value="">-- Pilih Status --</option>
                             <option value="aktif">Aktif</option>
                             <option value="selesai">Selesai</option>
                             <option value="dibatalkan">Dibatalkan</option>
@@ -104,14 +105,58 @@ body {
                     <input type="text" class="form-control" name="nama_dosen" placeholder="Nama Pemateri">
                 </div>
 
+                <!-- Tipe Kelas Online / Offline -->
                 <div class="mb-3">
-                    <label class="form-label">Link Zoom Meeting</label>
+                    <label class="form-label">Tipe Kelas <span class="text-danger">*</span></label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_online" value="online" onchange="toggle_tipe_kelas()">
+                            <label class="form-check-label" for="tipe_online">Online</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_offline" value="offline" onchange="toggle_tipe_kelas()">
+                            <label class="form-check-label" for="tipe_offline">Offline</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Online -->
+                <div id="seksi_online" style="display:none;">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Platform</label>
+                            <select name="platform_online" class="form-select">
+                                <option value="">-- Pilih Platform --</option>
+                                <option value="Zoom">Zoom</option>
+                                <option value="Google Meet">Google Meet</option>
+                                <option value="Microsoft Teams">Microsoft Teams</option>
+                                <option value="Webex">Webex</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Link Meeting</label>
+                            <input type="url" class="form-control" name="link_meeting" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Offline -->
+                <div id="seksi_offline" style="display:none;">
+                    <div class="mb-3">
+                        <label class="form-label">Lokasi / Ruangan</label>
+                        <input type="text" class="form-control" name="lokasi_offline" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Link Zoom Meeting <small class="text-muted">(opsional, untuk tombol Join Zoom)</small></label>
                     <input type="url" class="form-control" name="link_zoom" placeholder="https://zoom.us/j/...">
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Link YouTube Live / Record</label>
-                    <input type="url" class="form-control" name="link_youtube" placeholder="https://youtube.com/...">
+                    <input type="url" class="form-control" name="link_youtube" placeholder="https://youtube.com/...">  
                 </div>
                 
                 <div class="d-flex justify-content-end gap-2 mt-5">
@@ -126,9 +171,15 @@ body {
 (function() {
     var now = new Date();
     var pad = function(n) { return String(n).padStart(2, '0'); };
-    document.getElementById('tanggal').value  = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
+    document.getElementById('tanggal').value   = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
     document.getElementById('jam_mulai').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
-    var selesai = new Date(now.getTime() + 60 * 60 * 1000); // +1 jam
+    var selesai = new Date(now.getTime() + 60 * 60 * 1000);
     document.getElementById('jam_selesai').value = pad(selesai.getHours()) + ':' + pad(selesai.getMinutes());
 })();
+
+function toggle_tipe_kelas() {
+    var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
+    document.getElementById('seksi_online').style.display  = (tipe && tipe.value === 'online')  ? 'block' : 'none';
+    document.getElementById('seksi_offline').style.display = (tipe && tipe.value === 'offline') ? 'block' : 'none';
+}
 </script>

@@ -32,6 +32,7 @@ body { background-color: #f5f5f5 !important; }
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Status Kelas</label>
                         <select name="status_kelas" class="form-select">
+                            <option value="">-- Pilih Status --</option>
                             <option value="aktif"      <?= $kelas['status_kelas'] == 'aktif'      ? 'selected' : '' ?>>Aktif</option>
                             <option value="selesai"    <?= $kelas['status_kelas'] == 'selesai'    ? 'selected' : '' ?>>Selesai</option>
                             <option value="dibatalkan" <?= $kelas['status_kelas'] == 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
@@ -62,6 +63,52 @@ body { background-color: #f5f5f5 !important; }
                 <div class="mb-3">
                     <label class="form-label">Dosen / Pemateri</label>
                     <input type="text" class="form-control" name="nama_dosen" value="<?= esc($kelas['nama_dosen']) ?>">
+                </div>
+
+                <!-- Tipe Kelas Online / Offline -->
+                <div class="mb-3">
+                    <label class="form-label">Tipe Kelas</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_online" value="online"
+                                <?= ($kelas['tipe_kelas'] ?? '') === 'online' ? 'checked' : '' ?>
+                                onchange="toggle_tipe_kelas()">
+                            <label class="form-check-label" for="tipe_online">Online</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_offline" value="offline"
+                                <?= ($kelas['tipe_kelas'] ?? '') === 'offline' ? 'checked' : '' ?>
+                                onchange="toggle_tipe_kelas()">
+                            <label class="form-check-label" for="tipe_offline">Offline</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Online -->
+                <div id="seksi_online" style="display:none;">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Platform</label>
+                            <select name="platform_online" class="form-select">
+                                <option value="">-- Pilih Platform --</option>
+                                <?php foreach (['Zoom','Google Meet','Microsoft Teams','Webex','Lainnya'] as $p): ?>
+                                <option value="<?= $p ?>" <?= ($kelas['platform_online'] ?? '') === $p ? 'selected' : '' ?>><?= $p ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Link Meeting</label>
+                            <input type="url" class="form-control" name="link_meeting" value="<?= esc($kelas['link_meeting'] ?? '') ?>" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Offline -->
+                <div id="seksi_offline" style="display:none;">
+                    <div class="mb-3">
+                        <label class="form-label">Lokasi / Ruangan</label>
+                        <input type="text" class="form-control" name="lokasi_offline" value="<?= esc($kelas['lokasi_offline'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
+                    </div>
                 </div>
 
                 <!-- Multi Video Sesi -->
@@ -437,4 +484,12 @@ document.addEventListener('input', function(e) {
 document.querySelectorAll('.yt-link-input').forEach(function(inp) {
     if (inp.value) ambil_durasi_video(inp);
 });
+
+function toggle_tipe_kelas() {
+    var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
+    document.getElementById('seksi_online').style.display  = (tipe && tipe.value === 'online')  ? 'block' : 'none';
+    document.getElementById('seksi_offline').style.display = (tipe && tipe.value === 'offline') ? 'block' : 'none';
+}
+// Inisialisasi saat halaman load
+toggle_tipe_kelas();
 </script>

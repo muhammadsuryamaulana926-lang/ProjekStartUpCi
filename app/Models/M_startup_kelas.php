@@ -42,4 +42,25 @@ class M_startup_kelas extends Model
     {
         return $this->db->table('kelas_startup')->where('id_kelas', $data['id_kelas'])->delete();
     }
+
+    // Mengambil semua kelas untuk kalender (join dengan program)
+    public function semua_kelas_kalender()
+    {
+        return $this->db->table('kelas_startup ks')
+            ->select('ks.*, ps.nama_program')
+            ->join('program_startup ps', 'ps.id_program = ks.id_program')
+            ->orderBy('ks.tanggal ASC, ks.jam_mulai ASC')
+            ->get()->getResultArray();
+    }
+
+    // Mengambil kelas mendatang (tanggal >= hari ini)
+    public function kelas_mendatang()
+    {
+        return $this->db->table('kelas_startup ks')
+            ->select('ks.*, ps.nama_program')
+            ->join('program_startup ps', 'ps.id_program = ks.id_program')
+            ->where('ks.tanggal >=', date('Y-m-d'))
+            ->orderBy('ks.tanggal ASC, ks.jam_mulai ASC')
+            ->get()->getResultArray();
+    }
 }

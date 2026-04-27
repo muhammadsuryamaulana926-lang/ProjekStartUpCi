@@ -137,6 +137,9 @@ body {
 
                                 <div class="d-flex gap-2">
                                     <?php if($sudah_join || in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
+                                        <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-outline-secondary flex-fill btn-modern btn-sm">
+                                            <i class="mdi mdi-account-group"></i> Detail & Presensi
+                                        </a>
                                         <?php if(!empty($k['link_zoom'])): ?>
                                             <a href="<?= esc($k['link_zoom']) ?>" target="_blank" class="btn btn-primary flex-fill btn-modern">
                                                 <i class="mdi mdi-video"></i> Join Zoom
