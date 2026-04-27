@@ -124,6 +124,9 @@ body { background-color: #f5f5f5 !important; }
                         <a href="<?= base_url('materi_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-secondary btn-modern px-4">
                             <i class="mdi mdi-folder-open"></i> Materi Kelas
                         </a>
+                        <a href="<?= base_url('tugas_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-warning btn-modern px-4">
+                            <i class="mdi mdi-clipboard-text"></i> Tugas
+                        </a>
                     </div>
                 </div>
 
@@ -141,6 +144,13 @@ body { background-color: #f5f5f5 !important; }
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nama</label>
                             <input type="text" class="form-control" value="<?= esc($nama_peserta) ?>" disabled>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Kondisi Kehadiran <span class="text-danger">*</span></label>
+                            <select class="form-control" name="kondisi_hadir" required>
+                                <option value="">-- Pilih --</option>
+                                <option value="Hadir">Hadir</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Catatan <small class="text-muted">(opsional)</small></label>
@@ -181,6 +191,11 @@ body { background-color: #f5f5f5 !important; }
                             <div class="avatar-kecil"><?= strtoupper(substr($p['nama_peserta'], 0, 1)) ?></div>
                             <div>
                                 <div class="fw-semibold small text-dark"><?= esc($p['nama_peserta']) ?></div>
+                                <?php if (!empty($p['kondisi_hadir'])): ?>
+                                    <span class="badge <?= $p['kondisi_hadir'] === 'Hadir Langsung' ? 'bg-success' : 'bg-primary' ?> mt-1" style="font-size:10px;">
+                                        <?= esc($p['kondisi_hadir']) ?>
+                                    </span>
+                                <?php endif; ?>
                                 <?php if (!empty($p['catatan'])): ?>
                                     <div class="text-muted" style="font-size:12px;"><?= esc($p['catatan']) ?></div>
                                 <?php endif; ?>

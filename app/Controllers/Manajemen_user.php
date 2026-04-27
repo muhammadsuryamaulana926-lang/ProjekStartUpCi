@@ -3,11 +3,13 @@
 namespace App\Controllers;
 
 use App\Models\M_manajemen_user;
+use App\Models\M_role;
 
 // Controller untuk mengelola data user oleh admin/superadmin
 class Manajemen_user extends BaseController
 {
     protected $m_user;
+    protected $m_role;
 
     protected $daftar_role = [
         'admin'           => 'Admin',
@@ -32,6 +34,7 @@ class Manajemen_user extends BaseController
     public function __construct()
     {
         $this->m_user = new M_manajemen_user();
+        $this->m_role = new M_role();
     }
 
     // Menampilkan daftar semua user
@@ -48,8 +51,9 @@ class Manajemen_user extends BaseController
     // Menampilkan form tambah user baru
     public function tambah_user()
     {
-        $data['daftar_role']  = $this->daftar_role;
-        $data['daftar_modul'] = $this->daftar_modul;
+        $roles = $this->m_role->semua_role();
+        $data['daftar_role']    = array_column($roles, 'label', 'nama_role');
+        $data['daftar_modul']   = $this->daftar_modul;
         $data['izin_per_modul'] = [];
 
         return view('layout/header', ['title' => 'Tambah User'])
@@ -91,8 +95,9 @@ class Manajemen_user extends BaseController
     // Menampilkan form edit user beserta izin aksesnya
     public function edit_user($id_user)
     {
-        $data['user']        = $this->m_user->user_by_id($id_user);
-        $data['daftar_role'] = $this->daftar_role;
+        $data['user']         = $this->m_user->user_by_id($id_user);
+        $roles                = $this->m_role->semua_role();
+        $data['daftar_role']  = array_column($roles, 'label', 'nama_role');
         $data['daftar_modul'] = $this->daftar_modul;
 
         if (empty($data['user'])) {
@@ -171,6 +176,29 @@ class Manajemen_user extends BaseController
         $role = $this->request->getGet('role');
         $izin = (new \App\Models\M_izin_akses())->izin_by_role($role);
         return $this->response->setJSON($izin);
+    }
+
+    // Menyimpan role baru via AJAX
+    public function tambah_role()
+    {
+        $label     = trim($this->request->getPost('label'));
+        $nama_role = strtolower(str_replace(' ', '_', $label));
+
+        if (empty($label)) {
+            return $this->response->setJSON(['status' => 'error', 'pesan' => 'Nama role tidak boleh kosong.']);
+        }
+
+        if ($this->m_role->cek_duplikat($nama_role)) {
+            return $this->response->setJSON(['status' => 'error', 'pesan' => 'Role sudah ada.']);
+        }
+
+        $this->m_role->tambah_role($nama_role, $label);
+
+        return $this->response->setJSON([
+            'status'    => 'ok',
+            'nama_role' => $nama_role,
+            'label'     => $label,
+        ]);
     }
 
     // Mengubah status aktif/nonaktif user

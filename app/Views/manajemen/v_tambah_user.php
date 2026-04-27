@@ -78,14 +78,20 @@ body { background-color: #f5f5f5 !important; }
 
                 <div class="mb-4">
                     <label class="form-label">Role <span class="text-danger">*</span></label>
-                    <select class="form-control" name="role" id="roleSelect" required onchange="updateIzinByRole(this.value)">
-                        <option value="">-- Pilih Role --</option>
-                        <?php foreach ($daftar_role as $value => $label): ?>
-                            <option value="<?= $value ?>" <?= old('role') === $value ? 'selected' : '' ?>>
-                                <?= $label ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div id="notif_role_sukses" class="alert alert-success py-2 small mb-2" style="display:none;"></div>
+                    <div class="input-group">
+                        <select class="form-control" name="role" id="roleSelect" required onchange="updateIzinByRole(this.value)">
+                            <option value="">-- Pilih Role --</option>
+                            <?php foreach ($daftar_role as $value => $label): ?>
+                                <option value="<?= $value ?>" <?= old('role') === $value ? 'selected' : '' ?>>
+                                    <?= $label ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('modalTambahRole').style.display='flex'" title="Tambah Role Baru">
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Izin Akses -->
@@ -144,6 +150,23 @@ body { background-color: #f5f5f5 !important; }
     </div>
 </div>
 
+<!-- Modal Tambah Role -->
+<div id="modalTambahRole" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:10px; padding:28px; width:100%; max-width:380px; box-shadow:0 8px 30px rgba(0,0,0,0.15);">
+        <h6 class="fw-bold mb-3">Tambah Role Baru</h6>
+        <div class="mb-3">
+            <label class="form-label">Nama Role <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="input_role_baru" placeholder="Contoh: Mentor, Koordinator...">
+            <small class="text-muted">Spasi otomatis diganti underscore.</small>
+        </div>
+        <div id="pesan_role" class="text-danger small mb-2" style="display:none;"></div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light border" onclick="document.getElementById('modalTambahRole').style.display='none'">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="kirim_tambah_role()">Simpan Role</button>
+        </div>
+    </div>
+</div>
+
 <script>
 function toggle_password(id, btn) {
     var inp = document.getElementById(id);
@@ -155,6 +178,41 @@ function toggle_password(id, btn) {
         inp.type = 'password';
         icon.className = 'mdi mdi-eye';
     }
+}
+
+function kirim_tambah_role() {
+    var label = document.getElementById('input_role_baru').value.trim();
+    var pesan = document.getElementById('pesan_role');
+    if (!label) { pesan.textContent = 'Nama role tidak boleh kosong.'; pesan.style.display='block'; return; }
+
+    fetch('<?= base_url('manajemen_user/tambah_role') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: '<?= csrf_token() ?>=' + '<?= csrf_hash() ?>' + '&label=' + encodeURIComponent(label)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.status === 'ok') {
+            var sel = document.getElementById('roleSelect');
+            var opt = document.createElement('option');
+            opt.value = res.nama_role;
+            opt.textContent = res.label;
+            opt.selected = true;
+            sel.appendChild(opt);
+            document.getElementById('modalTambahRole').style.display = 'none';
+            document.getElementById('input_role_baru').value = '';
+            pesan.style.display = 'none';
+            updateIzinByRole(res.nama_role);
+            // Tampilkan notif sukses
+            var notif = document.getElementById('notif_role_sukses');
+            notif.textContent = 'Role "' + res.label + '" berhasil ditambahkan.';
+            notif.style.display = 'block';
+            setTimeout(function() { notif.style.display = 'none'; }, 3000);
+        } else {
+            pesan.textContent = res.pesan;
+            pesan.style.display = 'block';
+        }
+    });
 }
 
 // Saat role berubah, load izin akses role tersebut via AJAX

@@ -45,6 +45,20 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/manajemen_user/toggle_aktif',          'Manajemen_user::toggle_aktif');
     $routes->post('/manajemen_user/hapus_user',             'Manajemen_user::hapus_user');
     $routes->get('/manajemen_user/get_izin_by_role',        'Manajemen_user::get_izin_by_role');
+    $routes->post('/manajemen_user/tambah_role',             'Manajemen_user::tambah_role');
+
+    // Tugas Kelas
+    $routes->get('/tugas_kelas/(:any)',                    'Tugas_kelas::index/$1');
+    $routes->post('/tugas_kelas/simpan_tugas',             'Tugas_kelas::simpan_tugas');
+    $routes->post('/tugas_kelas/hapus_tugas',              'Tugas_kelas::hapus_tugas');
+    $routes->post('/tugas_kelas/simpan_jawaban',           'Tugas_kelas::simpan_jawaban');
+    $routes->post('/tugas_kelas/simpan_komentar',          'Tugas_kelas::simpan_komentar');
+    $routes->get('/tugas_kelas/download/(:any)/(:any)',    'Tugas_kelas::download/$1/$2');
+
+    // Peserta Kelas (Admin assign peserta ke kelas)
+    $routes->get('/peserta_kelas/(:any)',                  'Peserta_kelas::index/$1');
+    $routes->post('/peserta_kelas/tambah_peserta',         'Peserta_kelas::tambah_peserta');
+    $routes->post('/peserta_kelas/hapus_peserta',          'Peserta_kelas::hapus_peserta');
 
     // Presensi Kelas
     $routes->get('/presensi_kelas/detail_kelas/(:any)',    'Presensi_kelas::detail_kelas/$1');

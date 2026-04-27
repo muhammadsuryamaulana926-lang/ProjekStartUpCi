@@ -6,6 +6,7 @@ use App\Models\M_presensi_kelas;
 use App\Models\M_startup_kelas;
 use App\Models\M_startup_program;
 use App\Models\M_peserta_program;
+use App\Models\M_peserta_kelas;
 
 // Controller untuk mengelola presensi/check-in peserta sebelum masuk kelas
 class Presensi_kelas extends BaseController
@@ -40,10 +41,7 @@ class Presensi_kelas extends BaseController
 
         // Cek apakah sudah join program
         $data['sudah_join'] = $data['bisa_kelola'] ? true
-            : (new M_peserta_program())->cek_sudah_join([
-                'id_program'   => $data['kelas']['id_program'],
-                'nama_peserta' => $nama_peserta,
-            ]);
+            : (new M_peserta_kelas())->cek_sudah_terdaftar($id_kelas, $nama_peserta);
 
         // Hitung apakah kelas bisa diakses (30 menit sebelum jam mulai)
         $data['bisa_akses'] = $this->cek_bisa_akses($data['kelas']);
@@ -76,10 +74,11 @@ class Presensi_kelas extends BaseController
         }
 
         $data = [
-            'id_kelas'     => $id_kelas,
-            'id_program'   => $id_program,
-            'nama_peserta' => $nama_peserta,
-            'catatan'      => $catatan,
+            'id_kelas'      => $id_kelas,
+            'id_program'    => $id_program,
+            'nama_peserta'  => $nama_peserta,
+            'kondisi_hadir' => $this->request->getPost('kondisi_hadir'),
+            'catatan'       => $this->request->getPost('catatan'),
         ];
 
         if ($this->m_presensi->simpan_presensi($data)) {
