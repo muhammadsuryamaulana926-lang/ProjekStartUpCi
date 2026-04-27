@@ -6,6 +6,7 @@ use App\Models\M_startup_program;
 use App\Models\M_peserta_program;
 use App\Models\M_notifikasi;
 use App\Models\M_manajemen_user;
+use App\Models\M_role;
 
 // Controller untuk mengelola data peserta program startup
 class Peserta_program extends BaseController
@@ -36,6 +37,9 @@ class Peserta_program extends BaseController
         if (empty($data['program'])) {
             return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
         }
+
+        $roles           = (new M_role())->semua_role();
+        $data['daftar_role'] = array_column($roles, 'label', 'nama_role');
 
         return view('layout/header', ['title' => 'Tambah Peserta'])
             . view('layout/topbar')

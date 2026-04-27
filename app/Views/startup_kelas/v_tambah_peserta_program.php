@@ -64,8 +64,9 @@ body { background-color: #f5f5f5 !important; }
                     <div class="mb-1">
                         <label class="form-label">Role <span class="text-danger">*</span></label>
                         <select class="form-control" name="role_akun" id="input_role">
-                            <option value="pemilik_startup">Pemilik Startup</option>
-                            <option value="pemateri">Pemateri</option>
+                            <?php foreach ($daftar_role as $value => $label): ?>
+                                <option value="<?= $value ?>"><?= $label ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
