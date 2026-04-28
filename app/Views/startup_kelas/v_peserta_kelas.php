@@ -48,33 +48,11 @@ body { background-color: #f5f5f5 !important; }
                 </div>
             </div>
 
-            <!-- Tambah Peserta ke Kelas -->
-            <div class="paper-card">
-                <h5 class="font-weight-bold text-dark mb-4">Tambah Peserta ke Kelas</h5>
-
-                <?php if (empty($belum_terdaftar)): ?>
-                    <div class="text-muted small">Semua peserta program sudah terdaftar di kelas ini.</div>
-                <?php else: ?>
-                    <form action="<?= base_url('peserta_kelas/tambah_peserta') ?>" method="POST" class="d-flex gap-2">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
-                        <select class="form-select" name="nama_peserta" required>
-                            <option value="">-- Pilih Peserta --</option>
-                            <?php foreach ($belum_terdaftar as $p): ?>
-                                <option value="<?= esc($p['nama_peserta']) ?>"><?= esc($p['nama_peserta']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="submit" class="btn btn-primary btn-modern px-4">
-                            <i class="mdi mdi-plus"></i> Tambah
-                        </button>
-                    </form>
-                <?php endif; ?>
-            </div>
 
             <!-- Daftar Peserta Kelas -->
             <div class="paper-card">
                 <h5 class="font-weight-bold text-dark mb-4">
-                    Peserta Kelas
+                    Peserta yang Hadir
                     <span class="badge bg-secondary ms-2"><?= count($peserta_kelas) ?></span>
                 </h5>
 
@@ -84,21 +62,29 @@ body { background-color: #f5f5f5 !important; }
                             <tr>
                                 <th width="5%">No</th>
                                 <th>Nama Peserta</th>
-                                <th>Tanggal Ditambahkan</th>
+                                <th>Kondisi</th>
+                                <th>Waktu Presensi</th>
                                 <th class="text-center" width="10%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($peserta_kelas)): ?>
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">Belum ada peserta di kelas ini.</td>
+                                <td colspan="5" class="text-center text-muted py-4">Belum ada peserta yang hadir.</td>
                             </tr>
                             <?php else: ?>
                                 <?php $no = 1; foreach ($peserta_kelas as $p): ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><strong><?= esc($p['nama_peserta']) ?></strong></td>
-                                    <td><?= date('d M Y H:i', strtotime($p['dibuat_pada'])) ?></td>
+                                    <td>
+                                        <?php if (!empty($p['kondisi_hadir'])): ?>
+                                            <span class="badge bg-success"><?= esc($p['kondisi_hadir']) ?></span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= !empty($p['waktu_presensi']) ? date('d M Y, H:i', strtotime($p['waktu_presensi'])) : '-' ?></td>
                                     <td class="text-center">
                                         <form action="<?= base_url('peserta_kelas/hapus_peserta') ?>" method="POST" class="d-inline">
                                             <?= csrf_field() ?>

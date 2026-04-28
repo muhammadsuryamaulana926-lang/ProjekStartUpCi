@@ -69,11 +69,8 @@ body { background-color: #f5f5f5 !important; }
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-info text-white rounded me-1" title="Detail">
+                                        <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-info text-white rounded" title="Detail">
                                             <i class="mdi mdi-eye"></i>
-                                        </a>
-                                        <a href="<?= base_url('materi_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-outline-secondary rounded" title="Materi">
-                                            <i class="mdi mdi-folder-open"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -105,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
         buttonText: { today: 'Hari Ini', month: 'Bulan', week: 'Minggu', list: 'Daftar' },
         events: '<?= base_url('jadwal_kelas/get_events') ?>',
         eventClick: function(info) {
-            window.location.href = '<?= base_url('presensi_kelas/detail_kelas/') ?>' + info.event.extendedProps.id_kelas;
+            window.location.href = '<?= base_url('presensi_kelas/detail_kelas/') ?>' + info.event.extendedProps.id_kelas + '?from=kalender';
         },
         eventDidMount: function(info) {
             info.el.title = info.event.title + ' — ' + info.event.extendedProps.nama_program;

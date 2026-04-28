@@ -23,17 +23,29 @@ class Program_startup extends BaseController
     // Menampilkan daftar semua program
     public function index()
     {
-        $id_user         = session()->get('user_id');
-        $nama_peserta    = session()->get('user_name') ?? 'Admin';
+        $id_user      = session()->get('user_id');
+        $role         = session()->get('user_role');
+        $nama_peserta = session()->get('user_name') ?? 'Admin';
+        $is_peserta   = session()->get('is_peserta_program');
+
         $data['program'] = $this->m_program->semua_program();
 
         foreach ($data['program'] as &$p) {
             $cek = $id_user
                 ? ['id_program' => $p['id_program'], 'id_user' => $id_user]
                 : ['id_program' => $p['id_program'], 'nama_peserta' => $nama_peserta];
-            $p['sudah_join']     = $this->m_peserta->cek_sudah_join($cek);
+            $p['sudah_join']     = in_array($role, ['admin', 'superadmin', 'pemateri']) ? true : $this->m_peserta->cek_sudah_join($cek);
             $p['jumlah_kelas']   = $this->m_program->hitung_kelas_program(['id_program' => $p['id_program']]);
             $p['jumlah_peserta'] = $this->m_program->hitung_peserta_program(['id_program' => $p['id_program']]);
+
+            // Untuk peserta: langsung load kelas agar tidak perlu klik detail dulu
+            if ($is_peserta && $p['sudah_join']) {
+                $p['kelas'] = $this->m_kelas->kelas_by_program(['id_program' => $p['id_program']]);
+                $m_presensi = new \App\Models\M_presensi_kelas();
+                foreach ($p['kelas'] as &$k) {
+                    $k['sudah_presensi'] = $m_presensi->cek_sudah_presensi($k['id_kelas'], $nama_peserta);
+                }
+            }
         }
 
         return view('layout/header', ['title' => 'Daftar Program'])
@@ -55,8 +67,9 @@ class Program_startup extends BaseController
     public function simpan_program()
     {
         $data = [
-            'nama_program' => $this->request->getPost('nama_program'),
-            'deskripsi'    => $this->request->getPost('deskripsi'),
+            'nama_program'   => $this->request->getPost('nama_program'),
+            'deskripsi'      => $this->request->getPost('deskripsi'),
+            'status_program' => $this->request->getPost('status_program') ?: 'aktif',
         ];
 
         if ($this->m_program->tambah_program($data)) {
@@ -88,9 +101,10 @@ class Program_startup extends BaseController
     {
         $id   = $this->request->getPost('id_program');
         $data = [
-            'id_program'   => $id,
-            'nama_program' => $this->request->getPost('nama_program'),
-            'deskripsi'    => $this->request->getPost('deskripsi'),
+            'id_program'     => $id,
+            'nama_program'   => $this->request->getPost('nama_program'),
+            'deskripsi'      => $this->request->getPost('deskripsi'),
+            'status_program' => $this->request->getPost('status_program') ?: 'aktif',
         ];
 
         if ($this->m_program->ubah_program($data)) {

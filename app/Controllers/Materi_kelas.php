@@ -113,6 +113,44 @@ class Materi_kelas extends BaseController
         return redirect()->to(base_url('materi_kelas/' . $id_kelas));
     }
 
+    // Preview file materi (stream ke browser)
+    public function preview_materi($id_materi)
+    {
+        $materi = $this->m_materi->materi_by_id($id_materi);
+
+        if (empty($materi) || empty($materi['nama_file'])) {
+            return $this->response->setStatusCode(404)->setBody('File tidak ditemukan.');
+        }
+
+        $path = ROOTPATH . 'public/uploads/materi/' . $materi['nama_file'];
+
+        if (!file_exists($path)) {
+            return $this->response->setStatusCode(404)->setBody('File tidak ditemukan di server.');
+        }
+
+        $mime_map = [
+            'pdf'  => 'application/pdf',
+            'png'  => 'image/png',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif'  => 'image/gif',
+        ];
+        $tipe = strtolower($materi['tipe_file'] ?? '');
+        $mime = $mime_map[$tipe] ?? null;
+
+        // Hanya PDF dan gambar yang bisa di-preview langsung
+        if ($mime) {
+            return $this->response
+                ->setHeader('Content-Type', $mime)
+                ->setHeader('Content-Disposition', 'inline; filename="' . $materi['nama_file'] . '"')
+                ->setBody(file_get_contents($path));
+        }
+
+        // File lain (doc, ppt, xls) — redirect ke Google Docs Viewer
+        $url_file = base_url('uploads/materi/' . $materi['nama_file']);
+        return redirect()->to('https://docs.google.com/viewer?url=' . urlencode($url_file) . '&embedded=true');
+    }
+
     // Download file materi
     public function download_materi($id_materi)
     {

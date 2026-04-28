@@ -34,6 +34,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/program/tambah_peserta_program/(:any)', 'Peserta_program::tambah_peserta_program/$1');
     $routes->post('/peserta_program/simpan_peserta_program','Peserta_program::simpan_peserta_program');
     $routes->post('/peserta_program/hapus_peserta_program', 'Peserta_program::hapus_peserta_program');
+    $routes->get('/kelas/get_pemateri',                    'Kelas_startup::get_pemateri');
+    $routes->post('/kelas/simpan_pemateri_ajax',            'Kelas_startup::simpan_pemateri_ajax');
     // --------------------------
 
     // Manajemen User
@@ -48,12 +50,13 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/manajemen_user/tambah_role',             'Manajemen_user::tambah_role');
 
     // Tugas Kelas
+    $routes->get('/tugas_kelas/download/(:any)/(:any)',    'Tugas_kelas::download/$1/$2');
+    $routes->get('/tugas_kelas/preview/(:any)/(:any)',     'Tugas_kelas::preview/$1/$2');
     $routes->get('/tugas_kelas/(:any)',                    'Tugas_kelas::index/$1');
     $routes->post('/tugas_kelas/simpan_tugas',             'Tugas_kelas::simpan_tugas');
     $routes->post('/tugas_kelas/hapus_tugas',              'Tugas_kelas::hapus_tugas');
     $routes->post('/tugas_kelas/simpan_jawaban',           'Tugas_kelas::simpan_jawaban');
     $routes->post('/tugas_kelas/simpan_komentar',          'Tugas_kelas::simpan_komentar');
-    $routes->get('/tugas_kelas/download/(:any)/(:any)',    'Tugas_kelas::download/$1/$2');
 
     // Peserta Kelas (Admin assign peserta ke kelas)
     $routes->get('/peserta_kelas/(:any)',                  'Peserta_kelas::index/$1');
@@ -70,10 +73,11 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/jadwal_kelas/get_events',               'Jadwal_kelas::get_events');
 
     // Materi Kelas
+    $routes->get('/materi_kelas/download_materi/(:any)',   'Materi_kelas::download_materi/$1');
+    $routes->get('/materi_kelas/preview_materi/(:any)',    'Materi_kelas::preview_materi/$1');
     $routes->get('/materi_kelas/(:any)',                   'Materi_kelas::index/$1');
     $routes->post('/materi_kelas/simpan_materi',           'Materi_kelas::simpan_materi');
     $routes->post('/materi_kelas/hapus_materi',            'Materi_kelas::hapus_materi');
-    $routes->get('/materi_kelas/download_materi/(:any)',   'Materi_kelas::download_materi/$1');
 
     // Izin Akses
     $routes->get('/izin_akses',                            'Izin_akses::index');

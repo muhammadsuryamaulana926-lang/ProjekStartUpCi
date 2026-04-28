@@ -23,6 +23,44 @@ class Kelas_startup extends BaseController
         $this->m_chapter     = new M_kelas_video_chapter();
     }
 
+    // Mengembalikan daftar pemateri aktif (untuk reload dropdown via AJAX)
+    public function get_pemateri()
+    {
+        $data = (new \App\Models\M_user())->pemateri_aktif();
+        return $this->response->setJSON($data);
+    }
+
+    // Menyimpan pemateri baru via AJAX dari form tambah/edit kelas
+    public function simpan_pemateri_ajax()
+    {
+        $m_user = new \App\Models\M_manajemen_user();
+        $email  = $this->request->getPost('email');
+        $nama   = $this->request->getPost('nama_lengkap');
+        $pass   = $this->request->getPost('password');
+
+        if (empty($nama) || empty($email) || empty($pass)) {
+            return $this->response->setJSON(['status' => 'error', 'pesan' => 'Semua field wajib diisi.']);
+        }
+
+        if ($m_user->cek_email_duplikat($email)) {
+            return $this->response->setJSON(['status' => 'error', 'pesan' => 'Email sudah digunakan.']);
+        }
+
+        $id_user = $m_user->tambah_user([
+            'nama_lengkap' => $nama,
+            'email'        => $email,
+            'password'     => password_hash($pass, PASSWORD_BCRYPT),
+            'role'         => 'pemateri',
+            'is_active'    => 1,
+        ]);
+
+        return $this->response->setJSON([
+            'status'       => 'ok',
+            'id_user'      => $id_user,
+            'nama_lengkap' => $nama,
+        ]);
+    }
+
     // Redirect ke detail program jika ada id_program, atau ke daftar program
     public function index($id_program = null)
     {

@@ -6,7 +6,7 @@ $role = session()->get('user_role');
 
 $notif_list  = [];
 $notif_count = 0;
-if (in_array($role, ['admin', 'pemilik_startup'])) {
+if (in_array($role, ['admin', 'pemilik_startup', 'pemateri'])) {
     $m_notif     = new \App\Models\M_notifikasi();
     $notif_list  = $m_notif->semua_belum_dibaca($role);
     $notif_count = count($notif_list);

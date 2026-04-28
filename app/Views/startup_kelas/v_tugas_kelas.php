@@ -26,16 +26,16 @@ body { background-color: #f5f5f5 !important; }
 .jawaban-item {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
     background: #fafafa;
 }
 .komentar-box {
     background: #fffbeb;
     border: 1px solid #fde68a;
     border-radius: 6px;
-    padding: 10px 14px;
-    margin-top: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
     font-size: 13px;
 }
 .avatar-kecil { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #475569; flex-shrink: 0; }
@@ -135,6 +135,13 @@ body { background-color: #f5f5f5 !important; }
                             </div>
                             <div class="d-flex gap-2 align-items-center">
                                 <?php if (!empty($t['nama_file'])): ?>
+                                    <?php $tp = strtolower($t['tipe_file'] ?? ''); ?>
+                                    <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-info rounded"
+                                        onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/tugas/' . $t['id_tugas']) ?>', '<?= esc($t['judul']) ?>', '<?= base_url('tugas_kelas/download/tugas/' . $t['id_tugas']) ?>')">
+                                        <i class="mdi mdi-eye"></i> Lihat
+                                    </button>
+                                    <?php endif; ?>
                                     <a href="<?= base_url('tugas_kelas/download/tugas/' . $t['id_tugas']) ?>" class="btn btn-sm btn-outline-primary rounded">
                                         <i class="mdi mdi-download"></i> Unduh Soal
                                     </a>
@@ -173,6 +180,13 @@ body { background-color: #f5f5f5 !important; }
                                         <div class="bg-light rounded p-3 mb-2" style="font-size:13px;"><?= nl2br(esc($jawaban_saya['jawaban_teks'])) ?></div>
                                     <?php endif; ?>
                                     <?php if (!empty($jawaban_saya['nama_file'])): ?>
+                                        <?php $tp = strtolower($jawaban_saya['tipe_file'] ?? ''); ?>
+                                        <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
+                                        <button type="button" class="btn btn-sm btn-outline-info rounded mb-2"
+                                            onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/jawaban/' . $jawaban_saya['id_jawaban']) ?>', 'Jawaban Saya', '<?= base_url('tugas_kelas/download/jawaban/' . $jawaban_saya['id_jawaban']) ?>')">
+                                            <i class="mdi mdi-eye"></i> Lihat File
+                                        </button>
+                                        <?php endif; ?>
                                         <a href="<?= base_url('tugas_kelas/download/jawaban/' . $jawaban_saya['id_jawaban']) ?>" class="btn btn-sm btn-outline-success rounded mb-2">
                                             <i class="mdi mdi-download"></i> File Jawaban Saya
                                         </a>
@@ -224,9 +238,16 @@ body { background-color: #f5f5f5 !important; }
                                                 </div>
                                             </div>
                                             <?php if (!empty($j['jawaban_teks'])): ?>
-                                                <div class="bg-white border rounded p-2 mb-2" style="font-size:13px;"><?= nl2br(esc($j['jawaban_teks'])) ?></div>
+                                                <div class="bg-white border rounded p-2 mb-3" style="font-size:13px;"><?= nl2br(esc($j['jawaban_teks'])) ?></div>
                                             <?php endif; ?>
                                             <?php if (!empty($j['nama_file'])): ?>
+                                                <?php $tp = strtolower($j['tipe_file'] ?? ''); ?>
+                                                <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
+                                                <button type="button" class="btn btn-xs btn-outline-info rounded mb-2" style="font-size:12px; padding:2px 10px;"
+                                                    onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/jawaban/' . $j['id_jawaban']) ?>', '<?= esc($j['nama_peserta']) ?>', '<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>')">
+                                                    <i class="mdi mdi-eye"></i> Lihat
+                                                </button>
+                                                <?php endif; ?>
                                                 <a href="<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>" class="btn btn-xs btn-outline-success rounded mb-2" style="font-size:12px; padding:2px 10px;">
                                                     <i class="mdi mdi-download"></i> Unduh Jawaban
                                                 </a>
@@ -247,7 +268,6 @@ body { background-color: #f5f5f5 !important; }
                                                 <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
                                                 <div class="input-group input-group-sm">
                                                     <input type="text" class="form-control" name="komentar"
-                                                        value="<?= esc($j['komentar'] ?? '') ?>"
                                                         placeholder="Tulis komentar...">
                                                     <button type="submit" class="btn btn-warning btn-sm">
                                                         <i class="mdi mdi-send"></i>
@@ -268,3 +288,36 @@ body { background-color: #f5f5f5 !important; }
         </div>
     </div>
 </div>
+
+<!-- Modal Preview Tugas/Jawaban -->
+<div class="modal fade" id="modalPreviewTugas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="height:90vh;">
+            <div class="modal-header py-2">
+                <h6 class="modal-title fw-bold mb-0" id="judulPreviewTugas"></h6>
+                <div class="d-flex gap-2 ms-auto">
+                    <a id="btnUnduhPreviewTugas" href="#" class="btn btn-sm btn-success rounded">
+                        <i class="mdi mdi-download"></i> Unduh
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0" style="height:100%; overflow:hidden;">
+                <iframe id="iframePreviewTugas" src="" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function buka_preview_tugas(url, judul, url_unduh) {
+    document.getElementById('judulPreviewTugas').textContent = judul;
+    document.getElementById('iframePreviewTugas').src = url;
+    document.getElementById('btnUnduhPreviewTugas').href = url_unduh;
+    new bootstrap.Modal(document.getElementById('modalPreviewTugas')).show();
+}
+
+document.getElementById('modalPreviewTugas').addEventListener('hidden.bs.modal', function() {
+    document.getElementById('iframePreviewTugas').src = '';
+});
+</script>

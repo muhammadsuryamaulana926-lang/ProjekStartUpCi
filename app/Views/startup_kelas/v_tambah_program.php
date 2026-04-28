@@ -24,6 +24,14 @@ body { background-color: #f5f5f5 !important; }
                     <label class="form-label">Deskripsi Program</label>
                     <textarea class="form-control" name="deskripsi" rows="5" placeholder="Penjelasan singkat mengenai program..."></textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="form-label">Status Program</label>
+                    <select class="form-select" name="status_program">
+                        <option value="aktif">Aktif</option>
+                        <option value="selesai">Selesai</option>
+                        <option value="dibatalkan">Dibatalkan</option>
+                    </select>
+                </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a href="<?= base_url('program') ?>" class="btn btn-light btn-modern border">Kembali</a>
                     <button type="submit" class="btn btn-primary btn-modern">Simpan Program</button>

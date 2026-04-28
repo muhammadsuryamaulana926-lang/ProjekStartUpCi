@@ -37,8 +37,21 @@ body { background-color: #f5f5f5 !important; }
             <?php endif; ?>
 
             <div class="mb-4">
-                <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-light btn-modern border">
-                    <i class="mdi mdi-arrow-left"></i> Kembali ke Program
+                <?php
+                    $from     = service('request')->getGet('from');
+                    $role_now = session()->get('user_role');
+                    if ($from === 'kalender') {
+                        $back_url = base_url('jadwal_kelas');
+                    } elseif ($role_now === 'pemateri') {
+                        $back_url = base_url('v_dashboard');
+                    } elseif (in_array($role_now, ['admin','superadmin'])) {
+                        $back_url = base_url('program/detail_program/' . $program['id_program']);
+                    } else {
+                        $back_url = base_url('program');
+                    }
+                ?>
+                <a href="<?= $back_url ?>" class="btn btn-light btn-modern border">
+                    <i class="mdi mdi-arrow-left"></i> Kembali
                 </a>
             </div>
 
@@ -102,8 +115,9 @@ body { background-color: #f5f5f5 !important; }
                 <?php elseif ($sudah_presensi): ?>
                 <!-- Sudah presensi — tampilkan akses kelas -->
                 <div class="paper-card">
-                    <div class="alert alert-success mb-4">
-                        <i class="mdi mdi-check-circle me-2"></i> Anda sudah melakukan presensi. Silakan akses kelas.
+                    <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+                        <i class="mdi mdi-check-circle text-success" style="font-size:22px;"></i>
+                        <span class="fw-semibold text-success">Anda sudah melakukan presensi. Silakan akses kelas.</span>
                     </div>
                     <div class="d-flex gap-3 flex-wrap">
                         <?php if (!empty($kelas['link_meeting'])): ?>
@@ -170,7 +184,8 @@ body { background-color: #f5f5f5 !important; }
             </div>
             <?php endif; ?>
 
-            <!-- Daftar Presensi -->
+            <!-- Daftar Presensi (hanya admin/pemateri) -->
+            <?php if ($bisa_kelola): ?>
             <div class="paper-card">
                 <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                     <h5 class="font-weight-bold text-dark m-0">
@@ -185,7 +200,7 @@ body { background-color: #f5f5f5 !important; }
                         <p class="mt-2 small">Belum ada peserta yang presensi.</p>
                     </div>
                 <?php else: ?>
-                    <?php $no = 1; foreach ($presensi as $p): ?>
+                    <?php foreach ($presensi as $p): ?>
                     <div class="peserta-item">
                         <div class="d-flex align-items-center gap-3">
                             <div class="avatar-kecil"><?= strtoupper(substr($p['nama_peserta'], 0, 1)) ?></div>
@@ -202,7 +217,6 @@ body { background-color: #f5f5f5 !important; }
                                 <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($p['dibuat_pada'])) ?></div>
                             </div>
                         </div>
-                        <?php if ($bisa_kelola): ?>
                         <form action="<?= base_url('presensi_kelas/hapus_presensi') ?>" method="POST" class="d-inline">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id_presensi" value="<?= $p['id_presensi'] ?>">
@@ -212,14 +226,12 @@ body { background-color: #f5f5f5 !important; }
                                 <i class="mdi mdi-delete"></i>
                             </button>
                         </form>
-                        <?php endif; ?>
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
 
-            <!-- Akses kelas untuk admin -->
-            <?php if ($bisa_kelola): ?>
+            <!-- Akses kelas untuk admin/pemateri -->
             <div class="paper-card">
                 <h5 class="font-weight-bold text-dark mb-3">Akses Kelas</h5>
                 <div class="d-flex gap-3 flex-wrap">
@@ -240,9 +252,6 @@ body { background-color: #f5f5f5 !important; }
                     <?php endif; ?>
                     <a href="<?= base_url('materi_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-secondary btn-modern">
                         <i class="mdi mdi-folder-open"></i> Materi Kelas
-                    </a>
-                    <a href="<?= base_url('tugas_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-warning btn-modern">
-                        <i class="mdi mdi-clipboard-text"></i> Tugas
                     </a>
                 </div>
             </div>

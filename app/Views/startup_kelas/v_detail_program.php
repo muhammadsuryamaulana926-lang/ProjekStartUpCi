@@ -71,7 +71,7 @@ body {
             <?php endif; ?>
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="javascript:history.back()" class="btn btn-light btn-modern border">
+                <a href="<?= base_url('program') ?>" class="btn btn-light btn-modern border">
                     <i class="mdi mdi-arrow-left"></i> Kembali
                 </a>
                 
@@ -174,7 +174,7 @@ body {
 
                                 <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
                                 <div class="mt-3 pt-3 border-top text-end">
-                                    <a href="<?= base_url('peserta_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-success text-white">Peserta</a>
+                                    <a href="<?= base_url('peserta_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-success text-white">Peserta Hadir</a>
                                     <a href="<?= base_url('program/edit_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-warning text-white">Edit</a>
                                     <a href="<?= base_url('program/hapus_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus kelas ini?')">Hapus</a>
                                 </div>

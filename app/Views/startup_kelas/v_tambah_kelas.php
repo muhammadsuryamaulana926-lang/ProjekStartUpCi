@@ -54,7 +54,7 @@ body {
 }
 </style>
 
-<div class="container-fluid" style="background-color: #f5f5f5; min-h-screen: 100vh; padding-bottom: 50px;">
+<div class="container-fluid" style="background-color: #f5f5f5; min-height: 100vh; padding-bottom: 50px;">
     <div class="paper-wrapper">
         <div class="paper-form">
             <h2 class="paper-title">Tambah Jadwal Kelas</h2>
@@ -102,14 +102,19 @@ body {
 
                 <div class="mb-3">
                     <label class="form-label">Dosen / Pemateri</label>
-                    <select class="form-select" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
-                        <option value="">-- Pilih Pemateri --</option>
-                        <?php foreach ($daftar_pemateri as $p): ?>
-                        <option value="<?= $p['id_user'] ?>" data-nama="<?= esc($p['nama_lengkap']) ?>">
-                            <?= esc($p['nama_lengkap']) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <div class="input-group">
+                        <select class="form-select" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
+                            <option value="">-- Pilih Pemateri --</option>
+                            <?php foreach ($daftar_pemateri as $p): ?>
+                            <option value="<?= $p['id_user'] ?>" data-nama="<?= esc($p['nama_lengkap']) ?>">
+                                <?= esc($p['nama_lengkap']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('modalTambahPemateri').style.display='flex'" title="Tambah Pemateri Baru">
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>
                     <input type="hidden" name="nama_dosen" id="nama_dosen">
                 </div>
 
@@ -147,6 +152,14 @@ body {
                             <input type="url" class="form-control" name="link_meeting" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link Zoom Meeting <small class="text-muted">(opsional, untuk tombol Join Zoom)</small></label>
+                        <input type="url" class="form-control" name="link_zoom" id="link_zoom" placeholder="https://zoom.us/j/...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Link YouTube Live / Record</label>
+                        <input type="url" class="form-control" name="link_youtube" id="link_youtube" placeholder="https://youtube.com/...">
+                    </div>
                 </div>
 
                 <!-- Field Offline -->
@@ -157,15 +170,7 @@ body {
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Link Zoom Meeting <small class="text-muted">(opsional, untuk tombol Join Zoom)</small></label>
-                    <input type="url" class="form-control" name="link_zoom" placeholder="https://zoom.us/j/...">
-                </div>
 
-                <div class="mb-4">
-                    <label class="form-label">Link YouTube Live / Record</label>
-                    <input type="url" class="form-control" name="link_youtube" placeholder="https://youtube.com/...">  
-                </div>
                 
                 <div class="d-flex justify-content-end gap-2 mt-5">
                     <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-light btn-modern border">Batal</a>
@@ -192,7 +197,81 @@ function isi_nama_dosen(sel) {
 
 function toggle_tipe_kelas() {
     var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
-    document.getElementById('seksi_online').style.display  = (tipe && tipe.value === 'online')  ? 'block' : 'none';
-    document.getElementById('seksi_offline').style.display = (tipe && tipe.value === 'offline') ? 'block' : 'none';
+    var isOnline = tipe && tipe.value === 'online';
+    document.getElementById('seksi_online').style.display  = isOnline  ? 'block' : 'none';
+    document.getElementById('seksi_offline').style.display = !isOnline && tipe ? 'block' : 'none';
+    if (!isOnline) {
+        document.getElementById('link_zoom').value = '';
+        document.getElementById('link_youtube').value = '';
+    }
+}
+</script>
+
+<!-- Modal Tambah Pemateri -->
+<div id="modalTambahPemateri" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:10px; padding:28px; width:100%; max-width:420px; box-shadow:0 8px 30px rgba(0,0,0,0.15);">
+        <h6 class="fw-bold mb-3">Tambah Pemateri Baru</h6>
+        <div class="mb-3">
+            <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="pm_nama" placeholder="Nama pemateri...">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="pm_email" placeholder="email@contoh.com">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="pm_password" placeholder="Password...">
+        </div>
+        <div id="pm_pesan" class="text-danger small mb-2" style="display:none;"></div>
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light border" onclick="document.getElementById('modalTambahPemateri').style.display='none'">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="kirim_tambah_pemateri()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function kirim_tambah_pemateri() {
+    var nama     = document.getElementById('pm_nama').value.trim();
+    var email    = document.getElementById('pm_email').value.trim();
+    var password = document.getElementById('pm_password').value;
+    var pesan    = document.getElementById('pm_pesan');
+
+    if (!nama || !email || !password) {
+        pesan.textContent = 'Semua field wajib diisi.';
+        pesan.style.display = 'block';
+        return;
+    }
+
+    fetch('<?= base_url('kelas/simpan_pemateri_ajax') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'nama_lengkap=' + encodeURIComponent(nama)
+            + '&email=' + encodeURIComponent(email)
+            + '&password=' + encodeURIComponent(password)
+            + '&<?= csrf_token() ?>=' + '<?= csrf_hash() ?>'
+    })
+    .then(r => r.json())
+    .then(function(res) {
+        if (res.status === 'error') {
+            pesan.textContent = res.pesan;
+            pesan.style.display = 'block';
+            return;
+        }
+        var sel = document.getElementById('id_pemateri');
+        var opt = document.createElement('option');
+        opt.value = res.id_user;
+        opt.dataset.nama = res.nama_lengkap;
+        opt.textContent = res.nama_lengkap;
+        opt.selected = true;
+        sel.appendChild(opt);
+        document.getElementById('nama_dosen').value = res.nama_lengkap;
+        document.getElementById('modalTambahPemateri').style.display = 'none';
+        document.getElementById('pm_nama').value = '';
+        document.getElementById('pm_email').value = '';
+        document.getElementById('pm_password').value = '';
+        pesan.style.display = 'none';
+    });
 }
 </script>

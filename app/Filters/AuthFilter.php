@@ -72,10 +72,18 @@ class AuthFilter implements FilterInterface
 
         // Jika tidak ada data izin atau tidak boleh lihat, cek apakah user adalah peserta program
         if (!$izin || !$izin['bisa_lihat']) {
-            $id_user = $session->get('user_id');
+            $id_user      = $session->get('user_id');
+            $nama_peserta = $session->get('user_name');
             // Peserta program boleh akses modul program, kelas, perpustakaan
-            if ($id_user && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
-                $peserta = (new M_peserta_program())->program_by_user($id_user);
+            if (in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
+                $m_peserta = new M_peserta_program();
+                $peserta = [];
+                if ($id_user) {
+                    $peserta = $m_peserta->program_by_user($id_user);
+                }
+                if (empty($peserta) && $nama_peserta) {
+                    $peserta = $this->db_table_peserta_by_nama($nama_peserta);
+                }
                 if (!empty($peserta)) {
                     return;
                 }
@@ -86,6 +94,13 @@ class AuthFilter implements FilterInterface
             }
             return redirect()->to(base_url('v_dashboard'))->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
         }
+    }
+
+    private function db_table_peserta_by_nama($nama_peserta)
+    {
+        return db_connect()->table('peserta_program')
+            ->where('nama_peserta', $nama_peserta)
+            ->get()->getResultArray();
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

@@ -44,11 +44,8 @@ body { background-color: #f5f5f5 !important; }
 
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-light btn-modern border">
+                <a href="<?= base_url('presensi_kelas/detail_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-light btn-modern border">
                     <i class="mdi mdi-arrow-left"></i> Kembali
-                </a>
-                <a href="<?= base_url('jadwal_kelas') ?>" class="btn btn-light btn-modern border">
-                    <i class="mdi mdi-calendar"></i> Kalender
                 </a>
             </div>
 
@@ -158,6 +155,17 @@ body { background-color: #f5f5f5 !important; }
                                             </a>
                                         <?php endif; ?>
                                         <?php if (!empty($m['nama_file'])): ?>
+                                            <?php
+                                                $tipe_preview = strtolower($m['tipe_file'] ?? '');
+                                                $bisa_preview = in_array($tipe_preview, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx']);
+                                            ?>
+                                            <?php if ($bisa_preview): ?>
+                                            <button type="button" class="btn btn-sm btn-outline-info rounded"
+                                                onclick="buka_preview('<?= base_url('materi_kelas/preview_materi/' . $m['id_materi']) ?>', '<?= esc($m['judul']) ?>', '<?= $tipe_preview ?>')"
+                                                title="Lihat">
+                                                <i class="mdi mdi-eye"></i> Lihat
+                                            </button>
+                                            <?php endif; ?>
                                             <a href="<?= base_url('materi_kelas/download_materi/' . $m['id_materi']) ?>" class="btn btn-sm btn-outline-success rounded" title="Download">
                                                 <i class="mdi mdi-download"></i> Unduh
                                             </a>
@@ -185,3 +193,52 @@ body { background-color: #f5f5f5 !important; }
         </div>
     </div>
 </div>
+
+<!-- Modal Preview Materi -->
+<div class="modal fade" id="modalPreviewMateri" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="height:90vh;">
+            <div class="modal-header py-2">
+                <h6 class="modal-title fw-bold mb-0" id="judulPreview"></h6>
+                <div class="d-flex gap-2 ms-auto">
+                    <a id="btnUnduhPreview" href="#" class="btn btn-sm btn-success rounded">
+                        <i class="mdi mdi-download"></i> Unduh
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0" style="height:100%; overflow:hidden;">
+                <iframe id="iframePreview" src="" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function buka_preview(url, judul, tipe) {
+    document.getElementById('judulPreview').textContent = judul;
+
+    var tipe_gambar = ['png','jpg','jpeg','gif'];
+    var tipe_office = ['doc','docx','ppt','pptx','xls','xlsx'];
+    var src = url;
+
+    if (tipe_office.indexOf(tipe) !== -1) {
+        src = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
+    }
+
+    document.getElementById('iframePreview').src = src;
+
+    // Tombol unduh — ambil id_materi dari URL
+    var parts = url.split('/');
+    var id_materi = parts[parts.length - 1];
+    document.getElementById('btnUnduhPreview').href = '<?= base_url('materi_kelas/download_materi/') ?>' + id_materi;
+
+    var modal = new bootstrap.Modal(document.getElementById('modalPreviewMateri'));
+    modal.show();
+}
+
+// Kosongkan iframe saat modal ditutup agar tidak loading di background
+document.getElementById('modalPreviewMateri').addEventListener('hidden.bs.modal', function() {
+    document.getElementById('iframePreview').src = '';
+});
+</script>

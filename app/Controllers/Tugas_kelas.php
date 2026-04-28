@@ -138,6 +138,18 @@ class Tugas_kelas extends BaseController
 
         if ($this->m_jawaban->simpan_jawaban($data)) {
             session()->setFlashdata('success', 'Jawaban berhasil dikumpulkan.');
+
+            // Kirim notifikasi ke pemateri kelas ini
+            $kelas = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
+            $tugas = $this->m_tugas->tugas_by_id($id_tugas);
+            if (!empty($kelas['id_pemateri'])) {
+                (new \App\Models\M_notifikasi())->tambah_notifikasi([
+                    'judul'      => 'Jawaban Tugas Masuk',
+                    'pesan'      => $nama_peserta . ' mengumpulkan jawaban tugas "' . ($tugas['judul'] ?? '') . '"',
+                    'untuk_role' => 'pemateri',
+                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                ]);
+            }
         } else {
             session()->setFlashdata('error', 'Gagal mengumpulkan jawaban.');
         }
@@ -159,6 +171,47 @@ class Tugas_kelas extends BaseController
         }
 
         return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+    }
+
+    // Preview file tugas atau jawaban (stream ke browser)
+    public function preview($tipe, $id)
+    {
+        if ($tipe === 'tugas') {
+            $data = $this->m_tugas->tugas_by_id($id);
+        } else {
+            $data = $this->m_jawaban->jawaban_by_id($id);
+        }
+
+        if (empty($data['nama_file'])) {
+            return $this->response->setStatusCode(404)->setBody('File tidak ditemukan.');
+        }
+
+        $path = ROOTPATH . 'public/uploads/tugas/' . $data['nama_file'];
+
+        if (!file_exists($path)) {
+            return $this->response->setStatusCode(404)->setBody('File tidak ditemukan di server.');
+        }
+
+        $mime_map = [
+            'pdf'  => 'application/pdf',
+            'png'  => 'image/png',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif'  => 'image/gif',
+        ];
+        $tipe_file = strtolower($data['tipe_file'] ?? '');
+        $mime      = $mime_map[$tipe_file] ?? null;
+
+        if ($mime) {
+            return $this->response
+                ->setHeader('Content-Type', $mime)
+                ->setHeader('Content-Disposition', 'inline; filename="' . $data['nama_file'] . '"')
+                ->setBody(file_get_contents($path));
+        }
+
+        // Office files — Google Docs Viewer
+        $url_file = base_url('uploads/tugas/' . $data['nama_file']);
+        return redirect()->to('https://docs.google.com/viewer?url=' . urlencode($url_file) . '&embedded=true');
     }
 
     // Download file tugas atau jawaban

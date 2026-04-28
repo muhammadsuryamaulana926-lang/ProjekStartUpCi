@@ -83,8 +83,8 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 <div class="app-content">
     <div style="max-width:1600px; margin:0 auto;">
         <div class="mb-3">
-            <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-sm btn-light border" style="border-radius:8px; font-weight:500;">
-                <i class="mdi mdi-arrow-left"></i> Kembali ke Detail Program
+            <a href="<?= base_url('presensi_kelas/detail_kelas/' . $kelas_aktif['id_kelas']) ?>" class="btn btn-sm btn-light border" style="border-radius:8px; font-weight:500;">
+                <i class="mdi mdi-arrow-left"></i> Kembali
             </a>
         </div>
 

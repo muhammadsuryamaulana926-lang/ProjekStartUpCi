@@ -36,8 +36,15 @@ class Peserta_kelas extends BaseController
         $data['peserta_kelas']   = $this->m_peserta_kelas->peserta_by_kelas($id_kelas);
         $data['peserta_program'] = $this->m_peserta_program->peserta_by_program(['id_program' => $data['kelas']['id_program']]);
 
-        // Tandai peserta program yang sudah terdaftar di kelas ini
-        $sudah_terdaftar = array_column($data['peserta_kelas'], 'nama_peserta');
+        // Gabungkan data presensi ke peserta_kelas untuk tampil waktu hadir
+        $presensi_list = (new \App\Models\M_presensi_kelas())->presensi_by_kelas($id_kelas);
+        $presensi_map  = array_column($presensi_list, null, 'nama_peserta');
+        $sudah_terdaftar = [];
+        foreach ($data['peserta_kelas'] as &$pk) {
+            $pk['waktu_presensi'] = $presensi_map[$pk['nama_peserta']]['dibuat_pada'] ?? null;
+            $pk['kondisi_hadir']  = $presensi_map[$pk['nama_peserta']]['kondisi_hadir'] ?? null;
+            $sudah_terdaftar[]    = $pk['nama_peserta'];
+        }
         $data['belum_terdaftar'] = array_filter($data['peserta_program'], function($p) use ($sudah_terdaftar) {
             return !in_array($p['nama_peserta'], $sudah_terdaftar);
         });

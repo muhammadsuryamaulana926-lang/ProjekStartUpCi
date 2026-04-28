@@ -89,6 +89,14 @@ class Presensi_kelas extends BaseController
         ];
 
         if ($this->m_presensi->simpan_presensi($data)) {
+            // Otomatis daftarkan ke peserta_kelas jika belum ada
+            $m_peserta_kelas = new \App\Models\M_peserta_kelas();
+            if (!$m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
+                $m_peserta_kelas->tambah_peserta([
+                    'id_kelas'     => $id_kelas,
+                    'nama_peserta' => $nama_peserta,
+                ]);
+            }
             session()->setFlashdata('success', 'Presensi berhasil. Silakan akses kelas.');
         } else {
             session()->setFlashdata('error', 'Gagal menyimpan presensi.');
