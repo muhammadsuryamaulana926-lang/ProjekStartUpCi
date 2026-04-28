@@ -16,13 +16,27 @@ class M_peserta_program extends Model
         return $this->db->query($query)->getResultArray();
     }
 
-    // Mengecek apakah peserta sudah terdaftar di program
+    // Mengecek apakah peserta sudah terdaftar di program (by id_user atau nama_peserta)
     public function cek_sudah_join($data)
     {
+        $builder = $this->db->table('peserta_program')
+            ->where('id_program', $data['id_program']);
+
+        if (!empty($data['id_user'])) {
+            $builder->where('id_user', $data['id_user']);
+        } else {
+            $builder->where('nama_peserta', $data['nama_peserta']);
+        }
+
+        return $builder->countAllResults() > 0;
+    }
+
+    // Mengambil semua program yang diikuti user berdasarkan id_user
+    public function program_by_user($id_user)
+    {
         return $this->db->table('peserta_program')
-            ->where('id_program', $data['id_program'])
-            ->where('nama_peserta', $data['nama_peserta'])
-            ->countAllResults() > 0;
+            ->where('id_user', $id_user)
+            ->get()->getResultArray();
     }
 
     // Menyimpan peserta baru dan mengembalikan true/false

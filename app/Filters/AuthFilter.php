@@ -6,6 +6,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\M_izin_akses;
+use App\Models\M_peserta_program;
 
 class AuthFilter implements FilterInterface
 {
@@ -69,8 +70,17 @@ class AuthFilter implements FilterInterface
         $nama_modul = $this->peta_modul[$segment1];
         $izin       = (new M_izin_akses())->izin_by_role_modul($role, $nama_modul);
 
-        // Jika tidak ada data izin atau tidak boleh lihat, tolak akses
+        // Jika tidak ada data izin atau tidak boleh lihat, cek apakah user adalah peserta program
         if (!$izin || !$izin['bisa_lihat']) {
+            $id_user = $session->get('user_id');
+            // Peserta program boleh akses modul program, kelas, perpustakaan
+            if ($id_user && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
+                $peserta = (new M_peserta_program())->program_by_user($id_user);
+                if (!empty($peserta)) {
+                    return;
+                }
+            }
+
             if ($role === 'pemilik_startup') {
                 return redirect()->to(base_url('v_detail/' . $session->get('user_startup_uuid')));
             }

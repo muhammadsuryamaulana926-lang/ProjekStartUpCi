@@ -80,22 +80,17 @@ body { background-color: #f5f5f5 !important; }
                                                 'superadmin'      => 'bg-dark',
                                                 'pemateri'        => 'bg-success',
                                                 'pemilik_startup' => 'bg-warning text-dark',
-                                            ];
-                                            $badge_label = [
-                                                'admin'           => 'Admin',
-                                                'superadmin'      => 'Superadmin',
-                                                'pemateri'        => 'Pemateri',
-                                                'pemilik_startup' => 'Pemilik Startup',
+                                                'pemilik_ipp'     => 'bg-info text-dark',
                                             ];
                                         ?>
                                         <span class="badge <?= $badge_warna[$u['role']] ?? 'bg-secondary' ?> px-3 py-2">
-                                            <?= $badge_label[$u['role']] ?? ucfirst($u['role']) ?>
+                                            <?= esc($daftar_role[$u['role']] ?? ucwords(str_replace('_', ' ', $u['role']))) ?>
                                         </span>
                                     </td>
                                     <td class="text-center">
                                         <form action="<?= base_url('manajemen_user/toggle_aktif') ?>" method="POST" class="d-inline">
                                             <?= csrf_field() ?>
-                                            <input type="hidden" name="id_user" value="<?= $u['id_user'] ?>">
+                                            <input type="hidden" name="uuid_user" value="<?= $u['uuid_user'] ?>">
                                             <input type="hidden" name="is_active" value="<?= $u['is_active'] ? 0 : 1 ?>">
                                             <button type="submit" class="btn btn-sm <?= $u['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded"
                                                 onclick="return confirm('Ubah status user ini?')" title="<?= $u['is_active'] ? 'Nonaktifkan' : 'Aktifkan' ?>">
@@ -105,12 +100,12 @@ body { background-color: #f5f5f5 !important; }
                                         </form>
                                     </td>
                                     <td class="text-center">
-                                        <a href="<?= base_url('manajemen_user/edit_user/' . $u['id_user']) ?>" class="btn btn-sm btn-warning text-white rounded" title="Edit">
+                                        <a href="<?= base_url('manajemen_user/edit_user/' . $u['uuid_user']) ?>" class="btn btn-sm btn-warning text-white rounded" title="Edit">
                                             <i class="mdi mdi-pencil"></i>
                                         </a>
                                         <form action="<?= base_url('manajemen_user/hapus_user') ?>" method="POST" class="d-inline">
                                             <?= csrf_field() ?>
-                                            <input type="hidden" name="id_user" value="<?= $u['id_user'] ?>">
+                                            <input type="hidden" name="uuid_user" value="<?= $u['uuid_user'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger rounded" onclick="return confirm('Yakin hapus user ini? Data tidak dapat dikembalikan.')" title="Hapus">
                                                 <i class="mdi mdi-delete"></i>
                                             </button>

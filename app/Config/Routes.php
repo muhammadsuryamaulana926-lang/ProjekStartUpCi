@@ -40,7 +40,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/manajemen_user',                        'Manajemen_user::index');
     $routes->get('/manajemen_user/tambah_user',            'Manajemen_user::tambah_user');
     $routes->post('/manajemen_user/simpan_user',           'Manajemen_user::simpan_user');
-    $routes->get('/manajemen_user/edit_user/(:num)',        'Manajemen_user::edit_user/$1');
+    $routes->get('/manajemen_user/edit_user/(:any)',        'Manajemen_user::edit_user/$1');
     $routes->post('/manajemen_user/ubah_user',             'Manajemen_user::ubah_user');
     $routes->post('/manajemen_user/toggle_aktif',          'Manajemen_user::toggle_aktif');
     $routes->post('/manajemen_user/hapus_user',             'Manajemen_user::hapus_user');
@@ -85,6 +85,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/v_dashboard/get_data_startup',      'Dashboard_startup::get_data_startup');
     $routes->get('/v_dashboard/chart_per_tahun',        'Dashboard_startup::chart_per_tahun');
     $routes->get('/v_dashboard/chart_per_bulan',        'Dashboard_startup::chart_per_bulan');
+    $routes->get('/v_dashboard/get_data_program',       'Dashboard_startup::get_data_program');
+    $routes->get('/v_dashboard/get_data_buku',          'Dashboard_startup::get_data_buku');
+    $routes->get('/v_dashboard/get_data_video',         'Dashboard_startup::get_data_video');
 
     // Data Startup
     $routes->get('/v_data_startup',                     'Startup::index');

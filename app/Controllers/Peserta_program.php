@@ -64,6 +64,7 @@ class Peserta_program extends BaseController
         }
 
         // Buat akun user jika diminta
+        $id_user_baru = null;
         if ($buat_akun) {
             $email    = $this->request->getPost('email');
             $password = $this->request->getPost('password');
@@ -74,7 +75,7 @@ class Peserta_program extends BaseController
                 return redirect()->back()->withInput();
             }
 
-            $m_user->tambah_user([
+            $id_user_baru = $m_user->tambah_user([
                 'nama_lengkap' => $nama_peserta,
                 'email'        => $email,
                 'password'     => password_hash($password, PASSWORD_BCRYPT),
@@ -86,6 +87,7 @@ class Peserta_program extends BaseController
         $data = [
             'id_program'   => $id_program,
             'nama_peserta' => $nama_peserta,
+            'id_user'      => $id_user_baru ?: null,
         ];
 
         if ($this->m_peserta->tambah_peserta($data)) {

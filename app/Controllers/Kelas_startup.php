@@ -41,6 +41,8 @@ class Kelas_startup extends BaseController
             return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
         }
 
+        $data['daftar_pemateri'] = (new \App\Models\M_user())->pemateri_aktif();
+
         return view('layout/header', ['title' => 'Tambah Kelas'])
             . view('layout/topbar')
             . view('startup_kelas/v_tambah_kelas', $data)
@@ -67,6 +69,7 @@ class Kelas_startup extends BaseController
             'link_youtube'    => $this->request->getPost('link_youtube'),
             'link_zoom'       => $this->request->getPost('link_zoom'),
             'nama_dosen'      => $this->request->getPost('nama_dosen'),
+            'id_pemateri'     => $this->request->getPost('id_pemateri') ?: null,
         ];
 
         if ($this->m_kelas->tambah_kelas($data)) {
@@ -87,8 +90,9 @@ class Kelas_startup extends BaseController
             return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
         }
 
-        $data['program']      = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
-        $data['kelas_videos'] = $this->m_kelas_video->video_by_kelas($id_kelas);
+        $data['program']         = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
+        $data['kelas_videos']    = $this->m_kelas_video->video_by_kelas($id_kelas);
+        $data['daftar_pemateri'] = (new \App\Models\M_user())->pemateri_aktif();
 
         // Kelompokkan chapter berdasarkan id_kelas_video
         $video_ids    = array_column($data['kelas_videos'], 'id_kelas_video');
@@ -125,6 +129,7 @@ class Kelas_startup extends BaseController
             'jam_selesai'     => $this->request->getPost('jam_selesai'),
             'link_zoom'       => $this->request->getPost('link_zoom'),
             'nama_dosen'      => $this->request->getPost('nama_dosen'),
+            'id_pemateri'     => $this->request->getPost('id_pemateri') ?: null,
         ];
 
         $judul_sesi    = $this->request->getPost('judul_sesi')      ?? [];
@@ -241,10 +246,10 @@ class Kelas_startup extends BaseController
         }
         $data['chapters_map'] = $chapters_map;
 
-        if (!in_array(session()->get('user_role'), ['admin', 'superadmin'])) {
-            $nama_peserta = session()->get('user_name') ?? '';
-            $m_peserta    = new \App\Models\M_peserta_program();
-            if (!$m_peserta->cek_sudah_join(['id_program' => $id_program, 'nama_peserta' => $nama_peserta])) {
+        if (!in_array(session()->get('user_role'), ['admin', 'superadmin', 'pemateri'])) {
+            $id_user  = session()->get('user_id');
+            $m_peserta = new \App\Models\M_peserta_program();
+            if (!$m_peserta->cek_sudah_join(['id_program' => $id_program, 'id_user' => $id_user])) {
                 return redirect()->to(base_url('program/detail_program/' . $id_program))
                     ->with('error', 'Anda harus bergabung ke program ini terlebih dahulu.');
             }

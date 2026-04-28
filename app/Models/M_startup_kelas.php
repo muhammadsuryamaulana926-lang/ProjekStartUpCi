@@ -63,4 +63,15 @@ class M_startup_kelas extends Model
             ->orderBy('ks.tanggal ASC, ks.jam_mulai ASC')
             ->get()->getResultArray();
     }
+
+    // Mengambil semua kelas berdasarkan id_pemateri (relasi ke users)
+    public function kelas_by_pemateri($id_pemateri)
+    {
+        return $this->db->table('kelas_startup ks')
+            ->select('ks.*, ps.nama_program')
+            ->join('program_startup ps', 'ps.id_program = ks.id_program')
+            ->where('ks.id_pemateri', $id_pemateri)
+            ->orderBy('ks.tanggal ASC, ks.jam_mulai ASC')
+            ->get()->getResultArray();
+    }
 }

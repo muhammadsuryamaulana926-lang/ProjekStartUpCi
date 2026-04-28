@@ -62,7 +62,17 @@ body { background-color: #f5f5f5 !important; }
 
                 <div class="mb-3">
                     <label class="form-label">Dosen / Pemateri</label>
-                    <input type="text" class="form-control" name="nama_dosen" value="<?= esc($kelas['nama_dosen']) ?>">
+                    <select class="form-select" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
+                        <option value="">-- Pilih Pemateri --</option>
+                        <?php foreach ($daftar_pemateri as $p): ?>
+                        <option value="<?= $p['id_user'] ?>"
+                            data-nama="<?= esc($p['nama_lengkap']) ?>"
+                            <?= ($kelas['id_pemateri'] ?? '') == $p['id_user'] ? 'selected' : '' ?>>
+                            <?= esc($p['nama_lengkap']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="nama_dosen" id="nama_dosen" value="<?= esc($kelas['nama_dosen'] ?? '') ?>">
                 </div>
 
                 <!-- Tipe Kelas Online / Offline -->
@@ -492,4 +502,9 @@ function toggle_tipe_kelas() {
 }
 // Inisialisasi saat halaman load
 toggle_tipe_kelas();
+
+function isi_nama_dosen(sel) {
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('nama_dosen').value = opt ? (opt.dataset.nama || '') : '';
+}
 </script>

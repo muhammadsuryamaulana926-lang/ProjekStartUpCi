@@ -71,21 +71,11 @@ body {
             <?php endif; ?>
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="<?= base_url('program') ?>" class="btn btn-light btn-modern border">
-                    <i class="mdi mdi-arrow-left"></i> Kembali ke Daftar Program
+                <a href="javascript:history.back()" class="btn btn-light btn-modern border">
+                    <i class="mdi mdi-arrow-left"></i> Kembali
                 </a>
                 
-                <?php if(!$sudah_join): ?>
-                <form action="<?= base_url('peserta_program/simpan_peserta_program') ?>" method="POST" class="d-inline">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="id_program" value="<?= esc($program['id_program']) ?>">
-                    <button type="submit" class="btn btn-success btn-modern px-4 py-2">
-                        <i class="mdi mdi-handshake"></i> Ikuti Program Ini
-                    </button>
-                </form>
-                <?php else: ?>
-                    <span class="badge bg-success px-4 py-2" style="font-size:15px;"><i class="mdi mdi-check-circle"></i> Anda telah bergabung</span>
-                <?php endif; ?>
+
             </div>
 
             <!-- Header Program -->
@@ -135,20 +125,47 @@ body {
                                     </div>
                                 </div>
 
+                                <?php
+                                    $is_admin   = in_array(session()->get('user_role'), ['admin', 'superadmin', 'pemateri']);
+                                    $jam_mulai_k  = strtotime($k['tanggal'] . ' ' . $k['jam_mulai']);
+                                    $jam_selesai_k = strtotime($k['tanggal'] . ' ' . $k['jam_selesai']);
+                                    $sekarang_k   = time();
+                                    $bisa_akses_k = $sekarang_k >= ($jam_mulai_k - 1800) && $sekarang_k <= $jam_selesai_k;
+                                    $sudah_selesai_k = $sekarang_k > $jam_selesai_k;
+                                ?>
                                 <div class="d-flex gap-2">
-                                    <?php if($sudah_join || in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
-                                        <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-outline-secondary flex-fill btn-modern btn-sm">
-                                            <i class="mdi mdi-account-group"></i> Detail & Presensi
-                                        </a>
-                                        <?php if(!empty($k['link_zoom'])): ?>
-                                            <a href="<?= esc($k['link_zoom']) ?>" target="_blank" class="btn btn-primary flex-fill btn-modern">
-                                                <i class="mdi mdi-video"></i> Join Zoom
+                                    <?php if($sudah_join || $is_admin): ?>
+                                        <?php if($is_admin || $bisa_akses_k || $sudah_selesai_k): ?>
+                                            <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-outline-secondary flex-fill btn-modern btn-sm">
+                                                <i class="mdi mdi-account-group"></i> Detail & Presensi
                                             </a>
-                                        <?php endif; ?>
-                                        <?php if(!empty($k['link_youtube'])): ?>
-                                            <a href="<?= base_url('program/nonton_kelas/' . $k['id_kelas']) ?>" class="btn btn-danger flex-fill btn-modern">
-                                                <i class="mdi mdi-play-circle d-inline-block" style="font-size:16px;"></i> Rekaman Kelas
-                                            </a>
+                                            <?php if(!empty($k['link_zoom']) && ($is_admin || $bisa_akses_k)): ?>
+                                                <a href="<?= esc($k['link_zoom']) ?>" target="_blank" class="btn btn-primary flex-fill btn-modern">
+                                                    <i class="mdi mdi-video"></i> Join Zoom
+                                                </a>
+                                            <?php endif; ?>
+                                            <?php if(!empty($k['link_youtube'])): ?>
+                                                <a href="<?= base_url('program/nonton_kelas/' . $k['id_kelas']) ?>" class="btn btn-danger flex-fill btn-modern">
+                                                    <i class="mdi mdi-play-circle d-inline-block" style="font-size:16px;"></i> Rekaman Kelas
+                                                </a>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <button type="button" class="btn btn-outline-secondary flex-fill btn-modern btn-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modalBelumWaktu"
+                                                data-jam="<?= date('H:i', $jam_mulai_k) ?>"
+                                                data-tanggal="<?= date('d M Y', $jam_mulai_k) ?>"
+                                                data-nama="<?= esc($k['nama_kelas']) ?>">
+                                                <i class="mdi mdi-lock-clock"></i> Detail & Presensi
+                                            </button>
+                                            <?php if(!empty($k['link_zoom'])): ?>
+                                                <button type="button" class="btn btn-primary flex-fill btn-modern"
+                                                    data-bs-toggle="modal" data-bs-target="#modalBelumWaktu"
+                                                    data-jam="<?= date('H:i', $jam_mulai_k) ?>"
+                                                    data-tanggal="<?= date('d M Y', $jam_mulai_k) ?>"
+                                                    data-nama="<?= esc($k['nama_kelas']) ?>">
+                                                    <i class="mdi mdi-lock-clock"></i> Join Zoom
+                                                </button>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <div class="alert alert-warning w-100 text-center mb-0 py-2">Khusus Peserta Terdaftar</div>
@@ -222,3 +239,33 @@ body {
         </div>
     </div>
 </div>
+
+<!-- Modal Belum Waktunya -->
+<div class="modal fade" id="modalBelumWaktu" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center px-4 pb-4">
+                <i class="mdi mdi-lock-clock text-warning" style="font-size:56px;"></i>
+                <h5 class="fw-bold mt-3 mb-2">Kelas Belum Dibuka</h5>
+                <p class="text-muted mb-1">Kelas <strong id="modalNamaKelas"></strong></p>
+                <p class="text-muted">dijadwalkan pada <strong id="modalTanggalKelas"></strong> pukul <strong id="modalJamKelas"></strong> WIB.</p>
+                <div class="alert alert-info py-2 mt-3">
+                    <i class="mdi mdi-information-outline me-1"></i>
+                    Akses kelas dibuka <strong>30 menit sebelum</strong> kelas dimulai.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('modalBelumWaktu').addEventListener('show.bs.modal', function(e) {
+    var btn = e.relatedTarget;
+    document.getElementById('modalNamaKelas').textContent  = btn.dataset.nama;
+    document.getElementById('modalTanggalKelas').textContent = btn.dataset.tanggal;
+    document.getElementById('modalJamKelas').textContent   = btn.dataset.jam;
+});
+</script>

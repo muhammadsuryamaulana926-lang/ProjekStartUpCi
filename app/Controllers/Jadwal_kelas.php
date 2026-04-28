@@ -17,11 +17,20 @@ class Jadwal_kelas extends BaseController
         $this->m_program = new M_startup_program();
     }
 
-    // Menampilkan halaman kalender semua jadwal kelas
+    // Menampilkan halaman kalender jadwal kelas
     public function index()
     {
-        $data['semua_kelas']   = $this->m_kelas->semua_kelas_kalender();
-        $data['kelas_mendatang'] = $this->m_kelas->kelas_mendatang();
+        $role    = session()->get('user_role');
+        $id_user = session()->get('user_id');
+
+        if ($role === 'pemateri') {
+            $data['semua_kelas']     = $this->m_kelas->kelas_by_pemateri($id_user);
+            $data['kelas_mendatang'] = array_filter($data['semua_kelas'], fn($k) => $k['tanggal'] >= date('Y-m-d'));
+        } else {
+            $data['semua_kelas']    = $this->m_kelas->semua_kelas_kalender();
+            $data['kelas_mendatang'] = $this->m_kelas->kelas_mendatang();
+        }
+
         $data['semua_program'] = $this->m_program->semua_program();
 
         return view('layout/header', ['title' => 'Kalender Jadwal Kelas'])
@@ -33,7 +42,12 @@ class Jadwal_kelas extends BaseController
     // Mengembalikan data kelas dalam format JSON untuk FullCalendar
     public function get_events()
     {
-        $kelas  = $this->m_kelas->semua_kelas_kalender();
+        $role    = session()->get('user_role');
+        $id_user = session()->get('user_id');
+
+        $kelas = ($role === 'pemateri')
+            ? $this->m_kelas->kelas_by_pemateri($id_user)
+            : $this->m_kelas->semua_kelas_kalender();
         $events = [];
 
         foreach ($kelas as $k) {

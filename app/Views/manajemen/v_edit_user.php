@@ -53,7 +53,7 @@ body { background-color: #f5f5f5 !important; }
 
             <form action="<?= base_url('manajemen_user/ubah_user') ?>" method="POST">
                 <?= csrf_field() ?>
-                <input type="hidden" name="id_user" value="<?= esc($user['id_user']) ?>">
+                <input type="hidden" name="uuid_user" value="<?= esc($user['uuid_user']) ?>">
 
                 <!-- Data Akun -->
 

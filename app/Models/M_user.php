@@ -17,4 +17,10 @@ class M_user extends Model
     {
         return $this->where('email', $email)->first();
     }
+
+    // Mengambil semua user dengan role pemateri yang aktif
+    public function pemateri_aktif()
+    {
+        return $this->where('role', 'pemateri')->where('is_active', 1)->findAll();
+    }
 }

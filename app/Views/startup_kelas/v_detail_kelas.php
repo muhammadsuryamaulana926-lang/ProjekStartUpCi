@@ -125,7 +125,7 @@ body { background-color: #f5f5f5 !important; }
                             <i class="mdi mdi-folder-open"></i> Materi Kelas
                         </a>
                         <a href="<?= base_url('tugas_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-warning btn-modern px-4">
-                            <i class="mdi mdi-clipboard-text"></i> Tugas
+                            <i class="mdi mdi-clipboard-text"></i> Tugas & Catatan Pemateri
                         </a>
                     </div>
                 </div>
@@ -240,6 +240,9 @@ body { background-color: #f5f5f5 !important; }
                     <?php endif; ?>
                     <a href="<?= base_url('materi_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-secondary btn-modern">
                         <i class="mdi mdi-folder-open"></i> Materi Kelas
+                    </a>
+                    <a href="<?= base_url('tugas_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-outline-warning btn-modern">
+                        <i class="mdi mdi-clipboard-text"></i> Tugas
                     </a>
                 </div>
             </div>

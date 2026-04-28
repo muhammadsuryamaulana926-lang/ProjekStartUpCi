@@ -35,13 +35,16 @@ class Materi_kelas extends BaseController
 
         // Cek apakah user sudah join program (untuk peserta)
         $role = session()->get('user_role');
-        $data['bisa_kelola'] = in_array($role, ['admin', 'superadmin']);
-        $data['sudah_join']  = false;
+        $data['bisa_kelola'] = in_array($role, ['admin', 'superadmin', 'pemateri']);
+        $data['sudah_join']  = $data['bisa_kelola'] ? true : false;
 
         if (!$data['bisa_kelola']) {
-            $nama = session()->get('user_name') ?? '';
-            $data['sudah_join'] = (new M_peserta_program())
-                ->cek_sudah_join(['id_program' => $data['kelas']['id_program'], 'nama_peserta' => $nama]);
+            $id_user = session()->get('user_id');
+            $nama    = session()->get('user_name') ?? '';
+            $cek     = $id_user
+                ? ['id_program' => $data['kelas']['id_program'], 'id_user' => $id_user]
+                : ['id_program' => $data['kelas']['id_program'], 'nama_peserta' => $nama];
+            $data['sudah_join'] = (new M_peserta_program())->cek_sudah_join($cek);
         }
 
         return view('layout/header', ['title' => 'Materi Kelas'])

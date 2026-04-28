@@ -102,7 +102,15 @@ body {
 
                 <div class="mb-3">
                     <label class="form-label">Dosen / Pemateri</label>
-                    <input type="text" class="form-control" name="nama_dosen" placeholder="Nama Pemateri">
+                    <select class="form-select" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
+                        <option value="">-- Pilih Pemateri --</option>
+                        <?php foreach ($daftar_pemateri as $p): ?>
+                        <option value="<?= $p['id_user'] ?>" data-nama="<?= esc($p['nama_lengkap']) ?>">
+                            <?= esc($p['nama_lengkap']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="nama_dosen" id="nama_dosen">
                 </div>
 
                 <!-- Tipe Kelas Online / Offline -->
@@ -176,6 +184,11 @@ body {
     var selesai = new Date(now.getTime() + 60 * 60 * 1000);
     document.getElementById('jam_selesai').value = pad(selesai.getHours()) + ':' + pad(selesai.getMinutes());
 })();
+
+function isi_nama_dosen(sel) {
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('nama_dosen').value = opt ? (opt.dataset.nama || '') : '';
+}
 
 function toggle_tipe_kelas() {
     var tipe = document.querySelector('input[name="tipe_kelas"]:checked');

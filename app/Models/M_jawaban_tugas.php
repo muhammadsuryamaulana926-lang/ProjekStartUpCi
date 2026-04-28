@@ -49,6 +49,16 @@ class M_jawaban_tugas extends Model
             ->update(['komentar' => $komentar]);
     }
 
+    // Menghitung jawaban belum dikomentari berdasarkan id_kelas
+    public function hitung_belum_dikomentari_by_kelas($id_kelas)
+    {
+        return $this->db->table('jawaban_tugas jt')
+            ->join('tugas_kelas tk', 'tk.id_tugas = jt.id_tugas')
+            ->where('tk.id_kelas', $id_kelas)
+            ->where('jt.komentar IS NULL', null, false)
+            ->countAllResults();
+    }
+
     // Menghapus jawaban berdasarkan id
     public function hapus_jawaban($id_jawaban)
     {

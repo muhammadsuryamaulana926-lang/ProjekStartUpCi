@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\M_user;
 use App\Models\M_login;
 use App\Models\M_log_aktivitas;
+use App\Models\M_peserta_program;
 
 // Controller untuk menangani autentikasi pengguna (login, logout, dan session)
 class Login extends BaseController
@@ -70,11 +71,29 @@ class Login extends BaseController
             'user_agent' => $this->request->getUserAgent()->getAgentString(),
         ]);
 
-        // Jika pemilik startup, simpan uuid startup miliknya ke session lalu redirect ke detail startup
+        // Cek apakah user adalah peserta program, simpan ke session
+        $peserta_program = (new M_peserta_program())->program_by_user($user['id_user']);
+        session()->set('is_peserta_program', !empty($peserta_program));
+
+        // Jika pemilik startup, simpan uuid startup miliknya ke session lalu redirect
         if ($user['role'] === 'pemilik_startup') {
             $startup = (new \App\Models\M_startup())->startup_by_id_user($user['id_user']);
             session()->set('user_startup_uuid', $startup ? $startup->uuid_startup : null);
+
+            if (!empty($peserta_program)) {
+                return redirect()->to(base_url('program'));
+            }
             return redirect()->to(base_url('v_detail/' . ($startup ? $startup->uuid_startup : '')));
+        }
+
+        // Jika role peserta program kelas, redirect ke program
+        if (!empty($peserta_program)) {
+            return redirect()->to(base_url('program'));
+        }
+
+        // Pemateri redirect ke dashboard mereka
+        if ($user['role'] === 'pemateri') {
+            return redirect()->to(base_url('v_dashboard'));
         }
 
         return redirect()->to(base_url('v_dashboard'));

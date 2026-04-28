@@ -23,11 +23,15 @@ class Program_startup extends BaseController
     // Menampilkan daftar semua program
     public function index()
     {
+        $id_user         = session()->get('user_id');
         $nama_peserta    = session()->get('user_name') ?? 'Admin';
         $data['program'] = $this->m_program->semua_program();
 
         foreach ($data['program'] as &$p) {
-            $p['sudah_join']     = $this->m_peserta->cek_sudah_join(['id_program' => $p['id_program'], 'nama_peserta' => $nama_peserta]);
+            $cek = $id_user
+                ? ['id_program' => $p['id_program'], 'id_user' => $id_user]
+                : ['id_program' => $p['id_program'], 'nama_peserta' => $nama_peserta];
+            $p['sudah_join']     = $this->m_peserta->cek_sudah_join($cek);
             $p['jumlah_kelas']   = $this->m_program->hitung_kelas_program(['id_program' => $p['id_program']]);
             $p['jumlah_peserta'] = $this->m_program->hitung_peserta_program(['id_program' => $p['id_program']]);
         }
@@ -119,10 +123,22 @@ class Program_startup extends BaseController
             return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
         }
 
+        $id_user            = session()->get('user_id');
+        $role               = session()->get('user_role');
         $nama_peserta       = session()->get('user_name') ?? 'Admin';
         $data['kelas']      = $this->m_kelas->kelas_by_program(['id_program' => $id]);
-        $data['sudah_join'] = $this->m_peserta->cek_sudah_join(['id_program' => $id, 'nama_peserta' => $nama_peserta]);
-        $data['peserta']    = $this->m_peserta->peserta_by_program(['id_program' => $id]);
+
+        // Pemateri dan admin selalu dianggap sudah join
+        if (in_array($role, ['admin', 'superadmin', 'pemateri'])) {
+            $data['sudah_join'] = true;
+        } else {
+            $cek = $id_user
+                ? ['id_program' => $id, 'id_user' => $id_user]
+                : ['id_program' => $id, 'nama_peserta' => $nama_peserta];
+            $data['sudah_join'] = $this->m_peserta->cek_sudah_join($cek);
+        }
+
+        $data['peserta'] = $this->m_peserta->peserta_by_program(['id_program' => $id]);
 
         return view('layout/header', ['title' => 'Detail Program'])
             . view('layout/topbar')

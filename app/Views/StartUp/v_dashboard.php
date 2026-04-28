@@ -29,10 +29,25 @@ body { background-color: #f5f5f5 !important; }
 .btn-modern { border-radius: 6px; font-weight: 500; transition: all 0.3s; }
 .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 #modalDetailStartup div.dataTables_wrapper div.dataTables_filter,
-#modalDetailStartup div.dataTables_wrapper div.dataTables_length { margin-bottom: 12px; }
+#modalDetailStartup div.dataTables_wrapper div.dataTables_length,
+#modalDetailProgram div.dataTables_wrapper div.dataTables_filter,
+#modalDetailProgram div.dataTables_wrapper div.dataTables_length,
+#modalDetailBuku div.dataTables_wrapper div.dataTables_filter,
+#modalDetailBuku div.dataTables_wrapper div.dataTables_length,
+#modalDetailVideo div.dataTables_wrapper div.dataTables_filter,
+#modalDetailVideo div.dataTables_wrapper div.dataTables_length { margin-bottom: 12px; }
 #modalDetailStartup div.dataTables_wrapper div.dataTables_info,
-#modalDetailStartup div.dataTables_wrapper div.dataTables_paginate { margin-top: 12px; }
-#modalDetailStartup div.dataTables_wrapper { padding: 0 4px; }
+#modalDetailStartup div.dataTables_wrapper div.dataTables_paginate,
+#modalDetailProgram div.dataTables_wrapper div.dataTables_info,
+#modalDetailProgram div.dataTables_wrapper div.dataTables_paginate,
+#modalDetailBuku div.dataTables_wrapper div.dataTables_info,
+#modalDetailBuku div.dataTables_wrapper div.dataTables_paginate,
+#modalDetailVideo div.dataTables_wrapper div.dataTables_info,
+#modalDetailVideo div.dataTables_wrapper div.dataTables_paginate { margin-top: 12px; }
+#modalDetailStartup div.dataTables_wrapper,
+#modalDetailProgram div.dataTables_wrapper,
+#modalDetailBuku div.dataTables_wrapper,
+#modalDetailVideo div.dataTables_wrapper { padding: 0 4px; }
 </style>
 
 <div class="container-fluid py-4" style="background-color:#f5f5f5;">
@@ -41,12 +56,42 @@ body { background-color: #f5f5f5 !important; }
 
             <!-- Stat Cards -->
             <div class="row g-3 mb-4">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailStartup">
                         <div class="stat-icon"><i class="mdi mdi-rocket-launch"></i></div>
                         <div>
                             <div class="stat-label">Startup Terdaftar</div>
                             <div class="stat-value"><?= $total_startup ?></div>
+                        </div>
+                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailProgram">
+                        <div class="stat-icon" style="background:#e8f5e9; color:#22c55e;"><i class="mdi mdi-book-open-page-variant"></i></div>
+                        <div>
+                            <div class="stat-label">Total Program</div>
+                            <div class="stat-value"><?= $total_program ?></div>
+                        </div>
+                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailBuku">
+                        <div class="stat-icon" style="background:#fff3e0; color:#f97316;"><i class="mdi mdi-book"></i></div>
+                        <div>
+                            <div class="stat-label">Total Buku Digital</div>
+                            <div class="stat-value"><?= $total_buku ?></div>
+                        </div>
+                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailVideo">
+                        <div class="stat-icon" style="background:#fce4ec; color:#ef4444;"><i class="mdi mdi-video"></i></div>
+                        <div>
+                            <div class="stat-label">Total Video</div>
+                            <div class="stat-value"><?= $total_video ?></div>
                         </div>
                         <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
                     </div>
@@ -110,6 +155,75 @@ body { background-color: #f5f5f5 !important; }
                         <tbody></tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Program -->
+<div class="modal fade" id="modalDetailProgram" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">Daftar Program</h5>
+                    <small class="text-muted">Total <?= $total_program ?> program terdaftar</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <table id="dt-program" class="table table-hover table-bordered mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr><th>No</th><th>Nama Program</th><th>Deskripsi</th><th>Dibuat</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Buku -->
+<div class="modal fade" id="modalDetailBuku" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">Daftar Buku Digital</h5>
+                    <small class="text-muted">Total <?= $total_buku ?> buku</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <table id="dt-buku" class="table table-hover table-bordered mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr><th>No</th><th>Judul</th><th>Kategori</th><th>Status</th><th>Dibuat</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Video -->
+<div class="modal fade" id="modalDetailVideo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">Daftar Video</h5>
+                    <small class="text-muted">Total <?= $total_video ?> video</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <table id="dt-video" class="table table-hover table-bordered mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr><th>No</th><th>Judul</th><th>Kategori</th><th>Status</th><th>Dibuat</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -193,6 +307,58 @@ $(document).ready(function() {
             data: { '<?= csrf_token() ?>': '<?= csrf_hash() ?>' },
             success: function(response) { if (response && response.length > 0) tableStartup.rows.add(response).draw(); },
             error: function() { alert('Gagal mengambil data dari server.'); }
+        });
+    });
+    // Modal Program
+    $('#modalDetailProgram').on('shown.bs.modal', function() {
+        if ($.fn.DataTable.isDataTable('#dt-program')) return;
+        $.get('<?= base_url('v_dashboard/get_data_program') ?>', function(res) {
+            $('#dt-program').DataTable({
+                data: res, destroy: true, autoWidth: false,
+                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
+                columns: [
+                    { data: null, render: (d,t,r,m) => m.row+1 },
+                    { data: 'nama_program' },
+                    { data: 'deskripsi', render: d => d ? d.substring(0,60)+'...' : '-' },
+                    { data: 'dibuat_pada', render: d => d ? d.substring(0,10) : '-' }
+                ]
+            });
+        });
+    });
+
+    // Modal Buku
+    $('#modalDetailBuku').on('shown.bs.modal', function() {
+        if ($.fn.DataTable.isDataTable('#dt-buku')) return;
+        $.get('<?= base_url('v_dashboard/get_data_buku') ?>', function(res) {
+            $('#dt-buku').DataTable({
+                data: res, destroy: true, autoWidth: false,
+                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
+                columns: [
+                    { data: null, render: (d,t,r,m) => m.row+1 },
+                    { data: 'judul_ebook' },
+                    { data: 'kategori_ebook', render: d => d || '-' },
+                    { data: 'status_ebook', render: d => '<span class="badge '+(d==='Publik'?'bg-success':'bg-secondary')+'">'+d+'</span>' },
+                    { data: 'created_at', render: d => d ? d.substring(0,10) : '-' }
+                ]
+            });
+        });
+    });
+
+    // Modal Video
+    $('#modalDetailVideo').on('shown.bs.modal', function() {
+        if ($.fn.DataTable.isDataTable('#dt-video')) return;
+        $.get('<?= base_url('v_dashboard/get_data_video') ?>', function(res) {
+            $('#dt-video').DataTable({
+                data: res, destroy: true, autoWidth: false,
+                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
+                columns: [
+                    { data: null, render: (d,t,r,m) => m.row+1 },
+                    { data: 'judul_video' },
+                    { data: 'kategori_video', render: d => d || '-' },
+                    { data: 'status_video', render: d => '<span class="badge '+(d==='Publik'?'bg-success':'bg-secondary')+'">'+d+'</span>' },
+                    { data: 'created_at', render: d => d ? d.substring(0,10) : '-' }
+                ]
+            });
         });
     });
 });

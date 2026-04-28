@@ -37,11 +37,18 @@ class Presensi_kelas extends BaseController
         $nama_peserta             = session()->get('user_name') ?? '';
         $data['sudah_presensi']   = $this->m_presensi->cek_sudah_presensi($id_kelas, $nama_peserta);
         $data['nama_peserta']     = $nama_peserta;
-        $data['bisa_kelola']      = in_array(session()->get('user_role'), ['admin', 'superadmin']);
+        $data['bisa_kelola']      = in_array(session()->get('user_role'), ['admin', 'superadmin', 'pemateri']);
 
-        // Cek apakah sudah join program
-        $data['sudah_join'] = $data['bisa_kelola'] ? true
-            : (new M_peserta_kelas())->cek_sudah_terdaftar($id_kelas, $nama_peserta);
+        // Cek apakah sudah join program — pakai id_user atau nama_peserta
+        if ($data['bisa_kelola']) {
+            $data['sudah_join'] = true;
+        } else {
+            $id_user = session()->get('user_id');
+            $cek = $id_user
+                ? ['id_program' => $data['kelas']['id_program'], 'id_user' => $id_user]
+                : ['id_program' => $data['kelas']['id_program'], 'nama_peserta' => $nama_peserta];
+            $data['sudah_join'] = (new M_peserta_program())->cek_sudah_join($cek);
+        }
 
         // Hitung apakah kelas bisa diakses (30 menit sebelum jam mulai)
         $data['bisa_akses'] = $this->cek_bisa_akses($data['kelas']);

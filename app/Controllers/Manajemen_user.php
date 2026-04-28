@@ -40,7 +40,9 @@ class Manajemen_user extends BaseController
     // Menampilkan daftar semua user
     public function index()
     {
+        $roles         = $this->m_role->semua_role();
         $data['users'] = $this->m_user->semua_user();
+        $data['daftar_role'] = array_column($roles, 'label', 'nama_role');
 
         return view('layout/header', ['title' => 'Manajemen User'])
             . view('layout/topbar')
@@ -93,9 +95,9 @@ class Manajemen_user extends BaseController
     }
 
     // Menampilkan form edit user beserta izin aksesnya
-    public function edit_user($id_user)
+    public function edit_user($uuid)
     {
-        $data['user']         = $this->m_user->user_by_id($id_user);
+        $data['user']         = $this->m_user->user_by_uuid($uuid);
         $roles                = $this->m_role->semua_role();
         $data['daftar_role']  = array_column($roles, 'label', 'nama_role');
         $data['daftar_modul'] = $this->daftar_modul;
@@ -104,7 +106,6 @@ class Manajemen_user extends BaseController
             return redirect()->to(base_url('manajemen_user'))->with('error', 'User tidak ditemukan.');
         }
 
-        // Load izin akses berdasarkan role user
         $izin_list = (new \App\Models\M_izin_akses())->izin_by_role($data['user']['role']);
         $izin_per_modul = [];
         foreach ($izin_list as $izin) {
@@ -121,10 +122,10 @@ class Manajemen_user extends BaseController
     // Memperbarui data user beserta izin aksesnya
     public function ubah_user()
     {
-        $id_user = $this->request->getPost('id_user');
-        $email   = $this->request->getPost('email');
+        $uuid  = $this->request->getPost('uuid_user');
+        $email = $this->request->getPost('email');
 
-        if ($this->m_user->cek_email_duplikat($email, $id_user)) {
+        if ($this->m_user->cek_email_duplikat($email, $uuid)) {
             session()->setFlashdata('error', 'Email sudah digunakan user lain.');
             return redirect()->back()->withInput();
         }
@@ -141,7 +142,7 @@ class Manajemen_user extends BaseController
             $data['password'] = password_hash($password_baru, PASSWORD_BCRYPT);
         }
 
-        if ($this->m_user->ubah_user($id_user, $data)) {
+        if ($this->m_user->ubah_user($uuid, $data)) {
             $this->simpan_izin_dari_form($role);
             session()->setFlashdata('success', 'Data user berhasil diperbarui.');
         } else {
@@ -204,10 +205,10 @@ class Manajemen_user extends BaseController
     // Mengubah status aktif/nonaktif user
     public function toggle_aktif()
     {
-        $id_user = $this->request->getPost('id_user');
-        $status  = $this->request->getPost('is_active');
+        $uuid   = $this->request->getPost('uuid_user');
+        $status = $this->request->getPost('is_active');
 
-        if ($this->m_user->toggle_aktif($id_user, $status)) {
+        if ($this->m_user->toggle_aktif($uuid, $status)) {
             session()->setFlashdata('success', 'Status user berhasil diubah.');
         } else {
             session()->setFlashdata('error', 'Gagal mengubah status user.');
@@ -216,12 +217,12 @@ class Manajemen_user extends BaseController
         return redirect()->to(base_url('manajemen_user'));
     }
 
-    // Menghapus user berdasarkan id
+    // Menghapus user berdasarkan uuid
     public function hapus_user()
     {
-        $id_user = $this->request->getPost('id_user');
+        $uuid = $this->request->getPost('uuid_user');
 
-        if ($this->m_user->hapus_user($id_user)) {
+        if ($this->m_user->hapus_user($uuid)) {
             session()->setFlashdata('success', 'User berhasil dihapus.');
         } else {
             session()->setFlashdata('error', 'Gagal menghapus user.');
