@@ -24,7 +24,7 @@ body { background-color: #f5f5f5 !important; }
 }
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.08); border-color: #0d6efd; }
 .stat-icon { width: 56px; height: 56px; background: #e7f1ff; color: #0d6efd; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 24px; }
-.stat-label { font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.stat-label { font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 .stat-value { font-size: 32px; font-weight: 700; color: #212529; line-height: 1; }
 .btn-modern { border-radius: 6px; font-weight: 500; transition: all 0.3s; }
 .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
@@ -59,41 +59,37 @@ body { background-color: #f5f5f5 !important; }
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailStartup">
                         <div class="stat-icon"><i class="mdi mdi-rocket-launch"></i></div>
-                        <div>
-                            <div class="stat-label">Startup Terdaftar</div>
+                        <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_startup ?></div>
+                            <div class="stat-label">Startup Terdaftar</div>
                         </div>
-                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailProgram">
                         <div class="stat-icon" style="background:#e8f5e9; color:#22c55e;"><i class="mdi mdi-book-open-page-variant"></i></div>
-                        <div>
-                            <div class="stat-label">Total Program</div>
+                        <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_program ?></div>
+                            <div class="stat-label">Total Program</div>
                         </div>
-                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailBuku">
                         <div class="stat-icon" style="background:#fff3e0; color:#f97316;"><i class="mdi mdi-book"></i></div>
-                        <div>
-                            <div class="stat-label">Total Buku Digital</div>
+                        <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_buku ?></div>
+                            <div class="stat-label">Total Buku Digital</div>
                         </div>
-                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailVideo">
                         <div class="stat-icon" style="background:#fce4ec; color:#ef4444;"><i class="mdi mdi-video"></i></div>
-                        <div>
-                            <div class="stat-label">Total Video</div>
+                        <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_video ?></div>
+                            <div class="stat-label">Total Video</div>
                         </div>
-                        <i class="mdi mdi-chevron-right ms-auto text-muted fs-4"></i>
                     </div>
                 </div>
             </div>
@@ -101,8 +97,8 @@ body { background-color: #f5f5f5 !important; }
             <!-- Charts -->
             <div class="row g-3">
                 <div class="col-lg-6">
-                    <div class="paper-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="card border">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                             <h6 class="fw-bold m-0">Startup Terdaftar per Tahun</h6>
                             <div class="d-flex align-items-center gap-1">
                                 <input type="text" id="start_year" class="form-control form-control-sm yearpicker-dash" style="width:72px;text-align:center;" value="<?= date('Y') - 4 ?>" readonly>
@@ -110,16 +106,80 @@ body { background-color: #f5f5f5 !important; }
                                 <input type="text" id="end_year" class="form-control form-control-sm yearpicker-dash" style="width:72px;text-align:center;" value="<?= date('Y') ?>" readonly>
                             </div>
                         </div>
+                        <div class="card-body">
                         <div style="height:300px;"><canvas id="chart_per_tahun"></canvas></div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="paper-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="card border">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                             <h6 class="fw-bold m-0">Startup Terdaftar per Bulan</h6>
                             <input type="text" id="year_bulan" class="form-control form-control-sm yearpicker-dash" style="width:80px;text-align:center;" value="<?= date('Y') ?>" readonly>
                         </div>
+                        <div class="card-body">
                         <div style="height:300px;"><canvas id="chart_per_bulan"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Top Video & Tren Penonton -->
+                <div class="col-lg-6">
+                    <div class="card border">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="fw-bold m-0">Top 10 Video Terbanyak Ditonton</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height:300px;"><canvas id="chart_top_video"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="fw-bold m-0" id="tren_title">Tren Penonton Video per Bulan</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <select id="tren_mode_select" class="form-select form-select-sm" style="width:90px;">
+                                    <option value="bulan">Bulan</option>
+                                    <option value="minggu">Minggu</option>
+                                    <option value="tahun">Tahun</option>
+                                </select>
+                                <input type="text" id="year_tren" class="form-control form-control-sm yearpicker-dash" style="width:80px;text-align:center;" value="<?= date('Y') ?>" readonly>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="height:300px;"><canvas id="chart_tren_penonton"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Top Ebook & Tren Pembaca -->
+                <div class="col-lg-6">
+                    <div class="card border">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="fw-bold m-0">Top 10 Ebook Terbanyak Dibaca</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height:300px;"><canvas id="chart_top_ebook"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="fw-bold m-0" id="tren_ebook_title">Tren Pembaca Ebook per Bulan</h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <select id="tren_ebook_mode_select" class="form-select form-select-sm" style="width:90px;">
+                                    <option value="bulan">Bulan</option>
+                                    <option value="minggu">Minggu</option>
+                                    <option value="tahun">Tahun</option>
+                                </select>
+                                <input type="text" id="year_tren_ebook" class="form-control form-control-sm yearpicker-dash" style="width:80px;text-align:center;" value="<?= date('Y') ?>" readonly>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="height:300px;"><canvas id="chart_tren_pembaca_ebook"></canvas></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -229,9 +289,10 @@ body { background-color: #f5f5f5 !important; }
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -278,17 +339,145 @@ function loadChartBulan() {
 loadChartTahun();
 loadChartBulan();
 
+var chartTopVideo = null;
+var chartTrenPenonton = null;
+var trenMode = 'bulan';
+
+function loadChartTopVideo() {
+    $.get('<?= base_url('v_dashboard/chart_top_video') ?>', function(data) {
+        var labels = data.map(d => d.judul_video.length > 25 ? d.judul_video.substring(0, 25) + '...' : d.judul_video);
+        var values = data.map(d => parseInt(d.jumlah_ditonton));
+        if (chartTopVideo) chartTopVideo.destroy();
+        chartTopVideo = new Chart(document.getElementById('chart_top_video'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Ditonton', data: values, backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 6, borderSkipped: false }] },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+            }
+        });
+    });
+}
+
+function loadChartTrenPenonton() {
+    var tahun = $('#year_tren').val();
+    var titles = { bulan: 'Tren Penonton Video per Bulan', minggu: 'Tren Penonton Video per Minggu', tahun: 'Tren Penonton Video per Tahun' };
+    $('#tren_title').text(titles[trenMode]);
+    $('#year_tren').toggle(trenMode !== 'tahun');
+
+    $.get('<?= base_url('v_dashboard/chart_tren_penonton') ?>', { tahun: tahun, mode: trenMode }, function(data) {
+        var labels, values;
+        if (trenMode === 'bulan') {
+            labels = bulanLabel;
+            values = Array(12).fill(0);
+            data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
+        } else if (trenMode === 'minggu') {
+            labels = data.map(d => 'Minggu ' + d.periode);
+            values = data.map(d => parseInt(d.total));
+        } else {
+            labels = data.map(d => d.periode);
+            values = data.map(d => parseInt(d.total));
+        }
+        if (chartTrenPenonton) chartTrenPenonton.destroy();
+        chartTrenPenonton = new Chart(document.getElementById('chart_tren_penonton'), {
+            type: 'line',
+            data: { labels: labels, datasets: [{ label: 'Penonton', data: values, borderColor: 'rgba(13,110,253,0.9)', backgroundColor: 'rgba(13,110,253,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(13,110,253,0.9)', fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+        });
+    });
+}
+
+loadChartTopVideo();
+loadChartTrenPenonton();
+
+var chartTopEbook = null;
+var chartTrenPembacaEbook = null;
+var trenEbookMode = 'bulan';
+
+function loadChartTopEbook() {
+    $.get('<?= base_url('v_dashboard/chart_top_ebook') ?>', function(data) {
+        var labels = data.map(d => d.judul_ebook.length > 25 ? d.judul_ebook.substring(0, 25) + '...' : d.judul_ebook);
+        var values = data.map(d => parseInt(d.jumlah_dibaca || 0));
+        if (chartTopEbook) chartTopEbook.destroy();
+        chartTopEbook = new Chart(document.getElementById('chart_top_ebook'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Dibaca', data: values, backgroundColor: 'rgba(139,115,85,0.7)', borderRadius: 6, borderSkipped: false }] },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+            }
+        });
+    });
+}
+
+function loadChartTrenPembacaEbook() {
+    var tahun = $('#year_tren_ebook').val();
+    var titles = { bulan: 'Tren Pembaca Ebook per Bulan', minggu: 'Tren Pembaca Ebook per Minggu', tahun: 'Tren Pembaca Ebook per Tahun' };
+    $('#tren_ebook_title').text(titles[trenEbookMode]);
+    $('#year_tren_ebook').toggle(trenEbookMode !== 'tahun');
+
+    $.get('<?= base_url('v_dashboard/chart_tren_pembaca_ebook') ?>', { tahun: tahun, mode: trenEbookMode }, function(data) {
+        var labels, values;
+        if (trenEbookMode === 'bulan') {
+            labels = bulanLabel;
+            values = Array(12).fill(0);
+            data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
+        } else if (trenEbookMode === 'minggu') {
+            labels = data.map(d => 'Minggu ' + d.periode);
+            values = data.map(d => parseInt(d.total));
+        } else {
+            labels = data.map(d => d.periode);
+            values = data.map(d => parseInt(d.total));
+        }
+        if (chartTrenPembacaEbook) chartTrenPembacaEbook.destroy();
+        chartTrenPembacaEbook = new Chart(document.getElementById('chart_tren_pembaca_ebook'), {
+            type: 'line',
+            data: { labels: labels, datasets: [{ label: 'Pembaca', data: values, borderColor: 'rgba(139,115,85,0.9)', backgroundColor: 'rgba(139,115,85,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(139,115,85,0.9)', fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+        });
+    });
+}
+
+loadChartTopEbook();
+loadChartTrenPembacaEbook();
+
 $(document).ready(function() {
     $('.yearpicker-dash').datepicker({ format: 'yyyy', viewMode: 'years', minViewMode: 'years', autoclose: true });
     $('#start_year, #end_year').on('changeDate', function() { loadChartTahun(); });
     $('#year_bulan').on('changeDate', function() { loadChartBulan(); });
+    $('#year_tren').on('changeDate', function() { loadChartTrenPenonton(); });
 
-    var tableStartup = $('#datatable-startup').DataTable({
+    $('#tren_mode_select').on('change', function() {
+        trenMode = $(this).val();
+        loadChartTrenPenonton();
+    });
+
+    $('#tren_ebook_mode_select').on('change', function() {
+        trenEbookMode = $(this).val();
+        loadChartTrenPembacaEbook();
+    });
+    $('#year_tren_ebook').on('changeDate', function() { loadChartTrenPembacaEbook(); });
+
+    var dtOptions = {
+        pageLength: 10,
+        ordering: false,
+        dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
+        language: {
+            lengthMenu: 'Show _MENU_ entries',
+            info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+            paginate: { previous: 'Previous', next: 'Next' }
+        }
+    };
+
+    var tableStartup = $('#datatable-startup').DataTable($.extend({}, dtOptions, {
         autoWidth: false, destroy: true,
-        language: { emptyTable: "Tidak ada data startup", search: "Cari:", lengthMenu: "Tampilkan _MENU_ baris", info: "Menampilkan _START_–_END_ dari _TOTAL_ data", paginate: { previous: "Sebelumnya", next: "Selanjutnya" } },
         columns: [
             { data: null, className: 'text-center', render: function(d, t, r, meta) { return meta.row + 1; } },
-            { data: 'nama_perusahaan', render: function(d) { return d; } },
+            { data: 'nama_perusahaan' },
             { data: 'email_perusahaan' },
             { data: 'nomor_whatsapp' },
             { data: 'tahun_daftar', className: 'text-center' },
@@ -297,7 +486,7 @@ $(document).ready(function() {
                 return '<span class="badge ' + cls + '">' + d + '</span>';
             }}
         ]
-    });
+    }));
 
     $('#modalDetailStartup').on('shown.bs.modal', function() {
         tableStartup.clear().draw();
@@ -309,20 +498,18 @@ $(document).ready(function() {
             error: function() { alert('Gagal mengambil data dari server.'); }
         });
     });
-    // Modal Program
     $('#modalDetailProgram').on('shown.bs.modal', function() {
         if ($.fn.DataTable.isDataTable('#dt-program')) return;
         $.get('<?= base_url('v_dashboard/get_data_program') ?>', function(res) {
-            $('#dt-program').DataTable({
+            $('#dt-program').DataTable($.extend({}, dtOptions, {
                 data: res, destroy: true, autoWidth: false,
-                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'nama_program' },
                     { data: 'deskripsi', render: d => d ? d.substring(0,60)+'...' : '-' },
                     { data: 'dibuat_pada', render: d => d ? d.substring(0,10) : '-' }
                 ]
-            });
+            }));
         });
     });
 
@@ -330,9 +517,8 @@ $(document).ready(function() {
     $('#modalDetailBuku').on('shown.bs.modal', function() {
         if ($.fn.DataTable.isDataTable('#dt-buku')) return;
         $.get('<?= base_url('v_dashboard/get_data_buku') ?>', function(res) {
-            $('#dt-buku').DataTable({
+            $('#dt-buku').DataTable($.extend({}, dtOptions, {
                 data: res, destroy: true, autoWidth: false,
-                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'judul_ebook' },
@@ -340,7 +526,7 @@ $(document).ready(function() {
                     { data: 'status_ebook', render: d => '<span class="badge '+(d==='Publik'?'bg-success':'bg-secondary')+'">'+d+'</span>' },
                     { data: 'created_at', render: d => d ? d.substring(0,10) : '-' }
                 ]
-            });
+            }));
         });
     });
 
@@ -348,9 +534,8 @@ $(document).ready(function() {
     $('#modalDetailVideo').on('shown.bs.modal', function() {
         if ($.fn.DataTable.isDataTable('#dt-video')) return;
         $.get('<?= base_url('v_dashboard/get_data_video') ?>', function(res) {
-            $('#dt-video').DataTable({
+            $('#dt-video').DataTable($.extend({}, dtOptions, {
                 data: res, destroy: true, autoWidth: false,
-                language: { search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ baris', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Selanjutnya' } },
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'judul_video' },
@@ -358,7 +543,7 @@ $(document).ready(function() {
                     { data: 'status_video', render: d => '<span class="badge '+(d==='Publik'?'bg-success':'bg-secondary')+'">'+d+'</span>' },
                     { data: 'created_at', render: d => d ? d.substring(0,10) : '-' }
                 ]
-            });
+            }));
         });
     });
 });

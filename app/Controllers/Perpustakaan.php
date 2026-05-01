@@ -502,7 +502,10 @@ class Perpustakaan extends BaseController
         $path = FCPATH . 'uploads/ebook/file/' . $ebook->file_ebook;
         if (!file_exists($path)) throw new \CodeIgniter\Exceptions\PageNotFoundException();
 
-                return view('layout/header', ['title' => 'Baca Ebook'])
+        // Catat view unik ebook
+        $this->m_perpus->catat_view_unik_ebook($ebook->id_konten_ebook, session()->get('user_id'));
+
+        return view('layout/header', ['title' => 'Baca Ebook'])
 
             . view('layout/topbar')
             . view('startup/v_baca_ebook', ['ebook' => $ebook])
@@ -521,6 +524,11 @@ class Perpustakaan extends BaseController
         }
         
         $video->youtube_id = $this->m_perpus->decode_kode_video($video->kode_video);
+
+        // Catat view unik (1 user = 1 view per video)
+        $id_user = session()->get('user_id');
+        $this->m_perpus->catat_view_unik($video->id_konten_video, $id_user);
+        $video->jumlah_ditonton = $video->jumlah_ditonton ?? 0;
         
         // Ambil semua video untuk sidebar rekomendasi
         $role    = session()->get('user_role');

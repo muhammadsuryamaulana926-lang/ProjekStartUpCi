@@ -274,5 +274,13 @@ document.addEventListener('DOMContentLoaded', function() {
             gantiFideo(items[idx + 1]);
         }
     });
+
+    // Spacebar untuk play/pause
+    document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+            e.preventDefault();
+            player.togglePlay();
+        }
+    });
 });
 </script>

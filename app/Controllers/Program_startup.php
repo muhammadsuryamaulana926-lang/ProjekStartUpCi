@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\M_startup_program;
 use App\Models\M_startup_kelas;
 use App\Models\M_peserta_program;
+use App\Models\M_peserta_kelas;
 
 // Controller untuk mengelola data program inkubasi/akselerasi startup
 class Program_startup extends BaseController
@@ -39,7 +40,7 @@ class Program_startup extends BaseController
             $p['jumlah_peserta'] = $this->m_program->hitung_peserta_program(['id_program' => $p['id_program']]);
 
             // Untuk peserta: langsung load kelas agar tidak perlu klik detail dulu
-            if ($is_peserta && $p['sudah_join']) {
+            if (($is_peserta || $role === 'pemilik_startup') && $p['sudah_join']) {
                 $p['kelas'] = $this->m_kelas->kelas_by_program(['id_program' => $p['id_program']]);
                 $m_presensi = new \App\Models\M_presensi_kelas();
                 foreach ($p['kelas'] as &$k) {
@@ -87,7 +88,7 @@ class Program_startup extends BaseController
         $data['program'] = $this->m_program->program_by_id(['id_program' => $id]);
 
         if (empty($data['program'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         return view('layout/header', ['title' => 'Edit Program'])
@@ -134,13 +135,19 @@ class Program_startup extends BaseController
         $data['program'] = $this->m_program->program_by_id(['id_program' => $id]);
 
         if (empty($data['program'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $id_user            = session()->get('user_id');
         $role               = session()->get('user_role');
         $nama_peserta       = session()->get('user_name') ?? 'Admin';
         $data['kelas']      = $this->m_kelas->kelas_by_program(['id_program' => $id]);
+
+        // Load peserta per kelas
+        $m_peserta_kelas = new M_peserta_kelas();
+        foreach ($data['kelas'] as &$k) {
+            $k['peserta_kelas'] = $m_peserta_kelas->peserta_by_kelas($k['id_kelas']);
+        }
 
         // Pemateri dan admin selalu dianggap sudah join
         if (in_array($role, ['admin', 'superadmin', 'pemateri'])) {

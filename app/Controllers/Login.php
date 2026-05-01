@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\M_user;
 use App\Models\M_login;
 use App\Models\M_log_aktivitas;
+use App\Models\M_login_history;
 use App\Models\M_peserta_program;
 
 // Controller untuk menangani autentikasi pengguna (login, logout, dan session)
@@ -60,6 +61,17 @@ class Login extends BaseController
         ]);
         session()->setFlashdata('first_login', true);
 
+        // Catat login history
+        $ua = $this->request->getUserAgent();
+        (new M_login_history())->catat_login([
+            'id_user'        => $user['id_user'],
+            'nama_pengguna'  => $user['nama_lengkap'],
+            'email'          => $user['email'],
+            'ip_address'     => $ip,
+            'nama_perangkat' => $ua->getPlatform() ?: '-',
+            'web_browser'    => $ua->getBrowser() ?: '-',
+        ]);
+
         // Catat log aktivitas login
         (new M_log_aktivitas())->catat([
             'id_user'    => $user['id_user'],
@@ -103,6 +115,7 @@ class Login extends BaseController
     public function logout()
     {
         if (session()->get('user_logged_in')) {
+            (new M_login_history())->catat_logout((int) session()->get('user_id'));
             (new M_log_aktivitas())->catat([
                 'id_user'    => session()->get('user_id'),
                 'nama_user'  => session()->get('user_name'),

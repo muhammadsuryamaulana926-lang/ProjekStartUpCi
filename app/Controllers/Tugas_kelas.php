@@ -29,7 +29,7 @@ class Tugas_kelas extends BaseController
         $data['kelas'] = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
 
         if (empty($data['kelas'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $data['program']      = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
@@ -39,11 +39,13 @@ class Tugas_kelas extends BaseController
         $data['bisa_kelola']  = in_array($data['role'], ['admin', 'superadmin', 'pemateri']);
 
         // Untuk setiap tugas, ambil jawaban peserta yang login dan semua jawaban (untuk pemateri/admin)
-        $data['jawaban_saya'] = [];
+        $data['jawaban_saya']  = [];
         $data['semua_jawaban'] = [];
+        $peserta_kelas = (new \App\Models\M_peserta_kelas())->peserta_by_kelas($id_kelas);
+        $data['peserta_kelas'] = array_column($peserta_kelas, 'nama_peserta');
         foreach ($data['tugas_list'] as $t) {
-            $data['jawaban_saya'][$t['id_tugas']]   = $this->m_jawaban->jawaban_by_peserta($t['id_tugas'], $data['nama_peserta']);
-            $data['semua_jawaban'][$t['id_tugas']]  = $this->m_jawaban->jawaban_by_tugas($t['id_tugas']);
+            $data['jawaban_saya'][$t['id_tugas']]  = $this->m_jawaban->jawaban_by_peserta($t['id_tugas'], $data['nama_peserta']);
+            $data['semua_jawaban'][$t['id_tugas']] = $this->m_jawaban->jawaban_by_tugas($t['id_tugas']);
         }
 
         return view('layout/header', ['title' => 'Tugas Kelas'])
@@ -78,6 +80,18 @@ class Tugas_kelas extends BaseController
 
         if ($this->m_tugas->tambah_tugas($data)) {
             session()->setFlashdata('success', 'Tugas berhasil ditambahkan.');
+
+            // Kirim notifikasi ke semua peserta kelas
+            $peserta_kelas = (new \App\Models\M_peserta_kelas())->peserta_by_kelas($id_kelas);
+            $m_notif = new \App\Models\M_notifikasi();
+            foreach ($peserta_kelas as $pk) {
+                $m_notif->tambah_notifikasi([
+                    'judul'      => 'Tugas Baru: ' . $data['judul'],
+                    'pesan'      => ($data['dibuat_oleh']) . ' menambahkan tugas baru di kelas ini.',
+                    'untuk_nama' => $pk['nama_peserta'],
+                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                ]);
+            }
         } else {
             session()->setFlashdata('error', 'Gagal menambahkan tugas.');
         }
@@ -115,7 +129,8 @@ class Tugas_kelas extends BaseController
 
         if ($this->m_jawaban->jawaban_by_peserta($id_tugas, $nama_peserta)) {
             session()->setFlashdata('error', 'Anda sudah mengumpulkan jawaban untuk tugas ini.');
-            return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+            $from = $this->request->getPost('from');
+            return redirect()->to($from ?: base_url('tugas_kelas/' . $id_kelas));
         }
 
         $nama_file = null;
@@ -136,6 +151,7 @@ class Tugas_kelas extends BaseController
             'tipe_file'    => $tipe_file,
         ];
 
+        $from = $this->request->getPost('from');
         if ($this->m_jawaban->simpan_jawaban($data)) {
             session()->setFlashdata('success', 'Jawaban berhasil dikumpulkan.');
 
@@ -154,7 +170,7 @@ class Tugas_kelas extends BaseController
             session()->setFlashdata('error', 'Gagal mengumpulkan jawaban.');
         }
 
-        return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+        return redirect()->to($from ?: base_url('tugas_kelas/' . $id_kelas));
     }
 
     // Menyimpan komentar pemateri ke jawaban peserta
@@ -166,6 +182,18 @@ class Tugas_kelas extends BaseController
 
         if ($this->m_jawaban->simpan_komentar($id_jawaban, $komentar)) {
             session()->setFlashdata('success', 'Komentar berhasil disimpan.');
+
+            // Kirim notifikasi ke peserta yang jawabannya dikomentari
+            $jawaban = $this->m_jawaban->jawaban_by_id($id_jawaban);
+            if (!empty($jawaban['nama_peserta'])) {
+                $tugas = $this->m_tugas->tugas_by_id($jawaban['id_tugas']);
+                (new \App\Models\M_notifikasi())->tambah_notifikasi([
+                    'judul'      => 'Komentar Pemateri',
+                    'pesan'      => 'Pemateri memberikan catatan pada jawaban tugas "' . ($tugas['judul'] ?? '') . '"',
+                    'untuk_nama' => $jawaban['nama_peserta'],
+                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                ]);
+            }
         } else {
             session()->setFlashdata('error', 'Gagal menyimpan komentar.');
         }

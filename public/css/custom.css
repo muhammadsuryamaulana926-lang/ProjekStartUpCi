@@ -413,9 +413,8 @@ body {
 
 .app-footer .copyright {
     font-size: 12px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
 }
 
 .app-footer .copyright .separator {
@@ -426,23 +425,15 @@ body {
 
 .app-footer .copyright .sub {
     font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     color: var(--slate-300);
 }
 
-.app-footer .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
 .app-footer .footer-links a {
-    font-size: 10px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
     color: var(--slate-400);
     text-decoration: none;
     transition: color 0.2s;

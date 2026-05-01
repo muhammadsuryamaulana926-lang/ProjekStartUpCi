@@ -7,6 +7,8 @@ use App\Models\M_peserta_program;
 use App\Models\M_notifikasi;
 use App\Models\M_manajemen_user;
 use App\Models\M_role;
+use App\Models\M_startup_kelas;
+use App\Models\M_peserta_kelas;
 
 // Controller untuk mengelola data peserta program startup
 class Peserta_program extends BaseController
@@ -35,11 +37,17 @@ class Peserta_program extends BaseController
         $data['program'] = $this->m_program->program_by_id(['id_program' => $id_program]);
 
         if (empty($data['program'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Program tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
-        $roles           = (new M_role())->semua_role();
+        $roles               = (new M_role())->semua_role();
         $data['daftar_role'] = array_column($roles, 'label', 'nama_role');
+        $data['kelas']       = (new M_startup_kelas())->kelas_by_program(['id_program' => $id_program]);
+        $data['daftar_user'] = (new M_manajemen_user())->semua_user();
+        // Filter user yang belum terdaftar di program ini
+        $peserta_program     = $this->m_peserta->peserta_by_program(['id_program' => $id_program]);
+        $nama_terdaftar      = array_column($peserta_program, 'nama_peserta');
+        $data['daftar_user'] = array_filter($data['daftar_user'], fn($u) => !in_array($u['nama_lengkap'], $nama_terdaftar));
 
         return view('layout/header', ['title' => 'Tambah Peserta'])
             . view('layout/topbar')
@@ -84,6 +92,13 @@ class Peserta_program extends BaseController
             ]);
         }
 
+        // Cari id_user berdasarkan nama jika belum ada
+        if (!$id_user_baru) {
+            $m_user = new M_manajemen_user();
+            $user_data = $m_user->where('nama_lengkap', $nama_peserta)->first();
+            $id_user_baru = $user_data['id_user'] ?? null;
+        }
+
         $data = [
             'id_program'   => $id_program,
             'nama_peserta' => $nama_peserta,
@@ -91,6 +106,16 @@ class Peserta_program extends BaseController
         ];
 
         if ($this->m_peserta->tambah_peserta($data)) {
+            // Assign ke kelas yang dipilih
+            $kelas_dipilih = $this->request->getPost('id_kelas') ?? [];
+            if (!empty($kelas_dipilih)) {
+                $m_peserta_kelas = new M_peserta_kelas();
+                foreach ($kelas_dipilih as $id_kelas) {
+                    if (!$m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
+                        $m_peserta_kelas->tambah_peserta(['id_kelas' => $id_kelas, 'nama_peserta' => $nama_peserta]);
+                    }
+                }
+            }
             session()->setFlashdata('success', 'Berhasil bergabung dengan program / menambah peserta.');
             $program      = $this->m_program->program_by_id(['id_program' => $id_program]);
             $nama_program = $program['nama_program'] ?? 'Program';

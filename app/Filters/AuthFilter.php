@@ -74,8 +74,8 @@ class AuthFilter implements FilterInterface
         if (!$izin || !$izin['bisa_lihat']) {
             $id_user      = $session->get('user_id');
             $nama_peserta = $session->get('user_name');
-            // Peserta program boleh akses modul program, kelas, perpustakaan
-            if (in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
+            // Hanya role selain pemilik_startup yang perlu cek peserta program
+            if ($role !== 'pemilik_startup' && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
                 $m_peserta = new M_peserta_program();
                 $peserta = [];
                 if ($id_user) {

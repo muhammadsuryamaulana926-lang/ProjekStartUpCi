@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\M_startup;
 use App\Models\M_startup_kelas;
 use App\Models\M_startup_program;
+use App\Models\M_perpustakaan;
 
 // Controller untuk menampilkan halaman dashboard
 class Dashboard_startup extends BaseController
@@ -12,12 +13,14 @@ class Dashboard_startup extends BaseController
     protected $m_startup;
     protected $m_kelas;
     protected $m_program;
+    protected $m_perpus;
 
     public function __construct()
     {
         $this->m_startup = new M_startup();
         $this->m_kelas   = new M_startup_kelas();
         $this->m_program = new M_startup_program();
+        $this->m_perpus  = new M_perpustakaan();
     }
 
     public function index()
@@ -106,5 +109,45 @@ class Dashboard_startup extends BaseController
     {
         $tahun = (int)($this->request->getGet('tahun') ?? date('Y'));
         return $this->response->setJSON($this->m_startup->startup_per_bulan($tahun));
+    }
+
+    public function chart_top_video()
+    {
+        return $this->response->setJSON($this->m_perpus->top_video_ditonton(10));
+    }
+
+    public function chart_tren_penonton()
+    {
+        $tahun = (int)($this->request->getGet('tahun') ?? date('Y'));
+        $mode  = $this->request->getGet('mode') ?? 'bulan';
+
+        if ($mode === 'minggu') {
+            $data = $this->m_perpus->tren_penonton_per_minggu($tahun);
+        } elseif ($mode === 'tahun') {
+            $data = $this->m_perpus->tren_penonton_per_tahun();
+        } else {
+            $data = $this->m_perpus->tren_penonton_per_bulan($tahun);
+        }
+        return $this->response->setJSON($data);
+    }
+
+    public function chart_top_ebook()
+    {
+        return $this->response->setJSON($this->m_perpus->top_ebook_dibaca(10));
+    }
+
+    public function chart_tren_pembaca_ebook()
+    {
+        $tahun = (int)($this->request->getGet('tahun') ?? date('Y'));
+        $mode  = $this->request->getGet('mode') ?? 'bulan';
+
+        if ($mode === 'minggu') {
+            $data = $this->m_perpus->tren_pembaca_ebook_per_minggu($tahun);
+        } elseif ($mode === 'tahun') {
+            $data = $this->m_perpus->tren_pembaca_ebook_per_tahun();
+        } else {
+            $data = $this->m_perpus->tren_pembaca_ebook_per_bulan($tahun);
+        }
+        return $this->response->setJSON($data);
     }
 }

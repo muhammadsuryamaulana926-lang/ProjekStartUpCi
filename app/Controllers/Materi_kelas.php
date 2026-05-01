@@ -27,7 +27,7 @@ class Materi_kelas extends BaseController
         $data['kelas']   = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
 
         if (empty($data['kelas'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $data['program'] = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
@@ -85,7 +85,7 @@ class Materi_kelas extends BaseController
             session()->setFlashdata('error', 'Gagal mengunggah materi.');
         }
 
-        return redirect()->to(base_url('materi_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas) . '?tab=materi');
     }
 
     // Menghapus materi dan file-nya
@@ -110,7 +110,7 @@ class Materi_kelas extends BaseController
             session()->setFlashdata('error', 'Gagal menghapus materi.');
         }
 
-        return redirect()->to(base_url('materi_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas) . '?tab=materi');
     }
 
     // Preview file materi (stream ke browser)

@@ -66,6 +66,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // Presensi Kelas
     $routes->get('/presensi_kelas/detail_kelas/(:any)',    'Presensi_kelas::detail_kelas/$1');
     $routes->post('/presensi_kelas/simpan_presensi',       'Presensi_kelas::simpan_presensi');
+    $routes->post('/presensi_kelas/simpan_presensi_batch', 'Presensi_kelas::simpan_presensi_batch');
     $routes->post('/presensi_kelas/hapus_presensi',        'Presensi_kelas::hapus_presensi');
 
     // Jadwal Kelas (Kalender)
@@ -143,75 +144,26 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/riwayat/update_ebook',              'Riwayat::simpan_riwayat_ebook');
 
     // Tim
-    $routes->post('/v_simpan_tim',                      'Startup::simpan_tim');
-    $routes->post('/v_get_tim',                         'Startup::get_tim');
-    $routes->post('/v_update_tim',                      'Startup::update_tim');
-    $routes->post('/v_hapus_tim',                       'Startup::hapus_tim');
     $routes->post('/get_startup_tim',                   'Startup::get_startup_tim');
     $routes->post('/proses_tambah_informasi_tim',       'Startup::proses_tambah_informasi_tim');
     $routes->post('/proses_ubah_informasi_tim',         'Startup::proses_ubah_informasi_tim');
     $routes->post('/proses_hapus_informasi_tim',        'Startup::proses_hapus_informasi_tim');
 
-    // Produk
-    $routes->post('/get_startup_produk',                'Startup::get_startup_produk');
-    $routes->post('/proses_tambah_informasi_produk',    'Startup::proses_tambah_informasi_produk');
-    $routes->post('/proses_ubah_informasi_produk',      'Startup::proses_ubah_informasi_produk');
-    $routes->post('/proses_hapus_informasi_produk',     'Startup::proses_hapus_informasi_produk');
-
-    // Pendanaan ITB
-    $routes->post('/get_startup_pendanaan_itb',                 'Startup::get_startup_pendanaan_itb');
-    $routes->post('/proses_tambah_informasi_pendanaan_itb',     'Startup::proses_tambah_informasi_pendanaan_itb');
-    $routes->post('/proses_ubah_informasi_pendanaan_itb',       'Startup::proses_ubah_informasi_pendanaan_itb');
-    $routes->post('/proses_hapus_informasi_pendanaan_itb',      'Startup::proses_hapus_informasi_pendanaan_itb');
-
-    // Pendanaan Non ITB
-    $routes->post('/get_startup_pendanaan_non_itb',             'Startup::get_startup_pendanaan_non_itb');
-    $routes->post('/proses_tambah_informasi_pendanaan_non_itb', 'Startup::proses_tambah_informasi_pendanaan_non_itb');
-    $routes->post('/proses_ubah_informasi_pendanaan_non_itb',   'Startup::proses_ubah_informasi_pendanaan_non_itb');
-    $routes->post('/proses_hapus_informasi_pendanaan_non_itb',  'Startup::proses_hapus_informasi_pendanaan_non_itb');
-
-    // Prestasi
-    $routes->post('/get_startup_prestasi',                      'Startup::get_startup_prestasi');
-    $routes->post('/proses_tambah_informasi_prestasi',          'Startup::proses_tambah_informasi_prestasi');
-    $routes->post('/proses_ubah_informasi_prestasi',            'Startup::proses_ubah_informasi_prestasi');
-    $routes->post('/proses_hapus_informasi_prestasi',           'Startup::proses_hapus_informasi_prestasi');
-
-    // Mentor
-    $routes->post('/proses_tambah_informasi_mentor',            'Startup::proses_tambah_informasi_mentor');
-    $routes->post('/proses_hapus_informasi_mentor',             'Startup::proses_hapus_informasi_mentor');
-
     // Verifikasi
-    $routes->post('/proses_verifikasi_startup',                 'Startup::proses_verifikasi_startup');
-    $routes->post('/proses_tolak_startup',                      'Startup::proses_tolak_startup');
+    $routes->post('/proses_verifikasi_startup',         'Startup::proses_verifikasi_startup');
+    $routes->post('/proses_tolak_startup',              'Startup::proses_tolak_startup');
 
     $routes->post('/keep-alive',                                'Login::keepAlive');
     $routes->post('/notifikasi/tandai_dibaca',               'Startup::notif_tandai_dibaca');
     $routes->post('/notifikasi/tandai_semua',                'Startup::notif_tandai_semua');
     $routes->get('/log_aktivitas',                           'Startup::log_aktivitas');
+    $routes->get('/aktivitas_login',                         'Startup::aktivitas_login');
 
     // Alias prefix startup/ untuk AJAX di detail startup
-    $routes->post('/startup/get_startup_tim',                           'Startup::get_startup_tim');
-    $routes->post('/startup/proses_tambah_informasi_tim',               'Startup::proses_tambah_informasi_tim');
-    $routes->post('/startup/proses_ubah_informasi_tim',                 'Startup::proses_ubah_informasi_tim');
-    $routes->post('/startup/proses_hapus_informasi_tim',                'Startup::proses_hapus_informasi_tim');
-    $routes->post('/startup/get_startup_produk',                        'Startup::get_startup_produk');
-    $routes->post('/startup/proses_tambah_informasi_produk',            'Startup::proses_tambah_informasi_produk');
-    $routes->post('/startup/proses_ubah_informasi_produk',              'Startup::proses_ubah_informasi_produk');
-    $routes->post('/startup/proses_hapus_informasi_produk',             'Startup::proses_hapus_informasi_produk');
-    $routes->post('/startup/get_startup_pendanaan_itb',                 'Startup::get_startup_pendanaan_itb');
-    $routes->post('/startup/proses_tambah_informasi_pendanaan_itb',     'Startup::proses_tambah_informasi_pendanaan_itb');
-    $routes->post('/startup/proses_ubah_informasi_pendanaan_itb',       'Startup::proses_ubah_informasi_pendanaan_itb');
-    $routes->post('/startup/proses_hapus_informasi_pendanaan_itb',      'Startup::proses_hapus_informasi_pendanaan_itb');
-    $routes->post('/startup/get_startup_pendanaan_non_itb',             'Startup::get_startup_pendanaan_non_itb');
-    $routes->post('/startup/proses_tambah_informasi_pendanaan_non_itb', 'Startup::proses_tambah_informasi_pendanaan_non_itb');
-    $routes->post('/startup/proses_ubah_informasi_pendanaan_non_itb',   'Startup::proses_ubah_informasi_pendanaan_non_itb');
-    $routes->post('/startup/proses_hapus_informasi_pendanaan_non_itb',  'Startup::proses_hapus_informasi_pendanaan_non_itb');
-    $routes->post('/startup/get_startup_prestasi',                      'Startup::get_startup_prestasi');
-    $routes->post('/startup/proses_tambah_informasi_prestasi',          'Startup::proses_tambah_informasi_prestasi');
-    $routes->post('/startup/proses_ubah_informasi_prestasi',            'Startup::proses_ubah_informasi_prestasi');
-    $routes->post('/startup/proses_hapus_informasi_prestasi',           'Startup::proses_hapus_informasi_prestasi');
-    $routes->post('/startup/proses_tambah_informasi_mentor',            'Startup::proses_tambah_informasi_mentor');
-    $routes->post('/startup/proses_hapus_informasi_mentor',             'Startup::proses_hapus_informasi_mentor');
-    $routes->post('/startup/proses_verifikasi_startup',                 'Startup::proses_verifikasi_startup');
-    $routes->post('/startup/proses_tolak_startup',                      'Startup::proses_tolak_startup');
+    $routes->post('/startup/get_startup_tim',                   'Startup::get_startup_tim');
+    $routes->post('/startup/proses_tambah_informasi_tim',       'Startup::proses_tambah_informasi_tim');
+    $routes->post('/startup/proses_ubah_informasi_tim',         'Startup::proses_ubah_informasi_tim');
+    $routes->post('/startup/proses_hapus_informasi_tim',        'Startup::proses_hapus_informasi_tim');
+    $routes->post('/startup/proses_verifikasi_startup',         'Startup::proses_verifikasi_startup');
+    $routes->post('/startup/proses_tolak_startup',              'Startup::proses_tolak_startup');
 });

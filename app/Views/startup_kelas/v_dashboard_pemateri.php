@@ -80,9 +80,6 @@ body { background-color: #f5f5f5 !important; }
                                 <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-outline-secondary rounded" title="Detail & Presensi">
                                     <i class="mdi mdi-eye"></i>
                                 </a>
-                                <a href="<?= base_url('materi_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-outline-secondary rounded" title="Materi">
-                                    <i class="mdi mdi-folder-open"></i>
-                                </a>
                             </div>
                         </div>
                     </div>

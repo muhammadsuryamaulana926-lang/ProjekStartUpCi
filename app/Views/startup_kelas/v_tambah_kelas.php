@@ -138,7 +138,7 @@ body {
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Platform</label>
-                            <select name="platform_online" class="form-select">
+                            <select name="platform_online" id="platform_online" class="form-select" onchange="update_label_meeting()">
                                 <option value="">-- Pilih Platform --</option>
                                 <option value="Zoom">Zoom</option>
                                 <option value="Google Meet">Google Meet</option>
@@ -147,18 +147,16 @@ body {
                                 <option value="Lainnya">Lainnya</option>
                             </select>
                         </div>
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Link Meeting</label>
-                            <input type="url" class="form-control" name="link_meeting" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><span id="label_link_meeting">Link Meeting</span></label>
+                            <input type="url" class="form-control" name="link_zoom" id="link_zoom" placeholder="https://...">
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Link Zoom Meeting <small class="text-muted">(opsional, untuk tombol Join Zoom)</small></label>
-                        <input type="url" class="form-control" name="link_zoom" id="link_zoom" placeholder="https://zoom.us/j/...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Link YouTube Live / Record</label>
-                        <input type="url" class="form-control" name="link_youtube" id="link_youtube" placeholder="https://youtube.com/...">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Link YouTube Live / Record</label>
+                            <input type="url" class="form-control" name="link_youtube" id="link_youtube" placeholder="https://youtube.com/...">
+                        </div>
                     </div>
                 </div>
 
@@ -195,6 +193,21 @@ function isi_nama_dosen(sel) {
     document.getElementById('nama_dosen').value = opt ? (opt.dataset.nama || '') : '';
 }
 
+
+function update_label_meeting() {
+    var platform = document.getElementById('platform_online').value;
+    var labels = {
+        'Zoom': 'Link Zoom Meeting',
+        'Google Meet': 'Link Google Meet',
+        'Microsoft Teams': 'Link Microsoft Teams',
+        'Webex': 'Link Webex',
+        'Lainnya': 'Link Meeting'
+    };
+    var label = labels[platform] || 'Link Meeting';
+    document.getElementById('label_link_meeting').textContent = label;
+}
+document.addEventListener('DOMContentLoaded', update_label_meeting);
+
 function toggle_tipe_kelas() {
     var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
     var isOnline = tipe && tipe.value === 'online';
@@ -221,7 +234,12 @@ function toggle_tipe_kelas() {
         </div>
         <div class="mb-3">
             <label class="form-label">Password <span class="text-danger">*</span></label>
-            <input type="password" class="form-control" id="pm_password" placeholder="Password...">
+            <div class="input-group">
+                <input type="password" class="form-control" id="pm_password" placeholder="Password...">
+                <button type="button" class="btn btn-outline-secondary" onclick="toggle_pm_password(this)" tabindex="-1">
+                    <i class="mdi mdi-eye"></i>
+                </button>
+            </div>
         </div>
         <div id="pm_pesan" class="text-danger small mb-2" style="display:none;"></div>
         <div class="d-flex justify-content-end gap-2">
@@ -232,6 +250,18 @@ function toggle_tipe_kelas() {
 </div>
 
 <script>
+function toggle_pm_password(btn) {
+    var inp = document.getElementById('pm_password');
+    var icon = btn.querySelector('i');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'mdi mdi-eye-off';
+    } else {
+        inp.type = 'password';
+        icon.className = 'mdi mdi-eye';
+    }
+}
+
 function kirim_tambah_pemateri() {
     var nama     = document.getElementById('pm_nama').value.trim();
     var email    = document.getElementById('pm_email').value.trim();

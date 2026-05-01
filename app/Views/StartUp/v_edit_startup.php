@@ -72,22 +72,11 @@ body { background-color: #f5f5f5 !important; }
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Klaster <span class="text-danger">*</span></label>
-                    <div>
-                        <?php
-                        $klaster_aktif = [];
-                        if (!empty($data[0]['klaster'])) {
-                            $klaster_aktif = array_map('trim', explode(',', $data[0]['klaster']));
-                        }
-                        foreach ($daftar_klaster as $row):
-                        ?>
+                    <label class="form-label">Klaster</label>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
+                        <?php foreach ($daftar_klaster as $row): ?>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                id="klaster_<?= $row->id_klaster ?>"
-                                value="<?= $row->id_klaster ?>"
-                                name="kluster[]"
-                                onclick="cek_klaster()"
-                                <?= in_array($row->nama_klaster, $klaster_aktif) ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="checkbox" name="id_klaster[]" id="klaster_<?= $row->id_klaster ?>" value="<?= $row->id_klaster ?>" <?= in_array($row->id_klaster, $selected_klasters) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="klaster_<?= $row->id_klaster ?>"><?= esc($row->nama_klaster) ?></label>
                         </div>
                         <?php endforeach; ?>
@@ -228,7 +217,6 @@ $(document).ready(function () {
     try { $('.select2_tahun_berdiri').select2(); $('.select2_tahun_daftar').select2(); } catch(e) {}
     $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true });
     $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true });
-    cek_klaster();
 
     $('#form_ubah').submit(function (e) {
         e.preventDefault();
@@ -292,11 +280,6 @@ function cek_deskripsi() {
     } else if ($('form').hasClass('was-validated')) {
         $('.invalid-deskripsi').css('display', 'none');
     }
-}
-
-function cek_klaster() {
-    var jumlah = $('input[name="kluster[]"]:checked').length;
-    $('input[name="kluster[]"]').prop('required', jumlah === 0);
 }
 </script>
 

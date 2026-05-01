@@ -99,7 +99,7 @@ body { background-color: #f5f5f5 !important; }
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Platform</label>
-                            <select name="platform_online" class="form-select">
+                            <select name="platform_online" id="platform_online" class="form-select" onchange="update_label_meeting()">
                                 <option value="">-- Pilih Platform --</option>
                                 <?php foreach (['Zoom','Google Meet','Microsoft Teams','Webex','Lainnya'] as $p): ?>
                                 <option value="<?= $p ?>" <?= ($kelas['platform_online'] ?? '') === $p ? 'selected' : '' ?>><?= $p ?></option>
@@ -107,7 +107,7 @@ body { background-color: #f5f5f5 !important; }
                             </select>
                         </div>
                         <div class="col-md-8 mb-3">
-                            <label class="form-label">Link Meeting</label>
+                            <label class="form-label"><span id="label_link_meeting">Link Meeting</span></label>
                             <input type="url" class="form-control" name="link_meeting" value="<?= esc($kelas['link_meeting'] ?? '') ?>" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
                         </div>
                     </div>
@@ -117,7 +117,7 @@ body { background-color: #f5f5f5 !important; }
                 <div id="seksi_offline" style="display:none;">
                     <div class="mb-3">
                         <label class="form-label">Lokasi / Ruangan</label>
-                        <input type="text" class="form-control" name="lokasi_offline" value="<?= esc($kelas['lokasi_offline'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
+                        <input type="text" class="form-control" name="lokasi_offline" id="lokasi_offline" value="<?= esc($kelas['lokasi_offline'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
                     </div>
                 </div>
 
@@ -157,14 +157,10 @@ body { background-color: #f5f5f5 !important; }
                                        placeholder="Judul sesi" value="<?= esc($v['judul_sesi'] ?? '') ?>" required>
                             </div>
                             <div class="row g-2 mb-3">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <input type="url" class="form-control form-control-sm yt-link-input" name="link_youtube[]"
                                            placeholder="Link YouTube" value="<?= esc($v['link_youtube'] ?? '') ?>"
                                            oninput="ambil_durasi_video(this)">
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="url" class="form-control form-control-sm" name="link_zoom_sesi[]"
-                                           placeholder="Link Zoom" value="<?= esc($v['link_zoom'] ?? '') ?>">
                                 </div>
                             </div>
                             <div class="durasi-info mb-2" style="font-size:11px; display:none;"></div>
@@ -269,26 +265,38 @@ var jumlah_sesi = <?= count($videos) ?>;
 
 function tambah_sesi() {
     var idx = document.querySelectorAll('#sesiContainer .sesi-row').length;
+    var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
+    var isOnline = tipe && tipe.value === 'online';
     var div = document.createElement('div');
     div.className = 'sesi-row border rounded p-3 mb-3';
-    div.innerHTML =
+    var html =
         '<div class="d-flex justify-content-between align-items-center mb-2">' +
             '<span class="fw-semibold small text-muted">Sesi ' + (idx+1) + '</span>' +
             '<button type="button" class="btn btn-sm btn-outline-danger" onclick="hapus_sesi(this)"><i class="mdi mdi-close"></i></button>' +
         '</div>' +
-        '<div class="mb-2"><input type="text" class="form-control form-control-sm" name="judul_sesi[]" placeholder="Judul sesi" required></div>' +
-        '<div class="row g-2 mb-3">' +
-            '<div class="col-md-6"><input type="url" class="form-control form-control-sm yt-link-input" name="link_youtube[]" placeholder="Link YouTube" oninput="ambil_durasi_video(this)"></div>' +
-            '<div class="col-md-6"><input type="url" class="form-control form-control-sm" name="link_zoom_sesi[]" placeholder="Link Zoom"></div>' +
-        '</div>' +
-        '<div class="durasi-info mb-2" style="font-size:11px; display:none;"></div>' +
-        '<div class="border-top pt-2">' +
-            '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small fw-semibold text-secondary"><i class="mdi mdi-format-list-bulleted me-1"></i>Chapter / Timestamp</span>' +
-                '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="tambah_chapter(this)"><i class="mdi mdi-plus"></i> Tambah Chapter</button>' +
+        '<div class="mb-2"><input type="text" class="form-control form-control-sm" name="judul_sesi[]" placeholder="Judul sesi" required></div>';
+    if (isOnline) {
+        html +=
+            '<div class="row g-2 mb-3">' +
+                '<div class="col-md-12"><input type="url" class="form-control form-control-sm yt-link-input" name="link_youtube[]" placeholder="Link YouTube" oninput="ambil_durasi_video(this)"></div>' +
             '</div>' +
-            '<div class="chapter-container">' + buat_baris_chapter(idx, 0, true) + '</div>' +
-        '</div>';
+            '<div class="durasi-info mb-2" style="font-size:11px; display:none;"></div>' +
+            '<div class="border-top pt-2">' +
+                '<div class="d-flex align-items-center justify-content-between mb-2">' +
+                    '<span class="small fw-semibold text-secondary"><i class="mdi mdi-format-list-bulleted me-1"></i>Chapter / Timestamp</span>' +
+                    '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="tambah_chapter(this)"><i class="mdi mdi-plus"></i> Tambah Chapter</button>' +
+                '</div>' +
+                '<div class="chapter-container">' + buat_baris_chapter(idx, 0, true) + '</div>' +
+            '</div>';
+    } else {
+        var lokasi = document.getElementById('lokasi_offline') ? document.getElementById('lokasi_offline').value : '';
+        html +=
+            '<div class="mb-2">' +
+                '<label class="form-label form-label-sm text-muted">Lokasi / Ruangan</label>' +
+                '<input type="text" class="form-control form-control-sm lokasi-sesi-input" name="lokasi_sesi[]" value="' + lokasi + '" placeholder="Lokasi / Ruangan" readonly>' +
+            '</div>';
+    }
+    div.innerHTML = html;
     document.getElementById('sesiContainer').appendChild(div);
     nomori_ulang_sesi();
 }
@@ -495,6 +503,19 @@ document.querySelectorAll('.yt-link-input').forEach(function(inp) {
     if (inp.value) ambil_durasi_video(inp);
 });
 
+function update_label_meeting() {
+    var platform = document.getElementById('platform_online');
+    if (!platform) return;
+    var labels = {
+        'Zoom': 'Link Zoom Meeting',
+        'Google Meet': 'Link Google Meet',
+        'Microsoft Teams': 'Link Microsoft Teams',
+        'Webex': 'Link Webex',
+        'Lainnya': 'Link Meeting'
+    };
+    var el = document.getElementById('label_link_meeting');
+    if (el) el.textContent = labels[platform.value] || 'Link Meeting';
+}
 function toggle_tipe_kelas() {
     var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
     document.getElementById('seksi_online').style.display  = (tipe && tipe.value === 'online')  ? 'block' : 'none';
@@ -507,4 +528,19 @@ function isi_nama_dosen(sel) {
     var opt = sel.options[sel.selectedIndex];
     document.getElementById('nama_dosen').value = opt ? (opt.dataset.nama || '') : '';
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    update_label_meeting();
+    toggle_tipe_kelas();
+    var lokasiInput = document.getElementById('lokasi_offline');
+    if (lokasiInput) {
+        lokasiInput.addEventListener('input', function() {
+            document.querySelectorAll('.lokasi-sesi-input').forEach(function(el) {
+                el.value = lokasiInput.value;
+            });
+        });
+    }
+});
 </script>

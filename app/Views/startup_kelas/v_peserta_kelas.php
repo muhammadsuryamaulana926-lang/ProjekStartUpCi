@@ -20,16 +20,10 @@ body { background-color: #f5f5f5 !important; }
         <div class="col-12 col-xl-9">
 
             <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show mb-4">
-                    <?= session()->getFlashdata('success') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show mb-4">
-                    <?= session()->getFlashdata('error') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="mb-4">
@@ -50,15 +44,16 @@ body { background-color: #f5f5f5 !important; }
 
 
             <!-- Daftar Peserta Kelas -->
-            <div class="paper-card">
-                <h5 class="font-weight-bold text-dark mb-4">
-                    Peserta yang Hadir
-                    <span class="badge bg-secondary ms-2"><?= count($peserta_kelas) ?></span>
-                </h5>
-
+            <div class="card border">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="mdi mdi-account-group-outline me-2 text-primary"></i>Peserta yang Hadir
+                        <span class="badge bg-secondary ms-2"><?= count($peserta_kelas) ?></span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-paper align-middle">
-                        <thead>
+                    <table class="table table-hover table-bordered mb-0 align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th width="5%">No</th>
                                 <th>Nama Peserta</th>
@@ -91,7 +86,7 @@ body { background-color: #f5f5f5 !important; }
                                             <input type="hidden" name="id_peserta_kelas" value="<?= $p['id_peserta_kelas'] ?>">
                                             <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger rounded"
-                                                onclick="return confirm('Keluarkan peserta ini dari kelas?')">
+                                                onclick="return swalConfirm(this.closest('form'))">
                                                 <i class="mdi mdi-delete"></i>
                                             </button>
                                         </form>
@@ -102,8 +97,7 @@ body { background-color: #f5f5f5 !important; }
                         </tbody>
                     </table>
                 </div>
+                </div>
             </div>
-
-        </div>
     </div>
 </div>

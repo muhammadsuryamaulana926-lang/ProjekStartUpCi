@@ -71,11 +71,11 @@ body { background-color: #f5f5f5 !important; }
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Klaster <span class="text-danger">*</span></label>
-                    <div>
+                    <label class="form-label">Klaster</label>
+                    <div class="d-flex flex-wrap gap-2 mt-1">
                         <?php foreach ($klasters as $row): ?>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="klaster_<?= $row->id_klaster ?>" value="<?= $row->id_klaster ?>" name="kluster[]" onclick="cek_klaster()">
+                            <input class="form-check-input" type="checkbox" name="id_klaster[]" id="klaster_<?= $row->id_klaster ?>" value="<?= $row->id_klaster ?>">
                             <label class="form-check-label" for="klaster_<?= $row->id_klaster ?>"><?= esc($row->nama_klaster) ?></label>
                         </div>
                         <?php endforeach; ?>
@@ -259,11 +259,6 @@ function cek_deskripsi() {
     } else if ($('form').hasClass('was-validated')) {
         $('.invalid-deskripsi').css('display', 'none');
     }
-}
-
-function cek_klaster() {
-    var jumlah = $('input[name="kluster[]"]:checked').length;
-    $('input[name="kluster[]"]').prop('required', jumlah === 0);
 }
 </script>
 

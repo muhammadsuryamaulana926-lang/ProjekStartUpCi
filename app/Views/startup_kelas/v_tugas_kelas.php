@@ -51,71 +51,44 @@ body { background-color: #f5f5f5 !important; }
         <div class="col-12 col-xl-9">
 
             <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show mb-4">
-                    <?= session()->getFlashdata('success') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show mb-4">
-                    <?= session()->getFlashdata('error') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="<?= base_url('presensi_kelas/detail_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-light btn-modern border">
+                <?php
+                    $role_now = session()->get('user_role');
+                    $back_url = $role_now === 'pemateri'
+                        ? base_url('v_dashboard')
+                        : base_url('presensi_kelas/detail_kelas/' . $kelas['id_kelas']);
+                ?>
+                <a href="<?= $back_url ?>" class="btn btn-light btn-modern border">
                     <i class="mdi mdi-arrow-left"></i> Kembali
                 </a>
             </div>
 
-            <!-- Info Kelas -->
+            <!-- Info Kelas + Daftar Tugas dalam 1 card -->
             <div class="paper-card">
-                <h4 class="font-weight-bold text-dark mb-1"><?= esc($kelas['nama_kelas']) ?></h4>
-                <div class="text-muted small">
-                    <i class="mdi mdi-book-open-variant me-1"></i><?= esc($program['nama_program']) ?>
-                    &bull; <i class="mdi mdi-calendar me-1"></i><?= date('d M Y', strtotime($kelas['tanggal'])) ?>
-                    &bull; <i class="mdi mdi-account-tie me-1"></i><?= esc($kelas['nama_dosen'] ?? '-') ?>
+                <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                    <div>
+                        <h4 class="font-weight-bold text-dark mb-1"><?= esc($kelas['nama_kelas']) ?></h4>
+                        <div class="text-muted small">
+                            <i class="mdi mdi-book-open-variant me-1"></i><?= esc($program['nama_program']) ?>
+                            &bull; <i class="mdi mdi-calendar me-1"></i><?= date('d M Y', strtotime($kelas['tanggal'])) ?>
+                            &bull; <i class="mdi mdi-account-tie me-1"></i><?= esc($kelas['nama_dosen'] ?? '-') ?>
+                        </div>
+                    </div>
+                    <?php if ($bisa_kelola): ?>
+                    <button class="btn btn-primary btn-modern btn-sm" data-bs-toggle="modal" data-bs-target="#modalBuatTugas">
+                        <i class="mdi mdi-plus"></i> Buat Tugas Baru
+                    </button>
+                    <?php endif; ?>
                 </div>
-            </div>
 
-            <!-- Form Tambah Tugas (pemateri/admin) -->
-            <?php if ($bisa_kelola): ?>
-            <div class="paper-card">
-                <h5 class="font-weight-bold text-dark mb-4">Buat Tugas Baru</h5>
-                <form action="<?= base_url('tugas_kelas/simpan_tugas') ?>" method="POST" enctype="multipart/form-data">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label">Judul Tugas <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="judul" required placeholder="Contoh: Tugas 1 - Analisis Bisnis">
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Instruksi / Soal</label>
-                            <textarea class="form-control" name="instruksi" rows="3" placeholder="Tuliskan instruksi atau soal tugas..."></textarea>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">File Soal <small class="text-muted">(opsional)</small></label>
-                            <input type="file" class="form-control" name="file_soal" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg">
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="submit" class="btn btn-primary btn-modern">
-                            <i class="mdi mdi-plus"></i> Buat Tugas
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <?php endif; ?>
-
-            <!-- Daftar Tugas -->
-            <div class="paper-card">
-                <h5 class="font-weight-bold text-dark mb-4">
-                    Daftar Tugas
-                    <span class="badge bg-secondary ms-2"><?= count($tugas_list) ?></span>
-                </h5>
+                <h5 class="font-weight-bold text-dark mb-3">Daftar Tugas <span class="badge bg-secondary ms-2"><?= count($tugas_list) ?></span></h5>
 
                 <?php if (empty($tugas_list)): ?>
                     <div class="text-center text-muted py-5">
@@ -134,25 +107,13 @@ body { background-color: #f5f5f5 !important; }
                                 </div>
                             </div>
                             <div class="d-flex gap-2 align-items-center">
-                                <?php if (!empty($t['nama_file'])): ?>
-                                    <?php $tp = strtolower($t['tipe_file'] ?? ''); ?>
-                                    <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
-                                    <button type="button" class="btn btn-sm btn-outline-info rounded"
-                                        onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/tugas/' . $t['id_tugas']) ?>', '<?= esc($t['judul']) ?>', '<?= base_url('tugas_kelas/download/tugas/' . $t['id_tugas']) ?>')">
-                                        <i class="mdi mdi-eye"></i> Lihat
-                                    </button>
-                                    <?php endif; ?>
-                                    <a href="<?= base_url('tugas_kelas/download/tugas/' . $t['id_tugas']) ?>" class="btn btn-sm btn-outline-primary rounded">
-                                        <i class="mdi mdi-download"></i> Unduh Soal
-                                    </a>
-                                <?php endif; ?>
                                 <?php if ($bisa_kelola): ?>
                                     <form action="<?= base_url('tugas_kelas/hapus_tugas') ?>" method="POST" class="d-inline">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="id_tugas" value="<?= $t['id_tugas'] ?>">
                                         <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
                                         <button type="submit" class="btn btn-sm btn-outline-danger rounded"
-                                            onclick="return confirm('Yakin hapus tugas ini?')">
+                                            onclick="return swalConfirm(this.closest('form'))">
                                             <i class="mdi mdi-delete"></i>
                                         </button>
                                     </form>
@@ -220,60 +181,23 @@ body { background-color: #f5f5f5 !important; }
 
                             <!-- Daftar Jawaban (pemateri/admin) -->
                             <?php if ($bisa_kelola): ?>
-                                <?php $semua = $semua_jawaban[$t['id_tugas']] ?? []; ?>
+                                <?php
+                                    $semua = $semua_jawaban[$t['id_tugas']] ?? [];
+                                    $sudah_kirim = array_column($semua, 'nama_peserta');
+                                    $belum_kirim = array_diff($peserta_kelas, $sudah_kirim);
+                                ?>
                                 <div class="mt-3 border-top pt-3">
-                                    <div class="fw-semibold small text-muted mb-3">
-                                        Jawaban Masuk <span class="badge bg-secondary"><?= count($semua) ?></span>
-                                    </div>
+                                    <div class="fw-semibold small text-muted mb-2">Sudah Mengumpulkan <span class="badge bg-success"><?= count($semua) ?></span></div>
                                     <?php if (empty($semua)): ?>
-                                        <div class="text-muted small">Belum ada jawaban masuk.</div>
+                                        <div class="text-muted small">Belum ada yang mengumpulkan.</div>
                                     <?php else: ?>
                                         <?php foreach ($semua as $j): ?>
-                                        <div class="jawaban-item">
-                                            <div class="d-flex align-items-center gap-2 mb-2">
-                                                <div class="avatar-kecil"><?= strtoupper(substr($j['nama_peserta'], 0, 1)) ?></div>
-                                                <div>
-                                                    <strong class="small"><?= esc($j['nama_peserta']) ?></strong>
-                                                    <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($j['dibuat_pada'])) ?></div>
-                                                </div>
+                                        <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+                                            <div class="avatar-kecil"><?= strtoupper(substr($j['nama_peserta'], 0, 1)) ?></div>
+                                            <div>
+                                                <div class="small fw-semibold text-dark"><?= esc($j['nama_peserta']) ?></div>
+                                                <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($j['dibuat_pada'])) ?></div>
                                             </div>
-                                            <?php if (!empty($j['jawaban_teks'])): ?>
-                                                <div class="bg-white border rounded p-2 mb-3" style="font-size:13px;"><?= nl2br(esc($j['jawaban_teks'])) ?></div>
-                                            <?php endif; ?>
-                                            <?php if (!empty($j['nama_file'])): ?>
-                                                <?php $tp = strtolower($j['tipe_file'] ?? ''); ?>
-                                                <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
-                                                <button type="button" class="btn btn-xs btn-outline-info rounded mb-2" style="font-size:12px; padding:2px 10px;"
-                                                    onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/jawaban/' . $j['id_jawaban']) ?>', '<?= esc($j['nama_peserta']) ?>', '<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>')">
-                                                    <i class="mdi mdi-eye"></i> Lihat
-                                                </button>
-                                                <?php endif; ?>
-                                                <a href="<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>" class="btn btn-xs btn-outline-success rounded mb-2" style="font-size:12px; padding:2px 10px;">
-                                                    <i class="mdi mdi-download"></i> Unduh Jawaban
-                                                </a>
-                                            <?php endif; ?>
-
-                                            <!-- Komentar -->
-                                            <?php if (!empty($j['komentar'])): ?>
-                                                <div class="komentar-box mb-2">
-                                                    <strong><i class="mdi mdi-comment-text me-1"></i>Komentar:</strong>
-                                                    <div class="mt-1"><?= nl2br(esc($j['komentar'])) ?></div>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <!-- Form Komentar -->
-                                            <form action="<?= base_url('tugas_kelas/simpan_komentar') ?>" method="POST" class="mt-2">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="id_jawaban" value="<?= $j['id_jawaban'] ?>">
-                                                <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
-                                                <div class="input-group input-group-sm">
-                                                    <input type="text" class="form-control" name="komentar"
-                                                        placeholder="Tulis komentar...">
-                                                    <button type="submit" class="btn btn-warning btn-sm">
-                                                        <i class="mdi mdi-send"></i>
-                                                    </button>
-                                                </div>
-                                            </form>
                                         </div>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -289,6 +213,40 @@ body { background-color: #f5f5f5 !important; }
     </div>
 </div>
 
+<!-- Modal Buat Tugas -->
+<div class="modal fade" id="modalBuatTugas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Buat Tugas Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="<?= base_url('tugas_kelas/simpan_tugas') ?>" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Judul Tugas <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="judul" required placeholder="Contoh: Tugas 1 - Analisis Bisnis">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Instruksi / Soal</label>
+                        <textarea class="form-control" name="instruksi" rows="3" placeholder="Tuliskan instruksi atau soal tugas..."></textarea>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">File Soal <small class="text-muted">(opsional)</small></label>
+                        <input type="file" class="form-control" name="file_soal" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="mdi mdi-plus"></i> Buat Tugas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Preview Tugas/Jawaban -->
 <div class="modal fade" id="modalPreviewTugas" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -296,9 +254,6 @@ body { background-color: #f5f5f5 !important; }
             <div class="modal-header py-2">
                 <h6 class="modal-title fw-bold mb-0" id="judulPreviewTugas"></h6>
                 <div class="d-flex gap-2 ms-auto">
-                    <a id="btnUnduhPreviewTugas" href="#" class="btn btn-sm btn-success rounded">
-                        <i class="mdi mdi-download"></i> Unduh
-                    </a>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
             </div>

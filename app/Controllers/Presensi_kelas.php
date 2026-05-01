@@ -7,6 +7,7 @@ use App\Models\M_startup_kelas;
 use App\Models\M_startup_program;
 use App\Models\M_peserta_program;
 use App\Models\M_peserta_kelas;
+use App\Models\M_materi_kelas;
 
 // Controller untuk mengelola presensi/check-in peserta sebelum masuk kelas
 class Presensi_kelas extends BaseController
@@ -28,7 +29,7 @@ class Presensi_kelas extends BaseController
         $data['kelas'] = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
 
         if (empty($data['kelas'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $data['program']   = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
@@ -38,6 +39,7 @@ class Presensi_kelas extends BaseController
         $data['sudah_presensi']   = $this->m_presensi->cek_sudah_presensi($id_kelas, $nama_peserta);
         $data['nama_peserta']     = $nama_peserta;
         $data['bisa_kelola']      = in_array(session()->get('user_role'), ['admin', 'superadmin', 'pemateri']);
+        $data['sudah_join']       = false;
 
         // Cek apakah sudah join program — pakai id_user atau nama_peserta
         if ($data['bisa_kelola']) {
@@ -49,6 +51,36 @@ class Presensi_kelas extends BaseController
                 : ['id_program' => $data['kelas']['id_program'], 'nama_peserta' => $nama_peserta];
             $data['sudah_join'] = (new M_peserta_program())->cek_sudah_join($cek);
         }
+
+        // Jika peserta (bukan admin/pemateri), otomatis catat ke peserta_kelas saat akses
+        if (!$data['bisa_kelola'] && $data['sudah_join']) {
+            $m_peserta_kelas = new M_peserta_kelas();
+            if (!$m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
+                $m_peserta_kelas->tambah_peserta([
+                    'id_kelas'     => $id_kelas,
+                    'nama_peserta' => $nama_peserta,
+                ]);
+            }
+        }
+
+        // Load materi kelas
+        $data['materi'] = (new M_materi_kelas())->materi_by_kelas($id_kelas);
+
+        // Load tugas dan semua jawaban
+        $m_tugas   = new \App\Models\M_tugas_kelas();
+        $m_jawaban = new \App\Models\M_jawaban_tugas();
+        $data['tugas_list']    = $m_tugas->tugas_by_kelas($id_kelas);
+        $data['semua_jawaban'] = [];
+        foreach ($data['tugas_list'] as $t) {
+            $data['semua_jawaban'][$t['id_tugas']] = $m_jawaban->jawaban_by_tugas($t['id_tugas']);
+        }
+
+        // Load peserta_kelas (sudah akses) untuk modal tambah presensi admin
+        $sudah_presensi_nama   = array_column($data['presensi'], 'nama_peserta');
+        $data['sudah_akses']   = (new M_peserta_kelas())->peserta_by_kelas($id_kelas);
+        $data['belum_presensi'] = array_filter($data['sudah_akses'], function($p) use ($sudah_presensi_nama) {
+            return !in_array($p['nama_peserta'], $sudah_presensi_nama);
+        });
 
         // Hitung apakah kelas bisa diakses (30 menit sebelum jam mulai)
         $data['bisa_akses'] = $this->cek_bisa_akses($data['kelas']);
@@ -103,6 +135,31 @@ class Presensi_kelas extends BaseController
         }
 
         return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas));
+    }
+
+    // Simpan presensi batch oleh admin
+    public function simpan_presensi_batch()
+    {
+        $id_kelas    = $this->request->getPost('id_kelas');
+        $id_program  = $this->request->getPost('id_program');
+        $peserta_arr = $this->request->getPost('peserta') ?? [];
+
+        $m_peserta_kelas = new \App\Models\M_peserta_kelas();
+        foreach ($peserta_arr as $nama_peserta) {
+            if ($this->m_presensi->cek_sudah_presensi($id_kelas, $nama_peserta)) continue;
+            $this->m_presensi->simpan_presensi([
+                'id_kelas'      => $id_kelas,
+                'id_program'    => $id_program,
+                'nama_peserta'  => $nama_peserta,
+                'kondisi_hadir' => 'Hadir',
+            ]);
+            if (!$m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
+                $m_peserta_kelas->tambah_peserta(['id_kelas' => $id_kelas, 'nama_peserta' => $nama_peserta]);
+            }
+        }
+
+        session()->setFlashdata('success', count($peserta_arr) . ' peserta berhasil ditambahkan.');
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=hadir'));
     }
 
     // Menghapus presensi oleh admin

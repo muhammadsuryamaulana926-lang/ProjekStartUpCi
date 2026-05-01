@@ -9,10 +9,30 @@ body { background-color: #f5f5f5 !important; }
     margin-bottom: 24px;
 }
 #kalender { min-height: 500px; }
-.fc-event { cursor: pointer; font-size: 12px; }
+.fc-event { cursor: pointer; font-size: 11px; }
 .table-paper th { background-color: #f8f9fa; font-weight: 600; border-bottom: 2px solid #dee2e6; }
 .btn-modern { border-radius: 6px; font-weight: 500; transition: all 0.3s; }
 .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+/* Hari ini warna abu */
+.fc .fc-day-today { background: #f1f5f9 !important; }
+.fc .fc-day-today .fc-daygrid-day-number { 
+    background: #94a3b8 !important; 
+    color: #fff !important;
+    border-radius: 50%;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+}
+/* Kotak hari lebih compact */
+.fc .fc-daygrid-day { min-height: 60px !important; }
+.fc .fc-daygrid-day-frame { min-height: 60px !important; padding: 2px !important; }
+.fc .fc-daygrid-day-number { font-size: 12px; padding: 2px 4px; }
+.fc .fc-col-header-cell-cushion { font-size: 12px; padding: 4px; }
+/* Event text italic */
+.fc-event-title { font-style: italic; }
+/* Header toolbar select style */
+.fc .fc-button { font-size: 12px; padding: 4px 10px; }
 </style>
 
 <div class="container-fluid py-4" style="background-color: #f5f5f5;">
@@ -21,9 +41,14 @@ body { background-color: #f5f5f5 !important; }
 
             <!-- Kalender -->
             <div class="paper-card">
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="m-0 font-weight-bold text-dark">Kalender Jadwal Kelas</h4>
-                    <div class="d-flex gap-2 align-items-center" style="font-size:12px;">
+                    <div class="d-flex gap-2 align-items-center">
+                        <select id="kalender-view" class="form-select form-select-sm" style="width:120px;">
+                            <option value="dayGridMonth">Bulan</option>
+                            <option value="timeGridWeek">Minggu</option>
+                            <option value="listWeek">Daftar</option>
+                        </select>
                         <span class="badge" style="background:#3b82f6;">Aktif</span>
                         <span class="badge" style="background:#22c55e;">Selesai</span>
                         <span class="badge" style="background:#ef4444;">Dibatalkan</span>
@@ -97,17 +122,22 @@ document.addEventListener('DOMContentLoaded', function() {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
+            right: false
         },
-        buttonText: { today: 'Hari Ini', month: 'Bulan', week: 'Minggu', list: 'Daftar' },
+        buttonText: { today: 'Hari Ini' },
         events: '<?= base_url('jadwal_kelas/get_events') ?>',
         eventClick: function(info) {
             window.location.href = '<?= base_url('presensi_kelas/detail_kelas/') ?>' + info.event.extendedProps.id_kelas + '?from=kalender';
         },
         eventDidMount: function(info) {
             info.el.title = info.event.title + ' — ' + info.event.extendedProps.nama_program;
+            info.el.style.fontStyle = 'italic';
         }
     });
     calendar.render();
+
+    document.getElementById('kalender-view').addEventListener('change', function() {
+        calendar.changeView(this.value);
+    });
 });
 </script>

@@ -108,6 +108,9 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
             </div>
 
             <h1 class="yt-title"><?= esc($video->judul_video) ?></h1>
+            <div class="text-muted mb-3" style="font-size:13px;">
+                <i class="mdi mdi-eye-outline me-1"></i><?= number_format($video->jumlah_ditonton) ?> kali ditonton
+            </div>
 
             <div class="yt-meta-row">
                 <div></div>
@@ -175,8 +178,9 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
+let player;
 document.addEventListener('DOMContentLoaded', () => {
-    const player = new Plyr('#player', {
+    player = new Plyr('#player', {
         controls: ['play-large','play','progress','current-time','mute','volume','captions','settings','fullscreen'],
         youtube: { noCookie: true, rel: 0, showinfo: 0, ivory: 1, modestbranding: 1 }
     });
@@ -306,4 +310,11 @@ function renderQueue() {
 }
 
 renderQueue();
+
+document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault();
+        player.togglePlay();
+    }
+});
 </script>

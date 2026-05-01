@@ -57,17 +57,10 @@ body {
         <div class="col-12 col-xl-10">
             
             <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                    <?= session()->getFlashdata('success') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
-
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                    <?= session()->getFlashdata('error') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -84,10 +77,22 @@ body {
                 <p class="paper-subtitle mb-0"><?= nl2br(esc($program['deskripsi'])) ?></p>
             </div>
 
-            <!-- List Kelas -->
+            <!-- List Kelas + Peserta (Tab) -->
             <div class="paper-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                    <h3 class="m-0 font-weight-bold text-dark">Daftar Kelas</h3>
+                <ul class="nav nav-tabs mb-4" id="programTab">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-kelas">Daftar Kelas</a>
+                    </li>
+                    <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-peserta">Data Peserta Program</a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
+
+                <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-kelas">
+                <div class="d-flex justify-content-end mb-3">
                     <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
                     <a href="<?= base_url('program/tambah_kelas/' . $program['id_program']) ?>" class="btn btn-primary btn-modern btn-sm">
                         <i class="mdi mdi-plus"></i> Tambah Kelas
@@ -173,10 +178,39 @@ body {
                                 </div>
 
                                 <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
-                                <div class="mt-3 pt-3 border-top text-end">
-                                    <a href="<?= base_url('peserta_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-success text-white">Peserta Hadir</a>
-                                    <a href="<?= base_url('program/edit_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-warning text-white">Edit</a>
-                                    <a href="<?= base_url('program/hapus_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus kelas ini?')">Hapus</a>
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#peserta-<?= $k['id_kelas'] ?>">
+                                            <i class="mdi mdi-account-group"></i> Peserta (<?= count($k['peserta_kelas']) ?>)
+                                        </button>
+                                        <div>
+                                            <a href="<?= base_url('peserta_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-success text-white">Peserta Hadir</a>
+                                            <a href="<?= base_url('program/edit_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-warning text-white">Edit</a>
+                                            <a href="<?= base_url('program/hapus_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-danger"
+                                                onclick="event.preventDefault(); Swal.fire({title:'Yakin?',text:'Kelas akan dihapus.',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus!',cancelButtonText:'Batal'}).then(r=>{ if(r.isConfirmed) window.location.href=this.href; });">Hapus</a>
+                                        </div>
+                                    </div>
+                                    <div class="collapse mt-2" id="peserta-<?= $k['id_kelas'] ?>">
+                                        <?php if(empty($k['peserta_kelas'])): ?>
+                                            <p class="text-muted small mb-0">Belum ada peserta di kelas ini.</p>
+                                        <?php else: ?>
+                                            <ul class="list-group list-group-flush">
+                                                <?php foreach($k['peserta_kelas'] as $i => $pk): ?>
+                                                <li class="list-group-item px-0 py-1 small d-flex justify-content-between align-items-center">
+                                                    <span><?= ($i+1) . '. ' . esc($pk['nama_peserta']) ?></span>
+                                                    <form action="<?= base_url('peserta_kelas/hapus_peserta') ?>" method="POST" class="d-inline">
+                                                        <?= csrf_field() ?>
+                                                        <input type="hidden" name="id_peserta_kelas" value="<?= $pk['id_peserta_kelas'] ?>">
+                                                        <input type="hidden" name="id_kelas" value="<?= $k['id_kelas'] ?>">
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return swalConfirm(this.closest('form'))">
+                                                            <i class="mdi mdi-close"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <?php endif; ?>
                             </div>
@@ -186,19 +220,16 @@ body {
                 <?php endif; ?>
             </div>
 
-            <!-- List Peserta (Hanya Admin) -->
-            <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
-            <div class="paper-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                    <h3 class="m-0 font-weight-bold text-dark">Data Peserta Program</h3>
-                    <a href="<?= base_url('program/tambah_peserta_program/' . $program['id_program']) ?>" class="btn btn-success btn-modern btn-sm">
+                <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
+                <div class="tab-pane fade" id="tab-peserta">
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="<?= base_url('program/tambah_peserta_program/' . $program['id_program']) ?>" class="btn btn-success btn-sm">
                         <i class="mdi mdi-plus"></i> Tambah Peserta
                     </a>
                 </div>
-
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="bg-light">
+                    <table class="table table-hover table-bordered mb-0 align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th width="5%">No</th>
                                 <th>Nama Peserta</th>
@@ -222,7 +253,7 @@ body {
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="id_peserta_program" value="<?= $pst['id_peserta_program'] ?>">
                                             <input type="hidden" name="id_program" value="<?= $program['id_program'] ?>">
-                                            <button type="submit" class="btn btn-sm btn-danger text-white rounded" onclick="return confirm('Keluarkan peserta ini dari program?')" title="Hapus Peserta">
+                                            <button type="submit" class="btn btn-sm btn-danger text-white rounded" onclick="return swalConfirm(this.closest('form'))" title="Hapus Peserta">
                                                 <i class="mdi mdi-delete"></i>
                                             </button>
                                         </form>
@@ -233,8 +264,11 @@ body {
                         </tbody>
                     </table>
                 </div>
+                </div>
+                <?php endif; ?>
+
+                </div><!-- end tab-content -->
             </div>
-            <?php endif; ?>
 
         </div>
     </div>

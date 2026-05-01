@@ -55,14 +55,16 @@ body { background-color: #f5f5f5 !important; }
                     </a>
                 </div>
 
-                <!-- Tab Role -->
-                <div class="d-flex gap-2 mb-4 flex-wrap">
-                    <?php foreach ($daftar_role as $role_key => $role_label): ?>
-                        <a href="<?= base_url('izin_akses?role=' . $role_key) ?>"
-                           class="role-tab <?= $role_aktif === $role_key ? 'aktif' : '' ?>">
+                <!-- Filter Role -->
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <label class="form-label small fw-semibold mb-0 text-nowrap">Per Role</label>
+                    <select id="selectRole" class="form-select form-select-sm" style="min-width:180px;" onchange="window.location.href='<?= base_url('izin_akses') ?>?role='+this.value">
+                        <?php foreach ($daftar_role as $role_key => $role_label): ?>
+                        <option value="<?= $role_key ?>" <?= $role_aktif === $role_key ? 'selected' : '' ?>>
                             <?= $role_label ?>
-                        </a>
-                    <?php endforeach; ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <form action="<?= base_url('izin_akses/simpan_izin') ?>" method="POST">

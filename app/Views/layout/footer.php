@@ -20,5 +20,25 @@
 
 <!-- JS Bootstrap untuk komponen interaktif (modal, dropdown, dll) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Helper global untuk confirm hapus pakai SweetAlert2
+function swalConfirm(form) {
+    Swal.fire({
+        title: 'Yakin?',
+        text: 'Data tidak dapat dikembalikan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then(function(result) {
+        if (result.isConfirmed) form.submit();
+    });
+    return false;
+}
+</script>
 </body>
 </html>

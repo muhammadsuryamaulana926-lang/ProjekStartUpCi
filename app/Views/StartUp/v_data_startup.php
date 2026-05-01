@@ -81,12 +81,9 @@
     <input type="hidden" name="id_startup" id="post-id-startup">
 </form>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<style>
-#tabel_startup_wrapper .dataTables_filter,
-#tabel_startup_wrapper .dataTables_length { padding: 12px 16px; }
-</style>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
     const CSRF_NAME = '<?= csrf_token() ?>';
@@ -94,14 +91,13 @@
 
     $(document).ready(function() {
         $('#tabel_startup').DataTable({
+            pageLength: 10,
+            ordering: false,
+            dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
             language: {
-                search: "Pencarian:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ startup",
-                infoEmpty: "Data tidak tersedia",
-                emptyTable: "Belum ada data startup yang terdaftar",
-                zeroRecords: "Tidak ditemukan data yang sesuai",
-                paginate: { first: "Pertama", last: "Terakhir", next: "Lanjut", previous: "Kembali" }
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                paginate: { previous: 'Previous', next: 'Next' }
             }
         });
 

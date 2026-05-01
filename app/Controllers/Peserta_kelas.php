@@ -29,7 +29,7 @@ class Peserta_kelas extends BaseController
         $data['kelas'] = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
 
         if (empty($data['kelas'])) {
-            return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
+            throw new \CodeIgniter\Exceptions\PageNotFoundException();
         }
 
         $data['program']         = $this->m_program->program_by_id(['id_program' => $data['kelas']['id_program']]);
@@ -58,21 +58,32 @@ class Peserta_kelas extends BaseController
     // Menambah peserta ke kelas
     public function tambah_peserta()
     {
-        $id_kelas     = $this->request->getPost('id_kelas');
-        $nama_peserta = $this->request->getPost('nama_peserta');
+        $id_kelas      = $this->request->getPost('id_kelas');
+        $nama_list     = $this->request->getPost('nama_peserta');
 
-        if ($this->m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
-            session()->setFlashdata('error', 'Peserta sudah terdaftar di kelas ini.');
-            return redirect()->to(base_url('peserta_kelas/' . $id_kelas));
+        if (empty($nama_list)) {
+            session()->setFlashdata('error', 'Pilih minimal satu peserta.');
+            return redirect()->back();
         }
 
-        if ($this->m_peserta_kelas->tambah_peserta(['id_kelas' => $id_kelas, 'nama_peserta' => $nama_peserta])) {
-            session()->setFlashdata('success', 'Peserta berhasil ditambahkan ke kelas.');
-        } else {
-            session()->setFlashdata('error', 'Gagal menambahkan peserta.');
+        $nama_list = is_array($nama_list) ? $nama_list : [$nama_list];
+        $kelas     = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
+        $id_program = $kelas['id_program'] ?? null;
+        $gagal = 0;
+        foreach ($nama_list as $nama_peserta) {
+            if (!$this->m_peserta_kelas->cek_sudah_terdaftar($id_kelas, $nama_peserta)) {
+                $this->m_peserta_kelas->tambah_peserta(['id_kelas' => $id_kelas, 'nama_peserta' => $nama_peserta]);
+            } else {
+                $gagal++;
+            }
+            // Otomatis daftarkan ke peserta_program jika belum
+            if ($id_program && !$this->m_peserta_program->cek_sudah_join(['id_program' => $id_program, 'nama_peserta' => $nama_peserta])) {
+                $this->m_peserta_program->tambah_peserta(['id_program' => $id_program, 'nama_peserta' => $nama_peserta]);
+            }
         }
 
-        return redirect()->to(base_url('peserta_kelas/' . $id_kelas));
+        session()->setFlashdata('success', 'Peserta berhasil ditambahkan ke kelas.' . ($gagal ? " ($gagal sudah terdaftar, dilewati)" : ''));
+        return redirect()->back();
     }
 
     // Menghapus peserta dari kelas

@@ -46,7 +46,7 @@ class Manajemen_user extends BaseController
 
         return view('layout/header', ['title' => 'Manajemen User'])
             . view('layout/topbar')
-            . view('manajemen/v_manajemen_user', $data)
+            . view('pengaturan/v_manajemen_user', $data)
             . view('layout/footer');
     }
 
@@ -60,7 +60,7 @@ class Manajemen_user extends BaseController
 
         return view('layout/header', ['title' => 'Tambah User'])
             . view('layout/topbar')
-            . view('manajemen/v_tambah_user', $data)
+            . view('pengaturan/v_tambah_user', $data)
             . view('layout/footer');
     }
 
@@ -115,7 +115,7 @@ class Manajemen_user extends BaseController
 
         return view('layout/header', ['title' => 'Edit User'])
             . view('layout/topbar')
-            . view('manajemen/v_edit_user', $data)
+            . view('pengaturan/v_edit_user', $data)
             . view('layout/footer');
     }
 

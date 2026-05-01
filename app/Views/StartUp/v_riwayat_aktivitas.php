@@ -2,9 +2,12 @@
     <div class="row justify-content-center">
         <div class="col-12 col-xl-11">
 
-            <!-- Filter -->
-            <div class="card border mb-3">
-                <div class="card-body py-2">
+            <div class="card border">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="mb-0 fw-bold"><i class="mdi mdi-history me-2 text-primary"></i>Riwayat Aktivitas</h5>
+                        <span class="text-muted small"><?= count($riwayat) ?> data</span>
+                    </div>
                     <form id="filterForm" method="GET" action="<?= base_url('v_riwayat_aktivitas') ?>" class="d-flex align-items-end gap-3 flex-wrap">
                         <input type="hidden" name="timeframe" id="timeframe_input" value="<?= $current_filters['timeframe'] ?? '' ?>">
                         <div>
@@ -31,14 +34,6 @@
                         <a href="<?= base_url('v_riwayat_aktivitas') ?>" class="btn btn-sm btn-outline-secondary">Reset</a>
                         <?php endif; ?>
                     </form>
-                </div>
-            </div>
-
-            <!-- Tabel -->
-            <div class="card border">
-                <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
-                    <h5 class="mb-0 fw-bold"><i class="mdi mdi-history me-2 text-primary"></i>Riwayat Aktivitas</h5>
-                    <span class="text-muted small"><?= count($riwayat) ?> data</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

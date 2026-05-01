@@ -95,6 +95,119 @@ class M_perpustakaan extends Model
         return $this->db->table('konten_video')->where('id_konten_video', $data['id_konten_video'])->delete();
     }
 
+    public function tambah_tontonan($id_konten_video)
+    {
+        // Increment jumlah_ditonton setiap kali video dibuka
+        return $this->db->query("UPDATE konten_video SET jumlah_ditonton = jumlah_ditonton + 1 WHERE id_konten_video = " . (int)$id_konten_video);
+    }
+
+    public function cek_sudah_nonton($id_konten_video, $id_user)
+    {
+        return $this->db->table('video_views')
+            ->where(['id_konten_video' => $id_konten_video, 'id_user' => $id_user])
+            ->countAllResults() > 0;
+    }
+
+    public function catat_view_unik($id_konten_video, $id_user)
+    {
+        if ($this->cek_sudah_nonton($id_konten_video, $id_user)) return false;
+        $this->db->table('video_views')->insert([
+            'id_konten_video' => $id_konten_video,
+            'id_user'         => $id_user,
+            'viewed_at'       => date('Y-m-d H:i:s'),
+        ]);
+        return $this->tambah_tontonan($id_konten_video);
+    }
+
+    public function top_video_ditonton($limit = 10)
+    {
+        return $this->db->query("
+            SELECT judul_video, jumlah_ditonton
+            FROM konten_video
+            ORDER BY jumlah_ditonton DESC
+            LIMIT " . (int)$limit)->getResultArray();
+    }
+
+    public function tren_penonton_per_bulan($tahun)
+    {
+        return $this->db->query("
+            SELECT MONTH(viewed_at) as periode, COUNT(*) as total
+            FROM video_views
+            WHERE YEAR(viewed_at) = " . (int)$tahun . "
+            GROUP BY MONTH(viewed_at)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
+    public function tren_penonton_per_minggu($tahun)
+    {
+        return $this->db->query("
+            SELECT WEEK(viewed_at, 1) as periode, COUNT(*) as total
+            FROM video_views
+            WHERE YEAR(viewed_at) = " . (int)$tahun . "
+            GROUP BY WEEK(viewed_at, 1)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
+    public function tren_penonton_per_tahun()
+    {
+        return $this->db->query("
+            SELECT YEAR(viewed_at) as periode, COUNT(*) as total
+            FROM video_views
+            GROUP BY YEAR(viewed_at)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
+    // ── EBOOK VIEWS ───────────────────────────────────────────────
+
+    public function catat_view_unik_ebook($id_konten_ebook, $id_user)
+    {
+        if ($this->db->table('ebook_views')->where(['id_konten_ebook' => $id_konten_ebook, 'id_user' => $id_user])->countAllResults() > 0) return false;
+        $this->db->table('ebook_views')->insert([
+            'id_konten_ebook' => $id_konten_ebook,
+            'id_user'         => $id_user,
+            'viewed_at'       => date('Y-m-d H:i:s'),
+        ]);
+        return $this->db->query("UPDATE konten_ebook SET jumlah_dibaca = jumlah_dibaca + 1 WHERE id_konten_ebook = " . (int)$id_konten_ebook);
+    }
+
+    public function top_ebook_dibaca($limit = 10)
+    {
+        return $this->db->query("
+            SELECT judul_ebook, jumlah_dibaca
+            FROM konten_ebook
+            ORDER BY jumlah_dibaca DESC
+            LIMIT " . (int)$limit)->getResultArray();
+    }
+
+    public function tren_pembaca_ebook_per_bulan($tahun)
+    {
+        return $this->db->query("
+            SELECT MONTH(viewed_at) as periode, COUNT(*) as total
+            FROM ebook_views
+            WHERE YEAR(viewed_at) = " . (int)$tahun . "
+            GROUP BY MONTH(viewed_at)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
+    public function tren_pembaca_ebook_per_minggu($tahun)
+    {
+        return $this->db->query("
+            SELECT WEEK(viewed_at, 1) as periode, COUNT(*) as total
+            FROM ebook_views
+            WHERE YEAR(viewed_at) = " . (int)$tahun . "
+            GROUP BY WEEK(viewed_at, 1)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
+    public function tren_pembaca_ebook_per_tahun()
+    {
+        return $this->db->query("
+            SELECT YEAR(viewed_at) as periode, COUNT(*) as total
+            FROM ebook_views
+            GROUP BY YEAR(viewed_at)
+            ORDER BY periode ASC")->getResultArray();
+    }
+
     public function decode_kode_video($kode)
     {
         // Mendekode kode video dari base64 menjadi YouTube ID asli

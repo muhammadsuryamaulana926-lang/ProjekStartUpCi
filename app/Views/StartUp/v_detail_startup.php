@@ -66,7 +66,7 @@ body { background-color: #f5f5f5 !important; }
 
                         <h5 class="fw-bold mb-1" style="text-transform:capitalize;"><?= esc(strtolower($data[0]['nama_perusahaan'])) ?></h5>
                         <p class="text-muted small mb-2" style="text-transform:capitalize;">
-                            <?= is_array($data[0]['klasters']) ? esc(strtolower(implode(', ', $data[0]['klasters']))) : esc(strtolower($data[0]['klasters'])) ?>
+                            <?= esc(strtolower($data[0]['nama_klaster'] ?? '-')) ?>
                         </p>
 
                         <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
