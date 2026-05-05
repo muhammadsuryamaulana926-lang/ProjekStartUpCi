@@ -10,10 +10,14 @@ class M_startup extends Model
     // Mengambil semua data startup beserta nama dosen pembina dan nama program
     public function semua_startup()
     {
-        $query = "SELECT s.*, d.nama_lengkap as nama_dosen, p.nama_program
+        $query = "SELECT s.*, d.nama_lengkap as nama_dosen, p.nama_program,
+                  GROUP_CONCAT(k.nama_klaster ORDER BY k.nama_klaster SEPARATOR ',') as klaster
                   FROM startups s
                   LEFT JOIN dosen_pembinas d ON d.id_dosen_pembina = s.id_dosen_pembina
                   LEFT JOIN programs p ON p.id_program = s.id_program
+                  LEFT JOIN startup_klaster sk ON sk.id_startup = s.id_startup
+                  LEFT JOIN klasters k ON k.id_klaster = sk.id_klaster
+                  GROUP BY s.id_startup
                   ORDER BY s.id_startup DESC";
         return $this->db->query($query);
     }

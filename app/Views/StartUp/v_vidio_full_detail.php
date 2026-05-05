@@ -453,7 +453,7 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
         <!-- Left Sidebar / Main Content -->
         <div class="yt-main">
             <!-- Player -->
-            <div class="yt-player-container" id="yt-player-placeholder" data-yt-id="<?= esc($video->youtube_id) ?>" data-vid-id="<?= $video->id_konten_video ?>" data-uuid="<?= esc($video->uuid_konten_video) ?>">
+            <div class="yt-player-container" id="yt-player-placeholder" data-yt-id="<?= esc($video->youtube_id) ?>" data-vid-id="<?= $video->id_konten_video ?>" data-uuid="<?= esc($video->uuid_konten_video) ?>" data-judul="<?= esc($video->judul_video) ?>" data-deskripsi="<?= esc(mb_substr($video->deskripsi_video ?? '', 0, 80)) ?>">
             </div>
 
             <!-- Title -->

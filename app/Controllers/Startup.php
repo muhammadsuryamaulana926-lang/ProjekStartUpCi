@@ -69,10 +69,19 @@ class Startup extends BaseController
     // ── Public Methods ────────────────────────────────────────────
     public function index()
     {
+        $role = session()->get('user_role');
+        // Permission flags untuk tampilan tombol aksi
+        $status_tambah = in_array($role, ['admin', 'superadmin']) ? 1 : 0;
+        $status_ubah   = in_array($role, ['admin', 'superadmin', 'pemilik_startup']) ? 1 : 0;
+        $status_hapus  = in_array($role, ['admin', 'superadmin']) ? 1 : 0;
+
         return view('layout/header')
             . view('layout/topbar')
             . view('startup/v_data_startup', [
-                'startups' => $this->m_startup->semua_startup()->getResult(),
+                'startups'       => $this->m_startup->semua_startup()->getResult(),
+                'status_tambah'  => $status_tambah,
+                'status_ubah'    => $status_ubah,
+                'status_hapus'   => $status_hapus,
             ])
             . view('layout/footer');
     }

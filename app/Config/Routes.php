@@ -166,6 +166,11 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('/keep-alive',                                'Login::keepAlive');
     $routes->post('/notifikasi/tandai_dibaca',               'Startup::notif_tandai_dibaca');
     $routes->post('/notifikasi/tandai_semua',                'Startup::notif_tandai_semua');
+
+    // Inkubasi Bisnis
+    $routes->get('/inkubasi_bisnis/program_kewirausahaan', 'Inkubasi_bisnis::program_kewirausahaan');
+    $routes->get('/inkubasi_bisnis/tambah_program',        'Inkubasi_bisnis::tambah_program');
+    $routes->get('/inkubasi_bisnis/edit_program/(:num)',   'Inkubasi_bisnis::edit_program/$1');
     $routes->get('/log_aktivitas',                           'Startup::log_aktivitas');
     $routes->get('/aktivitas_login',                         'Startup::aktivitas_login');
 

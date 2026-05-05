@@ -315,6 +315,18 @@ function initDependenciesDashboard() {
 // Lindungi dari duplikasi listener
 
 function initDashboard() {
+    // CountUp animation untuk stat cards
+    document.querySelectorAll('.stat-value').forEach(function(el) {
+        var target = parseInt(el.textContent) || 0;
+        var start = 0, duration = 1000, step = 16;
+        var increment = target / (duration / step);
+        el.textContent = '0';
+        var timer = setInterval(function() {
+            start += increment;
+            if (start >= target) { el.textContent = target; clearInterval(timer); }
+            else { el.textContent = Math.floor(start); }
+        }, step);
+    });
     // 1. CHART INITIALIZATION (Memori Leak Fix)
     // Gunakan window.* agar bisa diakses dan dihancurkan sebelum dirender ulang
     window.chartTahun = window.chartTahun || null;
@@ -346,7 +358,7 @@ function initDashboard() {
                     window.chartTahun = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: labels, datasets: [{ label: 'Startup', data: values, backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6, borderSkipped: false }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                        options: { animation: { duration: 800, easing: 'easeOutQuart' }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
                     });
                 }
             }, 50);
@@ -373,7 +385,7 @@ function initDashboard() {
                             'rgba(214,51,132,0.8)','rgba(32,201,151,0.8)','rgba(111,66,193,0.8)',
                             'rgba(20,108,67,0.8)','rgba(253,126,20,0.8)','rgba(108,117,125,0.8)'
                         ], borderWidth: 2, borderColor: '#fff' }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }, cutout: '60%' }
+                        options: { animation: { duration: 900, easing: 'easeOutQuart' }, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }, cutout: '60%' }
                     });
                 }
             }, 50);
@@ -395,6 +407,7 @@ function initDashboard() {
                         type: 'bar',
                         data: { labels: labels, datasets: [{ label: 'Ditonton', data: values, backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 6, borderSkipped: false }] },
                         options: {
+                            animation: { duration: 800, easing: 'easeOutQuart' },
                             indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
@@ -437,7 +450,7 @@ function initDashboard() {
                     window.chartTrenPenonton = new Chart(ctx, {
                         type: 'line',
                         data: { labels: labels, datasets: [{ label: 'Penonton', data: values, borderColor: 'rgba(13,110,253,0.9)', backgroundColor: 'rgba(13,110,253,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(13,110,253,0.9)', fill: true, tension: 0.4 }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                        options: { animation: { duration: 800, easing: 'easeOutQuart' }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
                     });
                 }
             }, 50);
@@ -459,6 +472,7 @@ function initDashboard() {
                         type: 'bar',
                         data: { labels: labels, datasets: [{ label: 'Dibaca', data: values, backgroundColor: 'rgba(139,115,85,0.7)', borderRadius: 6, borderSkipped: false }] },
                         options: {
+                            animation: { duration: 800, easing: 'easeOutQuart' },
                             indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
                             scales: {
@@ -501,7 +515,7 @@ function initDashboard() {
                     window.chartTrenPembacaEbook = new Chart(ctx, {
                         type: 'line',
                         data: { labels: labels, datasets: [{ label: 'Pembaca', data: values, borderColor: 'rgba(139,115,85,0.9)', backgroundColor: 'rgba(139,115,85,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(139,115,85,0.9)', fill: true, tension: 0.4 }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                        options: { animation: { duration: 800, easing: 'easeOutQuart' }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
                     });
                 }
             }, 50);

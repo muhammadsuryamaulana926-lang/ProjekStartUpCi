@@ -1,79 +1,215 @@
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-11">
+<!-- ============================================================== -->
+<!-- Start Page Content here -->
+<!-- ============================================================== -->
 
-            <?php $msg = session()->getFlashdata('msg'); if ($msg): ?>
-            <div class="alert alert-<?= $msg[0] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show mb-4" role="alert">
-                <?= $msg[1] ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <?php endif; ?>
+<style>
+    .select2-container--open {
+        z-index: 9999999; 
+    }
+</style>
 
-            <div class="card border">
-                <div class="card-header bg-white d-flex align-items-center justify-content-between py-3">
-                    <h5 class="mb-0 fw-bold"><i class="mdi mdi-rocket-launch-outline me-2 text-primary"></i>Daftar Startup</h5>
-                    <a href="<?= base_url('v_tambah_startup') ?>" class="btn btn-primary btn-sm">
-                        <i class="mdi mdi-plus"></i> Tambah Startup
-                    </a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="tabel_startup" class="table table-hover table-bordered mb-0 align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-center" style="width:50px;">No</th>
-                                    <th>Nama Perusahaan</th>
-                                    <th>Email</th>
-                                    <th>No WhatsApp</th>
-                                    <th class="text-center">Tahun Daftar</th>
-                                    <th class="text-center">Status Startup</th>
-                                    <th class="text-center">Status Ajuan</th>
-                                    <th class="text-center" style="width:130px;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($startups)): $no = 1; foreach ($startups as $row): ?>
-                                <tr>
-                                    <td class="text-center"><?= $no++ ?></td>
-                                    <td><span style="text-transform:capitalize;"><?= esc($row->nama_perusahaan) ?></span></td>
-                                    <td class="text-muted small"><?= esc($row->email_perusahaan) ?></td>
-                                    <td class="text-muted small"><?= esc($row->nomor_whatsapp) ?></td>
-                                    <td class="text-center"><?= esc($row->tahun_daftar) ?></td>
-                                    <td class="text-center"><span class="badge bg-primary"><?= esc($row->status_startup) ?></span></td>
-                                    <td class="text-center">
-                                        <?php
-                                        $ajuan_badge = match($row->status_ajuan) {
-                                            'Verified' => 'bg-success',
-                                            'Rejected' => 'bg-danger',
-                                            default    => 'bg-warning text-dark',
-                                        };
-                                        ?>
-                                        <span class="badge <?= $ajuan_badge ?>"><?= esc($row->status_ajuan) ?></span>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="<?= base_url('v_detail/' . $row->uuid_startup) ?>" class="btn btn-sm btn-info text-white" title="Detail">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                        <button onclick="proses_edit(<?= $row->id_startup ?>)" class="btn btn-sm btn-warning text-white" title="Edit">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button onclick="proses_hapus(<?= $row->id_startup ?>, '<?= esc($row->nama_perusahaan) ?>')" class="btn btn-sm btn-danger" title="Hapus">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php endforeach; else: ?>
-                                <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data startup</td></tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+<div class="content-page">
+    <div class="content">
+
+        <!-- Start Content-->
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box">
+                        <h4 class="page-title">Startup</h4>
                     </div>
                 </div>
             </div>
 
-        </div>
-    </div>
-</div>
+            <?php if (session()->getFlashdata('msg') !== NULL) { ?>
+                <div class="alert <?php if (session()->getFlashdata('msg')[0] == "success") {
+                    echo "alert-success";
+                } else {
+                    echo "alert-danger";
+                } ?> alert-dismissible fade show" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <?php echo session()->getFlashdata('msg')[1]; ?>
+                </div>
+            <?php } ?> 
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title mb-3">Daftar Startup</h4>
+                            <?php if (!empty($status_tambah) && $status_tambah == 1) { ?>
+                                <div class="text-md-end mt-2 mt-md-0 mb-2">
+                                    <a href="<?php echo base_url('v_tambah_startup'); ?>"
+                                        class="btn btn-md btn-primary waves-effect waves-light">
+                                        <i class="mdi mdi-plus"></i> Tambah
+                                    </a>
+                                </div>
+                            <?php } ?>
+                            <div id="tabel">
+                                <div class="table-responsive">
+                                    <table id="datatable" class="table table-bordered">
+                                        <thead> 
+                                            <tr>
+                                                <th class="text-center" style="min-width: 10px;">No</th>
+                                                <th class="text-center" style="min-width: 150px;">Startup</th>
+                                                <th class="text-center" style="min-width: 150px;">Klaster</th>
+                                                <th class="text-center" style="min-width: 125px;">Email</th>
+                                                <th class="text-center" style="min-width: 120px;">Nomor WhatsApp</th>
+                                                <th class="text-center" style="min-width: 70px;">Tahun Daftar</th>
+                                                <th class="text-center" style="min-width: 70px;">Status Startup</th>
+                                                <th class="text-center" style="min-width: 70px;">Status Ajuan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody> 
+                                            <?php $no = 1;
+                                                if (!empty($startups)) { foreach ($startups as $row) { ?>
+                                                <tr>
+                                                    <td style="text-align: center;">
+                                                        <?php echo $no; ?>.
+                                                    </td>
+                                                    <td>
+                                                        <b> <?php echo esc($row->nama_perusahaan); ?> </b> <br>
+                                                        <?php if ((!empty($status_ubah) && $status_ubah == 1) || (!empty($status_hapus) && $status_hapus == 1)) { ?>
+                                                            <?php if (isset($row->status_ajuan) && $row->status_ajuan == "draf") { ?>
+                                                                <div class="btn-group">
+                                                                    <button type="button" 
+                                                                        class="btn btn-primary btn-sm dropdown-toggle align-items-center"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">Pilih <i
+                                                                            class="mdi mdi-chevron-down"></i></button>
+                                                                    <div class="dropdown-menu">
+                                                                        <a type="submit" class="dropdown-item"
+                                                                                onclick="konfirmasi_pengajuan(<?php echo $row->id_startup; ?>, <?php echo $_SESSION['id_pengguna'] ?? 0; ?>)"><i
+                                                                                    class="mdi mdi-file-document"></i> Ajukan Permohonan</a>
+                                                                        <a class="dropdown-item" href="<?php echo base_url('v_detail/' . ($row->uuid_startup ?? $row->kode_url ?? '')); ?>"><i
+                                                                                    class="mdi mdi-eye"></i> Detail</a>
+                                                                        <?php if (!empty($status_ubah) && $status_ubah == 1) { ?>
+                                                                            <a class="dropdown-item" onclick="proses_edit(<?php echo $row->id_startup; ?>)"><i
+                                                                                    class="mdi mdi-pencil"></i> Ubah</a>
+                                                                        <?php } ?>
+                                                                        <?php 
+                                                                            if (!empty($status_hapus) && $status_hapus == 1) { 
+                                                                        ?>
+                                                                            <a type="submit" class="dropdown-item"
+                                                                                onclick="konfirmasi_hapus(<?php echo $row->id_startup; ?>)"><i
+                                                                                    class="mdi mdi-trash-can-outline"></i> Hapus</a>
+                                                                        <?php }?>
+                                                                    </div>
+                                                                </div>
+                                                            <?php }else{ ?>
+                                                                <div class="btn-group">
+                                                                    <button type="button" 
+                                                                        class="btn btn-primary btn-sm dropdown-toggle align-items-center"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">Pilih <i
+                                                                            class="mdi mdi-chevron-down"></i></button>
+                                                                    <div class="dropdown-menu">
+                                                                        <a class="dropdown-item" href="<?php echo base_url('v_detail/' . ($row->uuid_startup ?? $row->kode_url ?? '')); ?>"><i
+                                                                                    class="mdi mdi-eye"></i> Detail</a>
+                                                                        <?php if (!empty($status_ubah) && $status_ubah == 1) { ?>
+                                                                            <a class="dropdown-item" onclick="proses_edit(<?php echo $row->id_startup; ?>)"><i
+                                                                                    class="mdi mdi-pencil"></i> Ubah</a>
+                                                                        <?php } ?>
+                                                                    </div>
+                                                                </div>
+                                                        <?php } } ?>                                                        
+                                                    </td>
+                                                    <td>
+                                                        <?php
+                                                        $klaster_val = $row->klaster ?? '';
+                                                        if (!empty($klaster_val) && str_contains($klaster_val, ',')) {
+                                                            $pisah_klaster = explode(',', $klaster_val);
+                                                            foreach ($pisah_klaster as $key => $klaster) {
+                                                                if ($key === array_key_last($pisah_klaster)) {
+                                                                    echo esc(trim($klaster)) . '<br>';
+                                                                } else {
+                                                                    echo esc(trim($klaster)) . ',<br>';
+                                                                }
+                                                            }
+                                                        } else {
+                                                            echo esc($klaster_val ?: '-');
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                    <td><?php echo esc($row->email_perusahaan ?? ''); ?></td>
+                                                    <td><?php echo esc($row->nomor_whatsapp ?? $row->no_whatsapp ?? ''); ?></td>
+                                                    <td style="text-align: center;">
+                                                        <?php echo esc($row->tahun_daftar ?? ''); ?>
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        <?php if (($row->status_startup ?? '') == "aktif") { ?>
+                                                            <span class="badge bg-success">Aktif</span>
+                                                        <?php } else { ?>
+                                                            <span class="badge bg-danger">Tidak Aktif</span>
+                                                        <?php } ?>
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        <?php if (($row->status_ajuan ?? '') == "draf") { ?>
+                                                            <span class="badge bg-dark">Draf</span>
+                                                        <?php } else if (($row->status_ajuan ?? '') == "ajuan") { ?>
+                                                            <span class="badge bg-info">Ajuan</span>
+                                                        <?php } else if (($row->status_ajuan ?? '') == "verifikasi") { ?>
+                                                            <span class="badge bg-success">Verifikasi</span>
+                                                        <?php } else if (($row->status_ajuan ?? '') == "tolak") { ?>
+                                                            <span class="badge bg-danger">Ditolak</span>
+                                                        <?php } ?>
+                                                    </td>
+                                                </tr>
+                                                <?php $no++; } } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end row-->
+
+        </div> <!-- container -->
+
+    </div> <!-- content -->
+
+    <!-- Modal Pengajuan -->
+    <div class="modal fade" id="modal_pengajuan" aria-hidden="true" aria-labelledby="modal_konfirmasi" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Konfirmasi Pengajuan</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin akan mengajukan Startup ini?
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary submit" onclick="proses_pengajuan()"><i class="mdi mdi-check"></i> Ya</a>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Modal Hapus -->
+    <div class="modal fade" id="modal_konfirmasi" aria-hidden="true" aria-labelledby="modal_konfirmasi" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Konfirmasi</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin data ini akan dihapus?
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary submit" onclick="hapus()"><i class="mdi mdi-check"></i> Ya</a>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
+                            class="mdi mdi-close"></i> Batal</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+</div><!-- content-page -->
 
 <form id="post-edit-form" action="<?= base_url('v_edit_startup') ?>" method="post" style="display:none;">
     <?= csrf_field() ?>
@@ -81,57 +217,73 @@
     <input type="hidden" name="id_startup" id="post-id-startup">
 </form>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
 <script>
-    // Gunakan var untuk mencegah SyntaxError saat dirender ulang oleh Turbo
+    var temp_id_startup;
+    var temp_id_pengguna;
     var CSRF_NAME = '<?= csrf_token() ?>';
     var CSRF_HASH = '<?= csrf_hash() ?>';
 
-    function initDataStartup() {
-        // Hancurkan instance DataTables lama jika ada
-        $('#tabel_startup').DataTable({
-            pageLength: 10,
-            ordering: false,
-            destroy: true, // Penting untuk Turbo SPA
-            autoWidth: false,
-            dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
-            language: {
-                lengthMenu: 'Show _MENU_ entries',
-                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-                paginate: { previous: 'Previous', next: 'Next' }
-            }
-        });
-
-        <?php $msg = session()->getFlashdata('msg'); if ($msg): ?>
-        Swal.fire({
-            icon: '<?= $msg[0] ?>',
-            title: '<?= $msg[0] === 'success' ? 'Berhasil!' : 'Gagal!' ?>',
-            text: '<?= $msg[1] ?>',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true
-        });
-        <?php endif; ?>
-
-        var _sm = sessionStorage.getItem('swal_msg');
-        if (_sm) {
-            var _sd = JSON.parse(_sm);
-            sessionStorage.removeItem('swal_msg');
-            Swal.fire({ icon: _sd.icon, title: _sd.title, text: _sd.text, showConfirmButton: false, timer: 2000, timerProgressBar: true });
-        }
+    function konfirmasi_hapus(id_startup) {
+        temp_id_startup = id_startup;
+        $("#modal_konfirmasi").modal('show');
     }
 
-    // Eksekusi fungsi inisialisasi pada event Turbo dan DOM
-    document.addEventListener('DOMContentLoaded', initDataStartup);
+    function konfirmasi_pengajuan(id_startup, id_pengguna) {
+        temp_id_startup = id_startup;
+        temp_id_pengguna = id_pengguna;
+        $("#modal_pengajuan").modal('show');
+    }
+
+    function hapus() {
+        $(".submit").prop("disabled", true);
+        $(".submit").html('<i class="mdi mdi-spin mdi-loading"></i> Loading...');
+        $.ajax({
+            url: '<?php echo base_url('v_hapus_startup'); ?>',
+            type: 'post',
+            data: { id_startup: temp_id_startup, [CSRF_NAME]: CSRF_HASH },
+            success: function (msg) {
+                var data = typeof msg === 'string' ? jQuery.parseJSON(msg) : msg;
+                if (data.status) {
+                    $("#modal_konfirmasi").modal('hide');
+                    setTimeout(function () {
+                        window.location.href = "<?php echo base_url('v_data_startup') ?>";
+                    }, 1000);
+                } else {
+                    $("#modal_konfirmasi").modal('hide');
+                    setTimeout(function () {
+                        window.location.href = "<?php echo base_url('v_data_startup') ?>";
+                    }, 1000);
+                }
+            }
+        }); 
+    }
+
+    function proses_pengajuan() {
+        $(".submit").prop("disabled", true);
+        $(".submit").html('<i class="mdi mdi-spin mdi-loading"></i> Loading...');
+        $.ajax({
+            url: '<?php echo base_url('startup/proses_pengajuan_startup'); ?>',
+            type: 'post',
+            data: { id_startup: temp_id_startup, id_pengguna: temp_id_pengguna, [CSRF_NAME]: CSRF_HASH },
+            success: function (msg) {
+                var data = typeof msg === 'string' ? jQuery.parseJSON(msg) : msg;
+                if (data.status) {
+                    $("#modal_pengajuan").modal('hide');
+                    setTimeout(function () {
+                        window.location.href = "<?php echo base_url('v_data_startup') ?>";
+                    }, 1000);
+                } else {
+                    $("#modal_pengajuan").modal('hide');
+                    setTimeout(function () {
+                        window.location.href = "<?php echo base_url('v_data_startup') ?>";
+                    }, 1000);
+                }
+            }
+        });
+    }
 
     function proses_edit(id_startup) {
-        // Ambil CSRF token terbaru
         var csrf = getCsrfToken();
-        
-        // Update CSRF token di form
         document.getElementById('post-id-startup').value = id_startup;
         var csrfInput = document.getElementById('post-edit-csrf');
         csrfInput.name = csrf.name;
@@ -139,43 +291,23 @@
         document.getElementById('post-edit-form').submit();
     }
 
-    function proses_hapus(id_startup, nama) {
-        Swal.fire({
-            title: 'Hapus Startup?',
-            text: 'Anda akan menghapus data ' + nama + ' secara permanen.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?= base_url('v_hapus_startup') ?>",
-                    type: "POST",
-                    data: { id_startup: id_startup, [CSRF_NAME]: CSRF_HASH },
-                    success: function(res) {
-                        var data = typeof res === 'string' ? JSON.parse(res) : res;
-                        if (data.status) {
-                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Startup berhasil dihapus', showConfirmButton: false, timer: 1500 })
-                                .then(() => {
-                                    // Refresh tanpa memecah SPA Turbo
-                                    if (window.Turbo) {
-                                        window.location.href = window.location.href;
-                                    } else {
-                                        location.reload();
-                                    }
-                                });
-                        } else {
-                            Swal.fire('Gagal!', 'Terjadi kesalahan sistem', 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
-                    }
-                });
+    // Init DataTable
+    function initDataStartup() {
+        if ($.fn.DataTable && $.fn.DataTable.isDataTable('#datatable')) {
+            $('#datatable').DataTable().destroy();
+        }
+        $('#datatable').DataTable({
+            pageLength: 10,
+            ordering: false,
+            destroy: true,
+            autoWidth: false,
+            language: {
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                paginate: { previous: 'Previous', next: 'Next' }
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', initDataStartup);
 </script>
