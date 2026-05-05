@@ -33,7 +33,7 @@ if (session()->get('is_peserta_program') && $role !== 'pemilik_startup') $label 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="<?= base_url('img/logo-dkst.png') ?>">
+    <link rel="shortcut icon" href="<?= base_url('img/logo_itb.png') ?>">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -90,7 +90,7 @@ if (session()->get('is_peserta_program') && $role !== 'pemilik_startup') $label 
 
     /* ===== NAVBAR (Dark Top Bar) ===== */
     .navbar-custom {
-        background-color: var(--ct-bg-topbar-dark);
+        background-color: #005aab;
         padding: 0 12px;
         min-height: 70px;
         display: flex;
@@ -364,12 +364,15 @@ if (session()->get('is_peserta_program') && $role !== 'pemilik_startup') $label 
             <div class="container-fluid">
 
                 <!-- LOGO -->
-                <div class="logo-box">
+                <div class="logo-box" style="display:flex;align-items:center;gap:12px;">
                     <a href="<?= base_url('v_dashboard') ?>" class="logo logo-light text-center">
                         <span class="logo-lg">
-                            <img src="<?= base_url('img/logo-dkst.png') ?>" alt="SIMIK" height="30">
+                            <img src="<?= base_url('img/logo-simik.png') ?>" alt="SIMIK" height="30">
                         </span>
                     </a>
+                    <span class="badge bg-primary d-none d-lg-inline-block" style="font-size:0.72rem;padding:4px 10px;">
+                        <?= esc($label) ?>
+                    </span>
                 </div>
 
                 <!-- Left items -->
@@ -379,15 +382,10 @@ if (session()->get('is_peserta_program') && $role !== 'pemilik_startup') $label 
                             <i class="mdi mdi-menu"></i>
                         </button>
                     </li>
-                    <li class="d-none d-lg-block peran-label">
-                        <div class="form-control" style="min-width:120px;">
-                            <?= esc($label) ?>
-                        </div>
-                    </li>
                 </ul>
 
                 <!-- Right items -->
-                <ul class="list-unstyled topnav-menu float-end mb-0">
+                <ul class="list-unstyled topnav-menu mb-0 ms-auto">
                     <!-- Fullscreen -->
                     <li class="d-none d-lg-inline-block">
                         <a class="nav-link waves-effect waves-light" data-toggle="fullscreen" href="#" style="line-height:70px;padding:0 15px;">
@@ -438,21 +436,26 @@ if (session()->get('is_peserta_program') && $role !== 'pemilik_startup') $label 
 
                     <!-- User Profile -->
                     <li class="dropdown notification-list topbar-dropdown">
-                        <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="line-height:70px;padding:0 15px;">
-                            <img src="<?= base_url('img/logo-dkst.png') ?>" alt="user" class="rounded-circle" style="width:32px;height:32px;">
-                            <span class="pro-user-name ms-1">
-                                <?= esc(session()->get('user_email') ?? 'admin@simik.id') ?> <i class="mdi mdi-chevron-down"></i>
+                        <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="line-height:70px; padding:0 15px; display:flex; align-items:center; gap:8px;">
+                            <img src="<?= base_url('img/logo_itb.png') ?>" alt="user" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;flex-shrink:0;">
+                            <span style="display:flex;flex-direction:column;line-height:1.3;max-width:160px;">
+                                <span style="color:rgba(255,255,255,0.9);font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    <?= esc(session()->get('user_name') ?? 'Admin') ?>
+                                </span>
+                                <span style="color:rgba(255,255,255,0.55);font-size:0.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    <?= esc(session()->get('user_email') ?? '') ?>
+                                </span>
                             </span>
+                            <i class="mdi mdi-chevron-down" style="color:rgba(255,255,255,0.6);flex-shrink:0;"></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end profile-dropdown">
-                            <div class="dropdown-item text-center p-2 border-bottom">
-                                <strong><?= esc(session()->get('user_name') ?? 'Admin') ?></strong><br>
-                                <small class="text-muted"><?= esc($label) ?></small>
+                        <div class="dropdown-menu dropdown-menu-end profile-dropdown" style="min-width:200px;">
+                            <div class="px-3 py-2 border-bottom">
+                                <div style="font-weight:600;font-size:0.82rem;color:#343a40;"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
+                                <div style="font-size:0.75rem;color:#98a6ad;"><?= esc(session()->get('user_email') ?? '') ?></div>
+                                <div style="font-size:0.72rem;margin-top:2px;"><span class="badge bg-primary"><?= esc($label) ?></span></div>
                             </div>
-                            <div class="dropdown-divider"></div>
                             <a href="<?= base_url('logout') ?>" class="dropdown-item notify-item">
-                                <i class="mdi mdi-logout me-1"></i>
-                                <span>Logout</span>
+                                <i class="mdi mdi-logout me-1"></i> Logout
                             </a>
                         </div>
                     </li>

@@ -6,7 +6,7 @@
        ============================================ */
 
     /* Memaksa background dashboard menjadi putih seragam */
-    body, #content-wrapper, #content, .container-fluid, .app-content, .app-main, .app-wrapper {
+    .content-page, .content-page .container-fluid, .app-content, .app-main, .app-wrapper {
         background-color: #ffffff !important;
     }
 
@@ -15,7 +15,8 @@
        ============================ */
    
     .app-content {
-        overflow: visible !important; /* Biar buku bisa keluar dari container */
+        overflow: visible !important;
+        padding: 24px 24px 60px;
     }
     
     .library-header h2 {
@@ -664,7 +665,7 @@
         box-shadow: 4px 4px 12px rgba(0,0,0,0.06), 1px 1px 3px rgba(0,0,0,0.05);
     }
     .book-add-btn:hover {
-        border-color: #8B7355;
+        border-color: #005aab;
         background: rgba(255,255,255,0.85);
         transform: translateY(-6px);
         box-shadow: 4px 10px 20px rgba(0,0,0,0.1);
@@ -672,14 +673,14 @@
     .book-add-btn svg {
         width: 28px;
         height: 28px;
-        color: #C4B8A8;
+        color: #adb5bd;
         transition: color 0.3s;
     }
-    .book-add-btn:hover svg { color: #8B7355; }
+    .book-add-btn:hover svg { color: #005aab; }
     .book-add-btn span {
         font-size: 11px;
-        font-weight: 700;
-        color: #C4B8A8;
+        font-weight: 600;
+        color: #adb5bd;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         text-align: center;
@@ -687,7 +688,7 @@
         line-height: 1.5;
         transition: color 0.3s;
     }
-    .book-add-btn:hover span { color: #8B7355; }
+    .book-add-btn:hover span { color: #005aab; }
 
     /* Modal PDF Viewer */
     #modalPdf { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.95); backdrop-filter: blur(12px); align-items:center; justify-content:center; }
@@ -733,6 +734,7 @@
     .library-stats {
         display: flex;
         gap: 24px;
+        margin-top: 24px;
         margin-bottom: 28px;
     }
     .library-stat {
@@ -778,20 +780,20 @@
         align-items: center;
         gap: 8px;
         padding: 10px 24px;
-        background: #8B7355;
+        background: #005aab;
         color: #fff;
         border: none;
-        border-radius: 14px;
+        border-radius: 6px;
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
-        box-shadow: 0 4px 12px rgba(139,115,85,0.25);
+        box-shadow: none;
     }
     .btn-add-video:hover {
-        background: #6B5B45;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(139,115,85,0.35);
+        background: #004a8f;
+        transform: none;
+        box-shadow: none;
     }
     .btn-add-video svg { width: 18px; height: 18px; }
 
@@ -1158,44 +1160,44 @@
     }
     .filter-chip-label {
         font-size: 12px;
-        font-weight: 700;
-        color: #9C8E7A;
+        font-weight: 600;
+        color: #6c757d;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-right: 4px;
         flex-shrink: 0;
     }
     .filter-chip {
-        padding: 6px 16px;
-        border-radius: 20px;
-        border: 1.5px solid #E8DFD0;
+        padding: 5px 14px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
         background: #fff;
-        color: #6B5B45;
+        color: #6c757d;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.15s;
         white-space: nowrap;
     }
     .filter-chip:hover:not(.active) {
-        border-color: #C4B8A8;
-        background: #FAFAF9;
-        color: #3D3426;
+        border-color: #005aab;
+        color: #005aab;
+        background: #f0f6ff;
     }
     .filter-chip.active {
-        background: #3D3426;
-        border-color: #3D3426;
+        background: #005aab;
+        border-color: #005aab;
         color: #fff;
     }
     .filter-chip.active:hover {
-        background: #3D3426;
-        border-color: #3D3426;
+        background: #004a8f;
+        border-color: #004a8f;
         color: #fff;
     }
     .filter-chip-divider {
         width: 1px;
         height: 20px;
-        background: #E8DFD0;
+        background: #dee2e6;
         margin: 0 4px;
         flex-shrink: 0;
     }
@@ -1214,74 +1216,28 @@
     <?php endif; ?>
     <?php if (!$isVideoPage): ?>
 
-    <?php if (session()->get('user_role') === 'admin'): ?>
-    <?php endif; ?>
-
-    <!-- Stats -->
-    <?php if (session()->get('user_role') === 'admin'): ?>
-        <div class="library-stats">
-            <div class="library-stat">
-                <div class="library-stat-icon" style="background: #F0EBE0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#8B7355">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="library-stat-value"><?= count($ebooks ?? []) ?></div>
-                    <div class="library-stat-label">Total Ebook</div>
-                </div>
-            </div>
-            <div class="library-stat">
-                <div class="library-stat-icon" style="background: #E8F5E9;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#4CAF50">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="library-stat-value"><?= count(array_filter($ebooks ?? [], fn($e) => strtolower($e->status_ebook) === 'publik')) ?></div>
-                    <div class="library-stat-label">Publik</div>
-                </div>
-            </div>
-            <div class="library-stat">
-                <div class="library-stat-icon" style="background: #FFF3E0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#FF9800">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="library-stat-value"><?= count(array_filter($ebooks ?? [], fn($e) => strtolower($e->status_ebook) === 'privat')) ?></div>
-                    <div class="library-stat-label">Privat</div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <!-- Search Bar -->
-    <div class="library-search">
-        <div class="library-search-input" style="border-left: none; padding-left: 0;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input type="text" id="searchEbook" placeholder="Cari ebook di perpustakaan..." oninput="searchBooks(this.value)">
-        </div>
-    </div>
-
     <!-- Filter Chip Ebook -->
-    <div class="filter-chip-bar" id="filterChipEbook">
-        <span class="filter-chip-label">Filter</span>
-        <button class="filter-chip active" onclick="filterEbook('kategori', '', this)">Semua</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Teknologi', this)">Teknologi</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Marketing', this)">Marketing</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Keuangan', this)">Keuangan</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Manajemen', this)">Manajemen</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
-        <button class="filter-chip" onclick="filterEbook('kategori', 'Motivasi', this)">Motivasi</button>
-        <div class="filter-chip-divider"></div>
-        <button class="filter-chip" onclick="filterEbook('status', 'publik', this)">Publik</button>
-        <button class="filter-chip" onclick="filterEbook('status', 'privat', this)">Privat</button>
+    <div class="filter-chip-bar" id="filterChipEbook" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+            <span class="filter-chip-label">Filter</span>
+            <button class="filter-chip active" onclick="filterEbook('kategori', '', this)">Semua</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Teknologi', this)">Teknologi</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Marketing', this)">Marketing</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Keuangan', this)">Keuangan</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Manajemen', this)">Manajemen</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
+            <button class="filter-chip" onclick="filterEbook('kategori', 'Motivasi', this)">Motivasi</button>
+            <div class="filter-chip-divider"></div>
+            <button class="filter-chip" onclick="filterEbook('status', 'publik', this)">Publik</button>
+            <button class="filter-chip" onclick="filterEbook('status', 'privat', this)">Privat</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            <i class="mdi mdi-magnify" style="color:#adb5bd;font-size:18px;"></i>
+            <input type="text" id="searchEbook" placeholder="Cari ebook..." oninput="searchBooks(this.value)"
+                style="border:1px solid #dee2e6;border-radius:4px;padding:7px 12px;font-size:13px;outline:none;width:220px;">
+        </div>
     </div>
 
     <?php if (empty($ebooks)): ?>
@@ -1375,33 +1331,29 @@
 
     <?php if ($isVideoPage): ?>
         <div class="perpus-section" id="sectionVideo">
-            <!-- Search Bar -->
-            <div class="cinema-search" style="margin-top: 10px; margin-bottom: 8px;">
-                <div class="cinema-search-input" style="border-left: none; padding-left: 0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B8A990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <input type="text" id="searchVideo" placeholder="Cari video pembelajaran..." oninput="searchVideos(this.value)">
+            <!-- Filter Chip Video + Search -->
+            <div class="filter-chip-bar" id="filterChipVideo" style="justify-content:space-between; margin-top:10px;">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <span class="filter-chip-label">Filter</span>
+                    <button class="filter-chip active" onclick="filterVideo('kategori', '', this)">Semua</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Teknologi', this)">Teknologi</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Marketing', this)">Marketing</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Keuangan', this)">Keuangan</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Manajemen', this)">Manajemen</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Motivasi', this)">Motivasi</button>
+                    <button class="filter-chip" onclick="filterVideo('kategori', 'Podcast', this)">Podcast</button>
+                    <div class="filter-chip-divider"></div>
+                    <button class="filter-chip" onclick="filterVideo('status', 'publik', this)">Publik</button>
+                    <button class="filter-chip" onclick="filterVideo('status', 'privat', this)">Privat</button>
                 </div>
-            </div>
-
-            <!-- Filter Chip Video -->
-            <div class="filter-chip-bar" id="filterChipVideo">
-                <span class="filter-chip-label">Filter</span>
-                <button class="filter-chip active" onclick="filterVideo('kategori', '', this)">Semua</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Teknologi', this)">Teknologi</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Marketing', this)">Marketing</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Keuangan', this)">Keuangan</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Manajemen', this)">Manajemen</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Motivasi', this)">Motivasi</button>
-                <button class="filter-chip" onclick="filterVideo('kategori', 'Podcast', this)">Podcast</button>
-                <div class="filter-chip-divider"></div>
-                <button class="filter-chip" onclick="filterVideo('status', 'publik', this)">Publik</button>
-                <button class="filter-chip" onclick="filterVideo('status', 'privat', this)">Privat</button>
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                    <i class="mdi mdi-magnify" style="color:#adb5bd;font-size:18px;"></i>
+                    <input type="text" id="searchVideo" placeholder="Cari video..." oninput="searchVideos(this.value)"
+                        style="border:1px solid #dee2e6;border-radius:4px;padding:7px 12px;font-size:13px;outline:none;width:220px;">
+                </div>
             </div>
 
             <div class="d-flex justify-content-end" style="padding: 10px 0; margin-bottom: 24px;">

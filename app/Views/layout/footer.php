@@ -363,18 +363,18 @@ function tandaiSemuaDibaca() {
 
 <!-- Session Timeout Modal -->
 <div class="modal fade" id="sessionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center" style="border-radius:4px;">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius:4px;">
             <div class="modal-header">
                 <h5 class="modal-title">Konfirmasi</h5>
-                <div id="sessionCountdown" class="text-danger fw-bold"></div>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-center">
+                <div id="sessionCountdown" class="text-danger fw-bold mb-2" style="font-size:1.1rem;"></div>
                 Apakah Anda masih ingin berada di laman ini?
             </div>
-            <div class="modal-footer">
-                <a href="javascript:keepAlive()" class="btn btn-primary"><i class="mdi mdi-check"></i> Ya</a>
-                <a href="<?= base_url('logout') ?>" class="btn btn-secondary"><i class="mdi mdi-logout"></i> Logout</a>
+            <div class="modal-footer justify-content-center">
+                <a href="javascript:keepAlive()" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-check"></i> Ya</a>
+                <a href="<?= base_url('logout') ?>" class="btn btn-secondary waves-effect waves-light"><i class="mdi mdi-logout"></i> Logout</a>
             </div>
         </div>
     </div>

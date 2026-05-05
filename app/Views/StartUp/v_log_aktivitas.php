@@ -9,7 +9,7 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered mb-0 align-middle">
-                            <thead class="table-light">
+                            <thead class="table-secondary">
                                 <tr>
                                     <th class="text-center" style="width:50px;">No</th>
                                     <th>Nama User</th>

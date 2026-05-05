@@ -49,7 +49,7 @@
                             <div id="tabel">
                                 <div class="table-responsive">
                                     <table id="datatable" class="table table-bordered">
-                                        <thead> 
+                                        <thead class="table-secondary"> 
                                             <tr>
                                                 <th class="text-center" style="min-width: 10px;">No</th>
                                                 <th class="text-center" style="min-width: 150px;">Startup</th>

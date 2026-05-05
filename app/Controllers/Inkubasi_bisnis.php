@@ -27,4 +27,27 @@ class Inkubasi_bisnis extends BaseController
             . view('inkubasi/v_edit_program')
             . view('layout/footer');
     }
+
+    public function detail_peserta($id = null)
+    {
+        return view('layout/header', ['title' => 'Detail Peserta'])
+            . view('layout/topbar')
+            . view('inkubasi/v_detail_peserta')
+            . view('layout/footer');
+    }
+
+    public function detail_pendaftar($id = null)
+    {
+        return view('layout/header', ['title' => 'Detail Pendaftar'])
+            . view('layout/topbar')
+            . view('inkubasi/v_detail_pendaftar')
+            . view('layout/footer');
+    }
+    public function detail_startup($id = null)
+    {
+        return view('layout/header', ['title' => 'Detail Startup'])
+            . view('layout/topbar')
+            . view('inkubasi/v_detail_startup')
+            . view('layout/footer');
+    }
 }

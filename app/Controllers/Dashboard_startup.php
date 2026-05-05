@@ -58,10 +58,12 @@ class Dashboard_startup extends BaseController
         }
 
         $db = db_connect();
-        $data['total_startup'] = $this->m_startup->hitung_semua_startup();
-        $data['total_program']  = $db->table('program_startup')->countAllResults();
-        $data['total_buku']     = $db->table('konten_ebook')->countAllResults();
-        $data['total_video']    = $db->table('konten_video')->countAllResults();
+        $data['total_startup']     = $this->m_startup->hitung_semua_startup();
+        $data['total_program']     = $db->table('program_startup')->countAllResults();
+        $data['total_buku']        = $db->table('konten_ebook')->countAllResults();
+        $data['total_buku_publik'] = $db->table('konten_ebook')->where('status_ebook', 'Publik')->countAllResults();
+        $data['total_buku_privat'] = $db->table('konten_ebook')->where('status_ebook', 'Privat')->countAllResults();
+        $data['total_video']       = $db->table('konten_video')->countAllResults();
         return view('layout/header')
             . view('layout/topbar')
             . view('startup/v_dashboard', $data)

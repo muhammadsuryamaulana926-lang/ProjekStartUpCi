@@ -235,7 +235,7 @@ body {
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered mb-0 align-middle">
-                        <thead class="table-light">
+                        <thead class="table-secondary">
                             <tr>
                                 <th width="5%">No</th>
                                 <th>Nama Peserta</th>

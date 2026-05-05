@@ -668,7 +668,7 @@ setInterval(update_countdown, 1000);
                             <?php endif; ?>
                         </div>
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead class="table-secondary">
                                 <tr>
                                     <th width="5%" class="text-center">
                                         <?php if (!empty($belum_presensi)): ?>

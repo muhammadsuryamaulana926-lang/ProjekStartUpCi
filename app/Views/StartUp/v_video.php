@@ -1,28 +1,27 @@
 <?php /* View: Section Video — Galeri Video Pembelajaran */ ?>
 
 <!-- Filter Chip Video -->
-<div class="filter-chip-bar" id="filterChipVideo">
-    <span class="filter-chip-label">Filter</span>
-    <button class="filter-chip active" onclick="filterVideo('kategori', '', this)">Semua</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Teknologi', this)">Teknologi</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Marketing', this)">Marketing</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Keuangan', this)">Keuangan</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Manajemen', this)">Manajemen</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Motivasi', this)">Motivasi</button>
-    <button class="filter-chip" onclick="filterVideo('kategori', 'Podcast', this)">Podcast</button>
-    <div class="filter-chip-divider"></div>
-    <button class="filter-chip" onclick="filterVideo('status', 'publik', this)">Publik</button>
-    <button class="filter-chip" onclick="filterVideo('status', 'privat', this)">Privat</button>
-</div>
-
-<!-- Search Bar -->
-<div class="cinema-search" style="margin-bottom: 8px;">
-    <div class="cinema-search-input" style="border-left: none; padding-left: 0;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B8A990" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" id="searchVideo" placeholder="Cari video pembelajaran..." oninput="searchVideos(this.value)">
+<div class="filter-chip-bar" id="filterChipVideo" style="justify-content:space-between;">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span class="filter-chip-label">Filter</span>
+        <button class="filter-chip active" onclick="filterVideo('kategori', '', this)">Semua</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Bisnis & Startup', this)">Bisnis &amp; Startup</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Teknologi', this)">Teknologi</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Marketing', this)">Marketing</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Keuangan', this)">Keuangan</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Manajemen', this)">Manajemen</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Hukum & Legalitas', this)">Hukum &amp; Legalitas</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Desain & Produk', this)">Desain &amp; Produk</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Motivasi', this)">Motivasi</button>
+        <button class="filter-chip" onclick="filterVideo('kategori', 'Podcast', this)">Podcast</button>
+        <div class="filter-chip-divider"></div>
+        <button class="filter-chip" onclick="filterVideo('status', 'publik', this)">Publik</button>
+        <button class="filter-chip" onclick="filterVideo('status', 'privat', this)">Privat</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <i class="mdi mdi-magnify" style="color:#adb5bd;font-size:18px;"></i>
+        <input type="text" id="searchVideo" placeholder="Cari video..." oninput="searchVideos(this.value)"
+            style="border:1px solid #dee2e6;border-radius:4px;padding:7px 12px;font-size:13px;outline:none;width:220px;">
     </div>
 </div>
 

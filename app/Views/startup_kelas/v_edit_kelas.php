@@ -1,37 +1,42 @@
 <style>
-body { background-color: #f5f5f5 !important; }
-.paper-wrapper { max-width: 860px; margin: 40px auto; }
-.paper-form { background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; border-radius: 8px; padding: 40px; }
-.paper-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-.form-label { font-weight: 600; color: #555; margin-bottom: 8px; }
-.form-control, .form-select { border-radius: 6px; border: 1px solid #cbd5e1; padding: 10px 15px; transition: all 0.3s; }
-.form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-.btn-modern { padding: 10px 24px; border-radius: 6px; font-weight: 600; transition: all 0.3s; }
-.btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.kelas-subtitle { font-size: 14px; color: #64748b; margin-bottom: 20px; }
 .sesi-row { background: #f8fafc; }
 .chapter-row { background: #fff; }
 </style>
 
-<div class="container-fluid" style="background-color:#f5f5f5; padding-bottom:50px;">
-    <div class="paper-wrapper">
-        <div class="paper-form">
-            <h2 class="paper-title">Edit Jadwal Kelas</h2>
-            <div class="kelas-subtitle">Program: <strong><?= esc($program['nama_program']) ?></strong></div>
+<!-- ============================================================== -->
+<!-- Start Page Content here -->
+<!-- ============================================================== -->
+<div class="content-page">
+    <div class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box">
+                        <h4 class="page-title">Kelas</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title mb-1">Edit Jadwal Kelas</h4>
+                            <p class="text-muted mb-3">Program: <strong><?= esc($program['nama_program']) ?></strong></p>
 
             <form action="<?= base_url('kelas/ubah_kelas') ?>" method="POST">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
                 <input type="hidden" name="id_program" value="<?= esc($program['id_program']) ?>">
 
-                <div class="row">
-                    <div class="col-md-8 mb-3">
-                        <label class="form-label">Nama Kelas <span class="text-danger">*</span></label>
+                <div class="row mb-2">
+                    <label class="col-md-2 col-form-label">Nama Kelas <span class="text-danger">*</span></label>
+                    <div class="col-md-5">
                         <input type="text" class="form-control" name="nama_kelas" required value="<?= esc($kelas['nama_kelas']) ?>">
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Status Kelas</label>
-                        <select name="status_kelas" class="form-select">
+                    <div class="col-md-3">
+                        <select name="status_kelas" class="form-control">
                             <option value="">-- Pilih Status --</option>
                             <option value="aktif"      <?= $kelas['status_kelas'] == 'aktif'      ? 'selected' : '' ?>>Aktif</option>
                             <option value="selesai"    <?= $kelas['status_kelas'] == 'selesai'    ? 'selected' : '' ?>>Selesai</option>
@@ -39,75 +44,76 @@ body { background-color: #f5f5f5 !important; }
                         </select>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Deskripsi / Materi Kelas</label>
-                    <textarea class="form-control" name="deskripsi" rows="3"><?= esc($kelas['deskripsi']) ?></textarea>
+                <div class="row mb-2">
+                    <label class="col-md-2 col-form-label">Deskripsi / Materi</label>
+                    <div class="col-md-6">
+                        <textarea class="form-control" name="deskripsi" rows="3"><?= esc($kelas['deskripsi']) ?></textarea>
+                    </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tanggal Pelaksanaan</label>
+                <div class="row mb-2">
+                    <label class="col-md-2 col-form-label">Tanggal</label>
+                    <div class="col-md-2">
                         <input type="date" class="form-control" name="tanggal" value="<?= esc($kelas['tanggal']) ?>">
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Jam Mulai</label>
+                    <div class="col-md-2">
                         <input type="time" class="form-control" name="jam_mulai" value="<?= esc($kelas['jam_mulai']) ?>">
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Jam Selesai</label>
+                    <div class="col-md-2">
                         <input type="time" class="form-control" name="jam_selesai" value="<?= esc($kelas['jam_selesai']) ?>">
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Dosen / Pemateri</label>
-                    <select class="form-select" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
-                        <option value="">-- Pilih Pemateri --</option>
-                        <?php foreach ($daftar_pemateri as $p): ?>
-                        <option value="<?= $p['id_user'] ?>"
-                            data-nama="<?= esc($p['nama_lengkap']) ?>"
-                            <?= ($kelas['id_pemateri'] ?? '') == $p['id_user'] ? 'selected' : '' ?>>
-                            <?= esc($p['nama_lengkap']) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="hidden" name="nama_dosen" id="nama_dosen" value="<?= esc($kelas['nama_dosen'] ?? '') ?>">
+                <div class="row mb-2">
+                    <label class="col-md-2 col-form-label">Dosen / Pemateri</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="id_pemateri" id="id_pemateri" onchange="isi_nama_dosen(this)">
+                            <option value="">-- Pilih Pemateri --</option>
+                            <?php foreach ($daftar_pemateri as $p): ?>
+                            <option value="<?= $p['id_user'] ?>"
+                                data-nama="<?= esc($p['nama_lengkap']) ?>"
+                                <?= ($kelas['id_pemateri'] ?? '') == $p['id_user'] ? 'selected' : '' ?>>
+                                <?= esc($p['nama_lengkap']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input type="hidden" name="nama_dosen" id="nama_dosen" value="<?= esc($kelas['nama_dosen'] ?? '') ?>">
+                    </div>
                 </div>
-
-                <!-- Tipe Kelas Online / Offline -->
-                <div class="mb-3">
-                    <label class="form-label">Tipe Kelas</label>
-                    <div class="d-flex gap-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_online" value="online"
-                                <?= ($kelas['tipe_kelas'] ?? '') === 'online' ? 'checked' : '' ?>
-                                onchange="toggle_tipe_kelas()">
-                            <label class="form-check-label" for="tipe_online">Online</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_offline" value="offline"
-                                <?= ($kelas['tipe_kelas'] ?? '') === 'offline' ? 'checked' : '' ?>
-                                onchange="toggle_tipe_kelas()">
-                            <label class="form-check-label" for="tipe_offline">Offline</label>
+                <div class="row mb-2">
+                    <label class="col-md-2 col-form-label">Tipe Kelas</label>
+                    <div class="col-md-5">
+                        <div class="d-flex gap-3 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_online" value="online"
+                                    <?= ($kelas['tipe_kelas'] ?? '') === 'online' ? 'checked' : '' ?>
+                                    onchange="toggle_tipe_kelas()">
+                                <label class="form-check-label" for="tipe_online">Online</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipe_kelas" id="tipe_offline" value="offline"
+                                    <?= ($kelas['tipe_kelas'] ?? '') === 'offline' ? 'checked' : '' ?>
+                                    onchange="toggle_tipe_kelas()">
+                                <label class="form-check-label" for="tipe_offline">Offline</label>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Field Online -->
                 <div id="seksi_online" style="display:none;">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Platform</label>
-                            <select name="platform_online" id="platform_online" class="form-select" onchange="update_label_meeting()">
+                    <div class="row mb-2">
+                        <label class="col-md-2 col-form-label">Platform</label>
+                        <div class="col-md-3">
+                            <select name="platform_online" id="platform_online" class="form-control" onchange="update_label_meeting()">
                                 <option value="">-- Pilih Platform --</option>
                                 <?php foreach (['Zoom','Google Meet','Microsoft Teams','Webex','Lainnya'] as $p): ?>
                                 <option value="<?= $p ?>" <?= ($kelas['platform_online'] ?? '') === $p ? 'selected' : '' ?>><?= $p ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label"><span id="label_link_meeting">Link Meeting</span></label>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-md-2 col-form-label"><span id="label_link_meeting">Link Meeting</span></label>
+                        <div class="col-md-5">
                             <input type="url" class="form-control" name="link_meeting" value="<?= esc($kelas['link_meeting'] ?? '') ?>" placeholder="https://zoom.us/j/... atau https://meet.google.com/...">
                         </div>
                     </div>
@@ -115,9 +121,11 @@ body { background-color: #f5f5f5 !important; }
 
                 <!-- Field Offline -->
                 <div id="seksi_offline" style="display:none;">
-                    <div class="mb-3">
-                        <label class="form-label">Lokasi / Ruangan</label>
-                        <input type="text" class="form-control" name="lokasi_offline" id="lokasi_offline" value="<?= esc($kelas['lokasi_offline'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
+                    <div class="row mb-2">
+                        <label class="col-md-2 col-form-label">Lokasi / Ruangan</label>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" name="lokasi_offline" id="lokasi_offline" value="<?= esc($kelas['lokasi_offline'] ?? '') ?>" placeholder="Contoh: Gedung A Lantai 2, Ruang Seminar 301">
+                        </div>
                     </div>
                 </div>
 
@@ -255,14 +263,23 @@ body { background-color: #f5f5f5 !important; }
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-light btn-modern border">Batal</a>
-                    <button type="submit" class="btn btn-primary btn-modern">Update Kelas</button>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary waves-effect waves-light">
+                        <i class="mdi mdi-content-save"></i> Update Kelas
+                    </button>
+                    <a href="<?= base_url('program/detail_program/' . $program['id_program']) ?>" class="btn btn-white waves-effect waves-light">
+                        <i class="mdi mdi-keyboard-backspace"></i> Kembali
+                    </a>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- container -->
+    </div> <!-- content -->
+</div><!-- content-page -->
 
 <script>
 var jumlah_sesi = <?= count($videos) ?>;

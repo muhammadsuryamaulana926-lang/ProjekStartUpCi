@@ -58,7 +58,7 @@ body { background-color: #f5f5f5 !important; }
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailStartup">
-                        <div class="stat-icon"><i class="mdi mdi-rocket-launch"></i></div>
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
                         <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_startup ?></div>
                             <div class="stat-label">Startup Terdaftar</div>
@@ -67,7 +67,7 @@ body { background-color: #f5f5f5 !important; }
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailProgram">
-                        <div class="stat-icon" style="background:#e8f5e9; color:#22c55e;"><i class="mdi mdi-book-open-page-variant"></i></div>
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
                         <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_program ?></div>
                             <div class="stat-label">Total Program</div>
@@ -76,7 +76,7 @@ body { background-color: #f5f5f5 !important; }
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailBuku">
-                        <div class="stat-icon" style="background:#fff3e0; color:#f97316;"><i class="mdi mdi-book"></i></div>
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
                         <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_buku ?></div>
                             <div class="stat-label">Total Buku Digital</div>
@@ -85,10 +85,32 @@ body { background-color: #f5f5f5 !important; }
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card" data-bs-toggle="modal" data-bs-target="#modalDetailVideo">
-                        <div class="stat-icon" style="background:#fce4ec; color:#ef4444;"><i class="mdi mdi-video"></i></div>
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
                         <div class="ms-auto text-end">
                             <div class="stat-value"><?= $total_video ?></div>
                             <div class="stat-label">Total Video</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat Cards Row 2: Ebook breakdown -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
+                        <div class="ms-auto text-end">
+                            <div class="stat-value"><?= $total_buku_publik ?></div>
+                            <div class="stat-label">Ebook Publik</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:none;"><img src="<?= base_url('img/logo_itb.png') ?>" style="width:56px;height:56px;object-fit:contain;"></div>
+                        <div class="ms-auto text-end">
+                            <div class="stat-value"><?= $total_buku_privat ?></div>
+                            <div class="stat-label">Ebook Privat</div>
                         </div>
                     </div>
                 </div>
@@ -202,7 +224,7 @@ body { background-color: #f5f5f5 !important; }
             <div class="modal-body p-3">
                 <div class="table-responsive">
                     <table id="datatable-startup" class="table table-hover table-bordered mb-0 align-middle">
-                        <thead class="table-light">
+                        <thead class="table-secondary">
                             <tr>
                                 <th class="text-center" style="width:50px;">No</th>
                                 <th>Nama Perusahaan</th>
@@ -234,7 +256,7 @@ body { background-color: #f5f5f5 !important; }
             </div>
             <div class="modal-body p-3">
                 <table id="dt-program" class="table table-hover table-bordered mb-0 align-middle">
-                    <thead class="table-light">
+                    <thead class="table-secondary">
                         <tr><th>No</th><th>Nama Program</th><th>Deskripsi</th><th>Dibuat</th></tr>
                     </thead>
                     <tbody></tbody>
@@ -257,7 +279,7 @@ body { background-color: #f5f5f5 !important; }
             </div>
             <div class="modal-body p-3">
                 <table id="dt-buku" class="table table-hover table-bordered mb-0 align-middle">
-                    <thead class="table-light">
+                    <thead class="table-secondary">
                         <tr><th>No</th><th>Judul</th><th>Kategori</th><th>Status</th><th>Dibuat</th></tr>
                     </thead>
                     <tbody></tbody>
@@ -280,7 +302,7 @@ body { background-color: #f5f5f5 !important; }
             </div>
             <div class="modal-body p-3">
                 <table id="dt-video" class="table table-hover table-bordered mb-0 align-middle">
-                    <thead class="table-light">
+                    <thead class="table-secondary">
                         <tr><th>No</th><th>Judul</th><th>Kategori</th><th>Status</th><th>Dibuat</th></tr>
                     </thead>
                     <tbody></tbody>

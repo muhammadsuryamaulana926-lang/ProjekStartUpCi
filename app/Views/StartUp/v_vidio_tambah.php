@@ -1,80 +1,98 @@
-<style>
-body { background-color: #f5f5f5 !important; }
-.paper-wrapper { max-width: 700px; margin: 40px auto; }
-.paper-form { background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; border-radius: 8px; padding: 40px; }
-.paper-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-.form-label { font-weight: 600; color: #555; margin-bottom: 8px; }
-.form-control, .form-select { border-radius: 6px; border: 1px solid #cbd5e1; padding: 10px 15px; transition: all 0.3s; }
-.form-control:focus, .form-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-.btn-modern { padding: 10px 24px; border-radius: 6px; font-weight: 600; transition: all 0.3s; }
-.btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-</style>
+<!-- ============================================================== -->
+<!-- Start Page Content here -->
+<!-- ============================================================== -->
 
-<div class="container-fluid" style="background-color:#f5f5f5; padding-bottom:50px;">
-    <div class="paper-wrapper">
-        <div class="paper-form">
-            <h2 class="paper-title"><?= isset($video) ? 'Edit Video' : 'Tambah Video Baru' ?></h2>
+<div class="content-page">
+    <div class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="page-title-box">
+                        <h4 class="page-title">Perpustakaan</h4>
+                    </div>
+                </div>
+            </div>
 
             <?php if (session()->getFlashdata('error')): ?>
-                <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <?= session()->getFlashdata('error') ?>
+            </div>
             <?php endif; ?>
 
-            <form action="<?= isset($video) ? base_url('perpustakaan/ubah_video_page') : base_url('perpustakaan/simpan_video_page') ?>" method="POST">
-                <?= csrf_field() ?>
-                <?php if (isset($video)): ?>
-                    <input type="hidden" name="id_konten_video" value="<?= esc($video->id_konten_video) ?>">
-                <?php endif; ?>
-
-                <div class="mb-3">
-                    <label class="form-label">Judul Video <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="judul_video" required
-                           value="<?= esc($video->judul_video ?? '') ?>"
-                           placeholder="Masukkan judul video...">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="header-title mb-3"><?= isset($video) ? 'Edit Video' : 'Tambah Video Baru' ?></h4>
+                            <form action="<?= isset($video) ? base_url('perpustakaan/ubah_video_page') : base_url('perpustakaan/simpan_video_page') ?>" method="POST">
+                                <?= csrf_field() ?>
+                                <?php if (isset($video)): ?>
+                                    <input type="hidden" name="id_konten_video" value="<?= esc($video->id_konten_video) ?>">
+                                <?php endif; ?>
+                                <div class="row mb-2">
+                                    <label class="col-md-2 col-form-label">Judul Video <span class="text-danger">*</span></label>
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" name="judul_video" required
+                                               value="<?= esc($video->judul_video ?? '') ?>"
+                                               placeholder="Masukkan judul video...">
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <label class="col-md-2 col-form-label">URL YouTube <span class="text-danger">*</span></label>
+                                    <div class="col-md-5">
+                                        <input type="url" class="form-control" name="url_video" required
+                                               value="<?= isset($video) ? 'https://www.youtube.com/watch?v=' . esc($video->kode_video) : '' ?>"
+                                               placeholder="https://www.youtube.com/watch?v=...">
+                                       
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <label class="col-md-2 col-form-label">Deskripsi</label>
+                                    <div class="col-md-5">
+                                        <textarea class="form-control" name="deskripsi_video" rows="3"
+                                                  placeholder="Deskripsi singkat konten video..."><?= esc($video->deskripsi_video ?? '') ?></textarea>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <label class="col-md-2 col-form-label">Kategori</label>
+                                    <div class="col-md-3">
+                                        <select name="kategori_video" class="form-control">
+                                            <option value="">-- Pilih Kategori --</option>
+                                            <?php
+                                            $kategoriList = ['Bisnis & Startup','Teknologi','Marketing','Keuangan','Manajemen','Hukum & Legalitas','Desain & Produk','Motivasi','Podcast'];
+                                            foreach ($kategoriList as $kat):
+                                                $selected = isset($video) && $video->kategori_video === $kat ? 'selected' : '';
+                                            ?>
+                                                <option value="<?= esc($kat) ?>" <?= $selected ?>><?= esc($kat) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <label class="col-md-2 col-form-label">Status Akses <span class="text-danger">*</span></label>
+                                    <div class="col-md-3">
+                                        <select name="status_video" class="form-control" required>
+                                            <option value="Publik" <?= isset($video) && $video->status_video === 'Publik' ? 'selected' : '' ?>>Publik</option>
+                                            <option value="Privat" <?= isset($video) && $video->status_video === 'Privat' ? 'selected' : '' ?>>Privat</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                        <i class="mdi mdi-content-save"></i> <?= isset($video) ? 'Update Video' : 'Simpan Video' ?>
+                                    </button>
+                                    <a href="<?= base_url('perpustakaan/video') ?>" class="btn btn-white waves-effect waves-light">
+                                        <i class="mdi mdi-keyboard-backspace"></i> Kembali
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">URL YouTube <span class="text-danger">*</span></label>
-                    <input type="url" class="form-control" name="url_video" required
-                           value="<?= isset($video) ? 'https://www.youtube.com/watch?v=' . esc($video->kode_video) : '' ?>"
-                           placeholder="https://www.youtube.com/watch?v=...">
-                    <small class="text-muted">Salin URL lengkap dari address bar browser.</small>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Deskripsi <span class="text-muted fw-normal">(Opsional)</span></label>
-                    <textarea class="form-control" name="deskripsi_video" rows="3"
-                              placeholder="Deskripsi singkat konten video..."><?= esc($video->deskripsi_video ?? '') ?></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Kategori</label>
-                    <select name="kategori_video" class="form-select">
-                        <option value="">-- Pilih Kategori --</option>
-                        <?php
-                        $kategoriList = ['Bisnis & Startup','Teknologi','Marketing','Keuangan','Manajemen','Hukum & Legalitas','Desain & Produk','Motivasi','Podcast'];
-                        foreach ($kategoriList as $kat):
-                            $selected = isset($video) && $video->kategori_video === $kat ? 'selected' : '';
-                        ?>
-                            <option value="<?= esc($kat) ?>" <?= $selected ?>><?= esc($kat) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label">Status Akses <span class="text-danger">*</span></label>
-                    <select name="status_video" class="form-select" required>
-                        <option value="Publik" <?= isset($video) && $video->status_video === 'Publik' ? 'selected' : '' ?>>Publik</option>
-                        <option value="Privat" <?= isset($video) && $video->status_video === 'Privat' ? 'selected' : '' ?>>Privat</option>
-                    </select>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <a href="<?= base_url('perpustakaan/video') ?>" class="btn btn-light btn-modern border">Batal</a>
-                    <button type="submit" class="btn btn-primary btn-modern">
-                        <?= isset($video) ? 'Update Video' : 'Simpan Video' ?>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+        </div> <!-- container -->
+    </div> <!-- content -->
+</div><!-- content-page -->

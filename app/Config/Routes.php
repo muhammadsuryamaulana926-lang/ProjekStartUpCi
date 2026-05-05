@@ -171,6 +171,10 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/inkubasi_bisnis/program_kewirausahaan', 'Inkubasi_bisnis::program_kewirausahaan');
     $routes->get('/inkubasi_bisnis/tambah_program',        'Inkubasi_bisnis::tambah_program');
     $routes->get('/inkubasi_bisnis/edit_program/(:num)',   'Inkubasi_bisnis::edit_program/$1');
+    $routes->get('/inkubasi_bisnis/detail_peserta/(:any)', 'Inkubasi_bisnis::detail_peserta/$1');
+    $routes->get('/inkubasi_bisnis/detail_pendaftar/1', 'Inkubasi_bisnis::detail_pendaftar/1');
+    $routes->get('/inkubasi_bisnis/detail_pendaftar/(:any)', 'Inkubasi_bisnis::detail_pendaftar/$1');
+    $routes->get('/inkubasi_bisnis/detail_startup/(:any)', 'Inkubasi_bisnis::detail_startup/$1');
     $routes->get('/log_aktivitas',                           'Startup::log_aktivitas');
     $routes->get('/aktivitas_login',                         'Startup::aktivitas_login');
 

@@ -70,11 +70,11 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
 }
 
 .topnav .navbar-nav .nav-link {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     position: relative;
     line-height: 21.5px;
-    padding: calc(33px / 2) 1.1rem;
-    color: var(--ct-hori-menu-item-color, #6c757d);
+    padding: calc(33px / 2) 1.4rem;
+    color: #6c757d;
     font-family: "Cerebri Sans", sans-serif;
     background-color: #ffffff;
     white-space: nowrap;
@@ -95,7 +95,6 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
     z-index: 9999 !important;
     background: white;
     min-width: 200px;
-    display: none;
     border: none;
     box-shadow: 0 0 35px 0 rgba(154,161,171,.25);
     border-radius: 4px;
@@ -105,6 +104,7 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
 .topnav .dropdown-item {
     font-size: 0.8rem;
     padding: 6px 20px;
+    color: #6c757d;
 }
 
 .topnav .dropdown-item:hover {
@@ -149,8 +149,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-library me-1"></i>Perpustakaan<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-library me-1"></i>Perpustakaan
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_perpustakaan') ?>" class="dropdown-item"><i class="mdi mdi-book me-1"></i>Buku Digital</a>
@@ -184,8 +184,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-library me-1"></i>Perpustakaan<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-library me-1"></i>Perpustakaan
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_perpustakaan') ?>" class="dropdown-item"><i class="mdi mdi-book me-1"></i>Buku Digital</a>
@@ -193,8 +193,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_lokasi_startup_saya', 'v_globe']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-map-marker me-1"></i>Peta Lokasi<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_lokasi_startup_saya', 'v_globe']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-map-marker me-1"></i>Peta Lokasi
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_lokasi_startup_saya') ?>" class="dropdown-item"><i class="mdi mdi-map me-1"></i>Peta Lokal</a>
@@ -210,8 +210,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-library me-1"></i>Perpustakaan<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_perpustakaan', 'perpustakaan']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-library me-1"></i>Perpustakaan
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_perpustakaan') ?>" class="dropdown-item"><i class="mdi mdi-book me-1"></i>Buku Digital</a>
@@ -219,8 +219,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_lokasi_startup', 'v_globe']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-map-marker me-1"></i>Peta Lokasi<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['v_lokasi_startup', 'v_globe']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-map-marker me-1"></i>Peta Lokasi
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_lokasi_startup') ?>" class="dropdown-item"><i class="mdi mdi-map me-1"></i>Peta Lokal</a>
@@ -238,8 +238,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= ($currentPage === 'inkubasi_bisnis' || $currentPage === 'v_data_startup') ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-domain me-1"></i>Inkubasi Bisnis<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= ($currentPage === 'inkubasi_bisnis' || $currentPage === 'v_data_startup') ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-domain me-1"></i>Inkubasi Bisnis
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('v_data_startup') ?>" class="dropdown-item"><i class="mdi mdi-rocket-launch me-1"></i>Startup</a>
@@ -247,8 +247,8 @@ $is_peserta = session()->get('is_peserta_program') && $role !== 'pemilik_startup
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['log_aktivitas', 'aktivitas_login', 'manajemen_user', 'v_riwayat_aktivitas']) ? 'active' : '' ?>" href="#" data-bs-toggle="dropdown">
-                                    <i class="mdi mdi-cog me-1"></i>Pengaturan<div class="arrow-down"></div>
+                                <a href="#" class="nav-link dropdown-toggle arrow-none <?= in_array($currentPage, ['log_aktivitas', 'aktivitas_login', 'manajemen_user', 'v_riwayat_aktivitas']) ? 'active' : '' ?>" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-cog me-1"></i>Pengaturan
                                 </a>
                                 <div class="dropdown-menu">
                                     <a href="<?= base_url('aktivitas_login') ?>" class="dropdown-item"><i class="mdi mdi-login me-1"></i>Aktivitas Login</a>
@@ -307,26 +307,15 @@ $(document).ready(function () {
 
         item.addEventListener("mouseenter", function() {
             if (dropdown) {
-                dropdown.style.display = "block";
-                dropdown.style.position = "fixed";
                 let rect = this.getBoundingClientRect();
                 dropdown.style.left = rect.left + "px";
-                dropdown.style.top = rect.bottom + "px";
+                dropdown.style.top  = rect.bottom + "px";
+                dropdown.classList.add("show");
             }
         });
 
         item.addEventListener("mouseleave", function() {
-            if (dropdown) {
-                dropdown.style.display = "none";
-            }
-        });
-
-        window.addEventListener("scroll", function() {
-            if (dropdown && dropdown.style.display === "block") {
-                let rect = item.getBoundingClientRect();
-                dropdown.style.left = rect.left + "px";
-                dropdown.style.top = rect.bottom + "px";
-            }
+            if (dropdown) dropdown.classList.remove("show");
         });
     });
 });
