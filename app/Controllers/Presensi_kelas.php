@@ -174,7 +174,7 @@ class Presensi_kelas extends BaseController
             session()->setFlashdata('error', 'Gagal menghapus presensi.');
         }
 
-        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-hadir'));
     }
 
     // Helper: cek apakah kelas bisa diakses (30 menit sebelum jam mulai s/d selesai)

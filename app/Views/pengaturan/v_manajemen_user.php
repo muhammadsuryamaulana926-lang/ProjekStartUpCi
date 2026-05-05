@@ -3,10 +3,10 @@
         <div class="col-12 col-xl-11">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="card border">
@@ -113,33 +113,43 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    var table = $('#tabelUser').DataTable({
-        pageLength: 10,
-        ordering: false,
-        dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
-        language: {
-            lengthMenu: 'Show _MENU_ entries',
-            info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-            paginate: { previous: 'Previous', next: 'Next' }
+// Cegah inisialisasi DataTable berkali-kali
+if (!window.manajemenUserTableInitialized) {
+    window.manajemenUserTableInitialized = true;
+    
+    $(document).ready(function() {
+        // Destroy DataTable jika sudah ada
+        if ($.fn.DataTable.isDataTable('#tabelUser')) {
+            $('#tabelUser').DataTable().destroy();
         }
-    });
+        
+        var table = $('#tabelUser').DataTable({
+            pageLength: 10,
+            ordering: false,
+            dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
+            language: {
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                paginate: { previous: 'Previous', next: 'Next' }
+            }
+        });
 
-    $('#customSearch').on('keyup', function() {
-        table.search($(this).val()).draw();
-    });
+        $('#customSearch').on('keyup', function() {
+            table.search($(this).val()).draw();
+        });
 
-    $('#filterRole').on('change', function() {
-        var role = $(this).val();
-        $.fn.dataTable.ext.search.pop();
-        if (role) {
-            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                return $(table.row(dataIndex).node()).data('role') === role;
-            });
-        }
-        table.draw();
+        $('#filterRole').on('change', function() {
+            var role = $(this).val();
+            $.fn.dataTable.ext.search.pop();
+            if (role) {
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    return $(table.row(dataIndex).node()).data('role') === role;
+                });
+            }
+            table.draw();
+        });
     });
-});
+}
 
 function swalConfirm(form) {
     Swal.fire({

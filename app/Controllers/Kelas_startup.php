@@ -150,9 +150,34 @@ class Kelas_startup extends BaseController
     // Memperbarui data kelas beserta video sesi dan chapter
     public function ubah_kelas()
     {
-        $id_program = $this->request->getPost('id_program');
         $id_kelas   = $this->request->getPost('id_kelas');
+        $from_detail = $this->request->getPost('from_detail');
+        
+        // Ambil data kelas untuk mendapatkan id_program
+        $kelas_data = $this->m_kelas->kelas_by_id(['id_kelas' => $id_kelas]);
+        if (empty($kelas_data)) {
+            return redirect()->to(base_url('program'))->with('error', 'Kelas tidak ditemukan.');
+        }
+        
+        $id_program = $kelas_data['id_program'];
 
+        // Jika dari detail kelas (hanya update media)
+        if ($from_detail) {
+            $link_youtube = $this->request->getPost('link_youtube');
+            $link_zoom = $this->request->getPost('link_zoom');
+            
+            $this->m_kelas->ubah_media_kelas($id_kelas, $link_youtube, $link_zoom);
+            session()->setFlashdata('success', 'Media kelas berhasil diperbarui.');
+            
+            $active_tab = $this->request->getPost('active_tab') ?? '';
+            $redirect_url = base_url('presensi_kelas/detail_kelas/' . $id_kelas);
+            if ($active_tab) {
+                $redirect_url .= '?tab=' . $active_tab;
+            }
+            return redirect()->to($redirect_url);
+        }
+
+        // Jika dari form edit kelas lengkap
         $data_kelas = [
             'id_kelas'        => $id_kelas,
             'nama_kelas'      => $this->request->getPost('nama_kelas'),
@@ -171,6 +196,7 @@ class Kelas_startup extends BaseController
         ];
 
         $judul_sesi    = $this->request->getPost('judul_sesi')      ?? [];
+        $deskripsi_sesi = $this->request->getPost('deskripsi_sesi') ?? [];
         $link_yt       = $this->request->getPost('link_youtube')    ?? [];
         $link_zm       = $this->request->getPost('link_zoom_sesi')  ?? [];
         $judul_chapter = $this->request->getPost('judul_chapter')   ?? [];
@@ -195,6 +221,7 @@ class Kelas_startup extends BaseController
             $this->m_kelas_video->tambah_video_sesi([
                 'id_kelas'     => $id_kelas,
                 'judul_sesi'   => $judul,
+                'deskripsi'    => $deskripsi_sesi[$i] ?? null,
                 'link_youtube' => $link_yt[$i] ?? null,
                 'link_zoom'    => $link_zm[$i] ?? null,
                 'urutan'       => $i + 1,

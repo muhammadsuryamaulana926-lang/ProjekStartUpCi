@@ -98,8 +98,12 @@
 </div>
 <div id="globe-tooltip"></div>
 
-<script src="//unpkg.com/globe.gl"></script>
 <script>
+function startGlobe() {
+    if (window.globeLokasiAll) {
+        window.globeLokasiAll = null;
+    }
+    
     var container = document.getElementById('globe-wrap');
     var startupPoints = <?= json_encode(array_values(array_map(function($s) {
         return [
@@ -178,8 +182,11 @@
         .htmlLng('lng')
         .htmlAltitude(0.01)
         .htmlElement(makeMarker);
+        
+    window.globeLokasiAll = globe;
 
     function refreshMarkers() {
+        if (!window.globeLokasiAll) return;
         var alt = globe.pointOfView().altitude;
         globe.htmlElementsData(buildClusters(getRadius(alt)));
     }
@@ -191,7 +198,27 @@
     globe.controls().enableZoom = true;
     globe.controls().addEventListener('end', refreshMarkers);
 
-    window.addEventListener('resize', function() {
-        globe.width(container.offsetWidth).height(container.offsetHeight);
-    });
+    window.globeResizeHandler = window.globeResizeHandler || function() {
+        if (window.globeLokasiAll && document.getElementById('globe-wrap')) {
+            window.globeLokasiAll.width(container.offsetWidth).height(container.offsetHeight);
+        }
+    };
+    window.removeEventListener('resize', window.globeResizeHandler);
+    window.addEventListener('resize', window.globeResizeHandler);
+}
+
+function initDependenciesGlobe() {
+    if (typeof Globe === 'undefined') {
+        var s = document.createElement('script');
+        s.src = '//unpkg.com/globe.gl';
+        s.onload = startGlobe;
+        document.head.appendChild(s);
+    } else {
+        startGlobe();
+    }
+}
+
+initDependenciesGlobe();
+
+    
 </script>

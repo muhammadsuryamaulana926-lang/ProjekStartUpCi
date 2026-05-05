@@ -115,9 +115,9 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
                     </div>
                 </div>
 
-                <div class="yt-desc-box">
+                <div class="yt-desc-box" id="videoDescription">
                     <div class="yt-desc-meta">Deskripsi Kelas</div>
-                    <div><?= nl2br(esc($kelas_aktif['deskripsi'])) ?></div>
+                    <div id="descriptionContent"><?= nl2br(esc($first_video['deskripsi'] ?? $kelas_aktif['deskripsi'])) ?></div>
                 </div>
 
                 <!-- Card Chapter -->
@@ -191,6 +191,7 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
                          data-yt-id="<?= esc($yt_id) ?>"
                          data-judul="<?= esc($v['judul_sesi']) ?>"
                          data-vid-id="<?= $v['id_kelas_video'] ?? 0 ?>"
+                         data-deskripsi="<?= esc($v['deskripsi'] ?? '') ?>"
                          onclick="gantiFideo(this)">
                         <div class="yt-queue-item-icon">
                             <i class="mdi <?= $isFirst ? 'mdi-play-circle' : 'mdi-play-circle-outline' ?>"></i>
@@ -233,9 +234,18 @@ document.addEventListener('DOMContentLoaded', function() {
         var ytId   = el.dataset.ytId;
         var judul  = el.dataset.judul;
         var vidId  = el.dataset.vidId;
+        var deskripsi = el.dataset.deskripsi || '';
 
         player.source = { type: 'video', sources: [{ src: ytId, provider: 'youtube' }] };
         document.getElementById('videoTitle').textContent = judul;
+        
+        // Update deskripsi
+        var descContent = document.getElementById('descriptionContent');
+        if (deskripsi) {
+            descContent.innerHTML = deskripsi.replace(/\n/g, '<br>');
+        } else {
+            descContent.innerHTML = 'Tidak ada deskripsi untuk sesi ini.';
+        }
 
         // Update active state sidebar
         document.querySelectorAll('.sesi-item').forEach(function(s) {

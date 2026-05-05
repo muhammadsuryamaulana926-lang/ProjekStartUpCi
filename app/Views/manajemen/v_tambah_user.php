@@ -1,6 +1,6 @@
 <style>
 body { background-color: #f5f5f5 !important; }
-.paper-wrapper { max-width: 700px; margin: 40px auto; }
+.paper-wrapper { max-width: 1100px; margin: 40px auto; }
 .paper-form {
     background-color: #ffffff;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -102,11 +102,11 @@ body { background-color: #f5f5f5 !important; }
                         <thead>
                             <tr>
                                 <th width="5%">No</th>
-                                <th width="30%">Akses Halaman</th>
-                                <th class="text-center"><i class="mdi mdi-eye text-info"></i> Lihat</th>
-                                <th class="text-center"><i class="mdi mdi-plus-circle text-success"></i> Tambah</th>
-                                <th class="text-center"><i class="mdi mdi-pencil text-warning"></i> Edit</th>
-                                <th class="text-center"><i class="mdi mdi-delete text-danger"></i> Hapus</th>
+                                <th width="40%">Akses Halaman</th>
+                                <th class="text-center" width="13%"><i class="mdi mdi-eye text-info"></i> Lihat</th>
+                                <th class="text-center" width="14%"><i class="mdi mdi-plus-circle text-success"></i> Tambah</th>
+                                <th class="text-center" width="14%"><i class="mdi mdi-pencil text-warning"></i> Edit</th>
+                                <th class="text-center" width="14%"><i class="mdi mdi-delete text-danger"></i> Hapus</th>
                             </tr>
                         </thead>
                         <tbody>

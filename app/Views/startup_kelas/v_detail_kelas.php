@@ -72,10 +72,10 @@ body { background-color: #f5f5f5 !important; }
         <div class="col-12 col-xl-9">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="mb-4">
@@ -110,9 +110,9 @@ body { background-color: #f5f5f5 !important; }
                     <p class="text-muted small mb-3"><?= esc($kelas['deskripsi']) ?></p>
                 <?php endif; ?>
 
-                <div class="info-row"><i class="mdi mdi-book-open-variant text-primary"></i><strong>Program:</strong> <?= esc($program['nama_program']) ?></div>
-                <div class="info-row"><i class="mdi mdi-calendar text-primary"></i><strong>Tanggal:</strong> <?= date('d M Y', strtotime($kelas['tanggal'])) ?></div>
-                <div class="info-row"><i class="mdi mdi-clock text-primary"></i><strong>Waktu:</strong> <?= date('H:i', strtotime($kelas['jam_mulai'])) ?> - <?= date('H:i', strtotime($kelas['jam_selesai'])) ?> WIB</div>
+                <div class="info-row"><i class="mdi mdi-book-open-variant text-primary"></i><strong>Program:</strong> <?= esc($program['nama_program'] ?? '-') ?></div>
+                <div class="info-row"><i class="mdi mdi-calendar text-primary"></i><strong>Tanggal:</strong> <?= !empty($kelas['tanggal']) && $kelas['tanggal'] != '0000-00-00' ? date('d M Y', strtotime($kelas['tanggal'])) : '-' ?></div>
+                <div class="info-row"><i class="mdi mdi-clock text-primary"></i><strong>Waktu:</strong> <?= !empty($kelas['jam_mulai']) && $kelas['jam_mulai'] != '00:00:00' ? date('H:i', strtotime($kelas['jam_mulai'])) : '-' ?> - <?= !empty($kelas['jam_selesai']) && $kelas['jam_selesai'] != '00:00:00' ? date('H:i', strtotime($kelas['jam_selesai'])) : '-' ?> WIB</div>
                 <?php if (!empty($kelas['nama_dosen'])): ?>
                 <div class="info-row"><i class="mdi mdi-account-tie text-primary"></i><strong>Pemateri:</strong> <?= esc($kelas['nama_dosen']) ?></div>
                 <?php endif; ?>
@@ -341,11 +341,9 @@ body { background-color: #f5f5f5 !important; }
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#tab-akses">Media Kelas</a>
                     </li>
-                    <?php if (session()->get('user_role') !== 'pemateri'): ?>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#tab-tugas">Tugas <span class="badge bg-secondary ms-1"><?= count($tugas_list) ?></span></a>
                     </li>
-                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#tab-hadir">Kehadiran <span class="badge bg-secondary ms-1"><?= count($presensi) ?></span></a>
                     </li>
@@ -355,13 +353,11 @@ body { background-color: #f5f5f5 !important; }
 
                 <!-- Tab Materi Kelas -->
                 <div class="tab-pane fade show active" id="tab-materi">
-                <?php if ($bisa_kelola): ?>
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-primary btn-modern btn-sm" data-bs-toggle="modal" data-bs-target="#modalUploadMateri">
                         <i class="mdi mdi-upload"></i> Tambah Materi
                     </button>
                 </div>
-                <?php endif; ?>
 
                 <p class="fw-semibold text-dark mb-3 border-bottom pb-2">Daftar Materi <span class="badge bg-secondary ms-1"><?= count($materi) ?></span></p>
 
@@ -428,6 +424,11 @@ body { background-color: #f5f5f5 !important; }
 
                 <!-- Tab Akses Kelas -->
                 <div class="tab-pane fade" id="tab-akses">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary btn-modern btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahMedia">
+                        <i class="mdi mdi-plus-circle"></i> Tambah Media Kelas
+                    </button>
+                </div>
                 <?php
                     preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $kelas['link_youtube'] ?? '', $yt_m);
                     $yt_id = $yt_m[1] ?? null;
@@ -467,6 +468,13 @@ body { background-color: #f5f5f5 !important; }
 
                 <!-- Tab Tugas -->
                 <div class="tab-pane fade" id="tab-tugas">
+                <?php if (session()->get('user_role') === 'pemateri'): ?>
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary btn-modern btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahTugas">
+                        <i class="mdi mdi-plus"></i> Tambah Tugas
+                    </button>
+                </div>
+                <?php endif; ?>
                 <?php if (empty($tugas_list)): ?>
                     <div class="text-center text-muted py-4">
                         <i class="mdi mdi-clipboard-text-outline" style="font-size:40px; color:#cbd5e1;"></i>
@@ -485,38 +493,34 @@ body { background-color: #f5f5f5 !important; }
                         <?php if (!empty($t['instruksi'])): ?>
                             <p class="text-muted small mb-2"><?= nl2br(esc($t['instruksi'])) ?></p>
                         <?php endif; ?>
+                        <?php if (!empty($t['link_file']) || !empty($t['nama_file'])): ?>
+                        <div class="d-flex gap-2 mb-2">
+                            <?php if (!empty($t['link_file'])): ?>
+                            <a href="<?= esc($t['link_file']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded">
+                                <i class="mdi mdi-link-variant"></i> Buka File Tugas
+                            </a>
+                            <?php endif; ?>
+                            <?php if (!empty($t['nama_file'])): ?>
+                            <a href="<?= base_url('tugas_kelas/download/tugas/' . $t['id_tugas']) ?>" class="btn btn-sm btn-outline-success rounded">
+                                <i class="mdi mdi-download"></i> Unduh File
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                        <?php endif; ?>
                         <?php $jawaban_list = $semua_jawaban[$t['id_tugas']] ?? []; ?>
                         <?php if (!empty($jawaban_list)): ?>
                         <div class="mt-2 border-top pt-2">
+                            <div class="fw-semibold small text-muted mb-2">Sudah Mengumpulkan <span class="badge bg-success"><?= count($jawaban_list) ?></span></div>
                             <?php foreach ($jawaban_list as $j): ?>
-                            <div class="d-flex align-items-start gap-2 py-2 border-bottom">
+                            <div class="d-flex align-items-center gap-2 py-2 border-bottom">
                                 <div class="avatar-kecil"><?= strtoupper(substr($j['nama_peserta'], 0, 1)) ?></div>
                                 <div class="flex-grow-1">
                                     <strong class="small"><?= esc($j['nama_peserta']) ?></strong>
                                     <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($j['dibuat_pada'])) ?></div>
-                                    <?php if (!empty($j['jawaban_teks'])): ?>
-                                        <div class="bg-light rounded p-2 mt-1" style="font-size:13px;"><?= nl2br(esc($j['jawaban_teks'])) ?></div>
-                                    <?php endif; ?>
-                                    <?php if (!empty($j['nama_file'])): ?>
-                                        <a href="<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>" class="btn btn-xs btn-outline-success rounded mt-1" style="font-size:12px; padding:2px 10px;">
-                                            <i class="mdi mdi-download"></i> Unduh Jawaban
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (!empty($j['komentar'])): ?>
-                                        <div class="mt-1 p-2 rounded" style="background:#fffbeb; border:1px solid #fde68a; font-size:12px;">
-                                            <strong>Komentar:</strong> <?= nl2br(esc($j['komentar'])) ?>
-                                        </div>
-                                    <?php endif; ?>
                                 </div>
+                                <span class="badge bg-success"><i class="mdi mdi-check"></i> Selesai</span>
                             </div>
                             <?php endforeach; ?>
-                        </div>
-                        <?php endif; ?>
-                        <?php if (!in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
-                        <div class="mt-2 text-end">
-                            <a href="<?= base_url('tugas_kelas/' . $kelas['id_kelas']) ?>" class="btn btn-sm btn-outline-warning rounded">
-                                <i class="mdi mdi-pencil"></i> Kelola Tugas & Komentar
-                            </a>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -731,7 +735,69 @@ function ceklisSemua() {
 function toggleAll(el) {
     document.querySelectorAll('.peserta-check').forEach(c => c.checked = el.checked);
 }
+
+// Aktifkan tab berdasarkan parameter URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+    if (activeTab) {
+        document.querySelectorAll('#kelasTab .nav-link').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        const targetTab = document.querySelector(`#kelasTab a[href="#${activeTab}"]`);
+        const targetPane = document.querySelector(`#${activeTab}`);
+        if (targetTab && targetPane) {
+            targetTab.classList.add('active');
+            targetPane.classList.add('show', 'active');
+        }
+    }
+});
 </script>
+
+<!-- Modal Tambah Tugas -->
+<div class="modal fade" id="modalTambahTugas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Tugas Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="<?= base_url('tugas_kelas/simpan_tugas') ?>" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
+                <input type="hidden" name="from_detail" value="1">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Judul Tugas <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="judul" required placeholder="Contoh: Tugas Membuat Proposal Bisnis">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Instruksi Tugas <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="instruksi" rows="4" placeholder="Jelaskan detail tugas yang harus dikerjakan..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Link Google Drive / File Online</label>
+                        <input type="url" class="form-control" name="link_file" placeholder="https://drive.google.com/file/d/...">
+                        <small class="text-muted">Link file tugas dari Google Drive, Dropbox, atau platform lainnya</small>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label fw-semibold">Upload File Pendukung (Opsional)</label>
+                        <input type="file" class="form-control" name="file_tugas" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg">
+                        <small class="text-muted">PDF, DOC, PPT, XLS, ZIP, Gambar</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="mdi mdi-content-save"></i> Simpan Tugas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Preview Materi -->
 <div class="modal fade" id="modalPreviewMateri" tabindex="-1" style="--bs-modal-width:90vw;">
@@ -744,6 +810,44 @@ function toggleAll(el) {
             <div class="modal-body p-0" style="height:100%; overflow:hidden;">
                 <iframe id="iframePreview" src="" style="width:100%; height:100%; border:none;"></iframe>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Media Kelas -->
+<div class="modal fade" id="modalTambahMedia" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Media Kelas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="<?= base_url('kelas/ubah_kelas') ?>" method="POST">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id_kelas" value="<?= esc($kelas['id_kelas']) ?>">
+                <input type="hidden" name="from_detail" value="1">
+                <input type="hidden" name="active_tab" value="tab-akses">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Link YouTube</label>
+                        <input type="url" class="form-control" name="link_youtube" 
+                            value="<?= esc($kelas['link_youtube'] ?? '') ?>" 
+                            placeholder="https://www.youtube.com/watch?v=...">
+                        <small class="text-muted">Link video YouTube untuk rekaman kelas</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Link Meeting</label>
+                        <input type="url" class="form-control" name="link_zoom" 
+                            value="<?= esc($kelas['link_zoom'] ?? '') ?>" 
+                            placeholder="https://zoom.us/j/...">
+                        <small class="text-muted">Link Zoom, Google Meet, atau platform meeting lainnya</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary"><i class="mdi mdi-content-save"></i> Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

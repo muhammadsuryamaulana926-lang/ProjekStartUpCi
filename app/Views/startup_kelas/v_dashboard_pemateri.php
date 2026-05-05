@@ -54,7 +54,12 @@ body { background-color: #f5f5f5 !important; }
                     <div class="kelas-item">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <div class="fw-semibold text-dark mb-1"><?= esc($k['nama_kelas']) ?></div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="fw-semibold text-dark"><?= esc($k['nama_kelas']) ?></span>
+                                    <span class="badge <?= $k['status_kelas'] == 'aktif' ? 'bg-primary' : ($k['status_kelas'] == 'selesai' ? 'bg-success' : 'bg-danger') ?>">
+                                        <?= ucfirst($k['status_kelas']) ?>
+                                    </span>
+                                </div>
                                 <div class="text-muted small">
                                     <i class="mdi mdi-calendar me-1"></i><?= date('d M Y', strtotime($k['tanggal'])) ?>
                                     &nbsp;·&nbsp;
@@ -66,19 +71,13 @@ body { background-color: #f5f5f5 !important; }
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge <?= $k['status_kelas'] == 'aktif' ? 'bg-primary' : ($k['status_kelas'] == 'selesai' ? 'bg-success' : 'bg-danger') ?>">
-                                    <?= ucfirst($k['status_kelas']) ?>
-                                </span>
                                 <?php if ($k['jawaban_pending'] > 0): ?>
                                 <span class="badge bg-danger" title="Jawaban belum dikomentari">
                                     <i class="mdi mdi-bell"></i> <?= $k['jawaban_pending'] ?> Jawaban
                                 </span>
                                 <?php endif; ?>
-                                <a href="<?= base_url('tugas_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-warning rounded" title="Tugas & Jawaban">
-                                    <i class="mdi mdi-clipboard-check"></i>
-                                </a>
-                                <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-outline-secondary rounded" title="Detail & Presensi">
-                                    <i class="mdi mdi-eye"></i>
+                                <a href="<?= base_url('presensi_kelas/detail_kelas/' . $k['id_kelas']) ?>" class="btn btn-sm btn-primary rounded" title="Detail Kelas">
+                                    <i class="mdi mdi-eye"></i> Detail
                                 </a>
                             </div>
                         </div>

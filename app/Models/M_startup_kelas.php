@@ -37,6 +37,24 @@ class M_startup_kelas extends Model
         return $this->db->table('kelas_startup')->where('id_kelas', $data['id_kelas'])->update($data);
     }
 
+    // Memperbarui hanya media kelas (link_youtube dan link_zoom)
+    public function ubah_media_kelas($id_kelas, $link_youtube, $link_zoom)
+    {
+        $data = [];
+        if ($link_youtube !== null) {
+            $data['link_youtube'] = $link_youtube;
+        }
+        if ($link_zoom !== null) {
+            $data['link_zoom'] = $link_zoom;
+        }
+        
+        if (empty($data)) {
+            return true;
+        }
+        
+        return $this->db->table('kelas_startup')->where('id_kelas', $id_kelas)->update($data);
+    }
+
     // Menghapus kelas berdasarkan id_kelas
     public function hapus_kelas($data)
     {

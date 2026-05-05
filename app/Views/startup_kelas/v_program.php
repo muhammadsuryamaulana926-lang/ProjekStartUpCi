@@ -36,10 +36,10 @@ body {
         <div class="col-12 col-xl-10">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
@@ -60,7 +60,7 @@ body {
                                     <th width="30%">Nama Program</th>
                                     <th width="15%" class="text-center">Total Kelas</th>
                                     <th width="15%" class="text-center">Total Peserta</th>
-                                    <th width="20%">Status</th>
+                                    <th width="20%" class="text-center">Status</th>
                                     <th width="15%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -79,7 +79,7 @@ body {
                                         </td>
                                         <td class="text-center"><?= $p['jumlah_kelas'] ?> Kelas</td>
                                         <td class="text-center"><?= $p['jumlah_peserta'] ?> Orang</td>
-                                        <td>
+                                        <td class="text-center">
                                             <?php
                                                 $sp = $p['status_program'] ?? 'aktif';
                                                 $badge = $sp == 'aktif' ? 'bg-success' : ($sp == 'selesai' ? 'bg-primary' : 'bg-danger');
@@ -94,11 +94,9 @@ body {
                                                 <a href="<?= base_url('program/edit_program/' . $p['id_program']) ?>" class="btn btn-sm btn-warning text-white me-1 rounded" title="Edit Program">
                                                     <i class="mdi mdi-pencil"></i>
                                                 </a>
-                                                <a href="<?= base_url('program/hapus_program/' . $p['id_program']) ?>" class="btn btn-sm btn-danger rounded"
-                                                    onclick="event.preventDefault(); Swal.fire({title:'Yakin?',text:'Program akan dihapus permanen.',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus!',cancelButtonText:'Batal'}).then(r=>{ if(r.isConfirmed) window.location.href=this.href; });"
-                                                    title="Hapus Program">
+                                                <button type="button" class="btn btn-sm btn-danger rounded" onclick="hapusProgram('<?= $p['id_program'] ?>')" title="Hapus Program">
                                                     <i class="mdi mdi-delete"></i>
-                                                </a>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -207,4 +205,22 @@ body {
     </div>
 </div>
 
+<script>
+function hapusProgram(id) {
+    Swal.fire({
+        title: 'Hapus Program?',
+        text: 'Program dan semua kelas di dalamnya akan dihapus permanen. Tindakan ini tidak dapat dibatalkan!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '<?= base_url('program/hapus_program/') ?>' + id;
+        }
+    });
+}
+</script>
 

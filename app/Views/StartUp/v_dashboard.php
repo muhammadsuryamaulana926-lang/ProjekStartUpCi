@@ -210,6 +210,7 @@ body { background-color: #f5f5f5 !important; }
                                 <th>No WhatsApp</th>
                                 <th class="text-center">Tahun Daftar</th>
                                 <th class="text-center">Status Startup</th>
+                                <th class="text-center">Status Ajuan</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -289,182 +290,250 @@ body { background-color: #f5f5f5 !important; }
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-var chartTahun = null;
-var chartBulan = null;
-var bulanLabel = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-
-function loadChartTahun() {
-    var start = $('#start_year').val();
-    var end   = $('#end_year').val();
-    if (start && end && parseInt(start) > parseInt(end)) return;
-    $.get('<?= base_url('v_dashboard/chart_per_tahun') ?>', { start_year: start, end_year: end }, function(data) {
-        var labels = data.map(d => d.tahun);
-        var values = data.map(d => parseInt(d.total));
-        if (chartTahun) chartTahun.destroy();
-        chartTahun = new Chart(document.getElementById('chart_per_tahun'), {
-            type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Startup', data: values, backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6, borderSkipped: false }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
-        });
-    });
-}
-
-function loadChartBulan() {
-    var tahun = $('#year_bulan').val();
-    $.get('<?= base_url('v_dashboard/chart_per_bulan') ?>', { tahun: tahun }, function(data) {
-        var values = Array(12).fill(0);
-        data.forEach(d => { values[parseInt(d.bulan) - 1] = parseInt(d.total); });
-        if (chartBulan) chartBulan.destroy();
-        chartBulan = new Chart(document.getElementById('chart_per_bulan'), {
-            type: 'doughnut',
-            data: { labels: bulanLabel, datasets: [{ data: values, backgroundColor: [
-                'rgba(13,110,253,0.8)','rgba(102,16,242,0.8)','rgba(13,202,240,0.8)',
-                'rgba(25,135,84,0.8)','rgba(255,193,7,0.8)','rgba(220,53,69,0.8)',
-                'rgba(214,51,132,0.8)','rgba(32,201,151,0.8)','rgba(111,66,193,0.8)',
-                'rgba(20,108,67,0.8)','rgba(253,126,20,0.8)','rgba(108,117,125,0.8)'
-            ], borderWidth: 2, borderColor: '#fff' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }, cutout: '60%' }
-        });
-    });
-}
-
-loadChartTahun();
-loadChartBulan();
-
-var chartTopVideo = null;
-var chartTrenPenonton = null;
-var trenMode = 'bulan';
-
-function loadChartTopVideo() {
-    $.get('<?= base_url('v_dashboard/chart_top_video') ?>', function(data) {
-        var labels = data.map(d => d.judul_video.length > 25 ? d.judul_video.substring(0, 25) + '...' : d.judul_video);
-        var values = data.map(d => parseInt(d.jumlah_ditonton));
-        if (chartTopVideo) chartTopVideo.destroy();
-        chartTopVideo = new Chart(document.getElementById('chart_top_video'), {
-            type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Ditonton', data: values, backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 6, borderSkipped: false }] },
-            options: {
-                indexAxis: 'y',
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
-            }
-        });
-    });
-}
-
-function loadChartTrenPenonton() {
-    var tahun = $('#year_tren').val();
-    var titles = { bulan: 'Tren Penonton Video per Bulan', minggu: 'Tren Penonton Video per Minggu', tahun: 'Tren Penonton Video per Tahun' };
-    $('#tren_title').text(titles[trenMode]);
-    $('#year_tren').toggle(trenMode !== 'tahun');
-
-    $.get('<?= base_url('v_dashboard/chart_tren_penonton') ?>', { tahun: tahun, mode: trenMode }, function(data) {
-        var labels, values;
-        if (trenMode === 'bulan') {
-            labels = bulanLabel;
-            values = Array(12).fill(0);
-            data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
-        } else if (trenMode === 'minggu') {
-            labels = data.map(d => 'Minggu ' + d.periode);
-            values = data.map(d => parseInt(d.total));
-        } else {
-            labels = data.map(d => d.periode);
-            values = data.map(d => parseInt(d.total));
+function initDependenciesDashboard() {
+    if (typeof Chart === 'undefined' || typeof $.fn.DataTable === 'undefined' || typeof $.fn.datepicker === 'undefined') {
+        if (!document.getElementById('dt-css')) {
+            document.head.insertAdjacentHTML('beforeend', '<link id="dt-css" rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">');
+            document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">');
         }
-        if (chartTrenPenonton) chartTrenPenonton.destroy();
-        chartTrenPenonton = new Chart(document.getElementById('chart_tren_penonton'), {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'Penonton', data: values, borderColor: 'rgba(13,110,253,0.9)', backgroundColor: 'rgba(13,110,253,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(13,110,253,0.9)', fill: true, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
-        });
-    });
+        var s1 = document.createElement('script'); s1.src = 'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js';
+        var s2 = document.createElement('script'); s2.src = 'https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js';
+        var s3 = document.createElement('script'); s3.src = 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js';
+        var s4 = document.createElement('script'); s4.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        
+        s1.onload = function() { document.head.appendChild(s2); };
+        s2.onload = function() { document.head.appendChild(s3); };
+        s3.onload = function() { document.head.appendChild(s4); };
+        s4.onload = initDashboard;
+        
+        document.head.appendChild(s1);
+    } else {
+        initDashboard();
+    }
 }
+// Lindungi dari duplikasi listener
 
-loadChartTopVideo();
-loadChartTrenPenonton();
+function initDashboard() {
+    // 1. CHART INITIALIZATION (Memori Leak Fix)
+    // Gunakan window.* agar bisa diakses dan dihancurkan sebelum dirender ulang
+    window.chartTahun = window.chartTahun || null;
+    window.chartBulan = window.chartBulan || null;
+    window.chartTopVideo = window.chartTopVideo || null;
+    window.chartTrenPenonton = window.chartTrenPenonton || null;
+    window.chartTopEbook = window.chartTopEbook || null;
+    window.chartTrenPembacaEbook = window.chartTrenPembacaEbook || null;
+    
+    var bulanLabel = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    var trenMode = $('#tren_mode_select').val() || 'bulan';
+    var trenEbookMode = $('#tren_ebook_mode_select').val() || 'bulan';
 
-var chartTopEbook = null;
-var chartTrenPembacaEbook = null;
-var trenEbookMode = 'bulan';
-
-function loadChartTopEbook() {
-    $.get('<?= base_url('v_dashboard/chart_top_ebook') ?>', function(data) {
-        var labels = data.map(d => d.judul_ebook.length > 25 ? d.judul_ebook.substring(0, 25) + '...' : d.judul_ebook);
-        var values = data.map(d => parseInt(d.jumlah_dibaca || 0));
-        if (chartTopEbook) chartTopEbook.destroy();
-        chartTopEbook = new Chart(document.getElementById('chart_top_ebook'), {
-            type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Dibaca', data: values, backgroundColor: 'rgba(139,115,85,0.7)', borderRadius: 6, borderSkipped: false }] },
-            options: {
-                indexAxis: 'y',
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
-            }
+    function loadChartTahun() {
+        var start = $('#start_year').val();
+        var end   = $('#end_year').val();
+        if (start && end && parseInt(start) > parseInt(end)) return;
+        if (!$('#chart_per_tahun').length) return;
+        
+        $.get('<?= base_url('v_dashboard/chart_per_tahun') ?>', { start_year: start, end_year: end }, function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_per_tahun').length) return;
+                var labels = data.map(d => d.tahun);
+                var values = data.map(d => parseInt(d.total));
+                if (window.chartTahun) window.chartTahun.destroy();
+                var ctx = document.getElementById('chart_per_tahun');
+                if (ctx) {
+                    window.chartTahun = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: [{ label: 'Startup', data: values, backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6, borderSkipped: false }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                    });
+                }
+            }, 50);
         });
-    });
-}
+    }
 
-function loadChartTrenPembacaEbook() {
-    var tahun = $('#year_tren_ebook').val();
-    var titles = { bulan: 'Tren Pembaca Ebook per Bulan', minggu: 'Tren Pembaca Ebook per Minggu', tahun: 'Tren Pembaca Ebook per Tahun' };
-    $('#tren_ebook_title').text(titles[trenEbookMode]);
-    $('#year_tren_ebook').toggle(trenEbookMode !== 'tahun');
-
-    $.get('<?= base_url('v_dashboard/chart_tren_pembaca_ebook') ?>', { tahun: tahun, mode: trenEbookMode }, function(data) {
-        var labels, values;
-        if (trenEbookMode === 'bulan') {
-            labels = bulanLabel;
-            values = Array(12).fill(0);
-            data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
-        } else if (trenEbookMode === 'minggu') {
-            labels = data.map(d => 'Minggu ' + d.periode);
-            values = data.map(d => parseInt(d.total));
-        } else {
-            labels = data.map(d => d.periode);
-            values = data.map(d => parseInt(d.total));
-        }
-        if (chartTrenPembacaEbook) chartTrenPembacaEbook.destroy();
-        chartTrenPembacaEbook = new Chart(document.getElementById('chart_tren_pembaca_ebook'), {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'Pembaca', data: values, borderColor: 'rgba(139,115,85,0.9)', backgroundColor: 'rgba(139,115,85,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(139,115,85,0.9)', fill: true, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+    function loadChartBulan() {
+        var tahun = $('#year_bulan').val();
+        if (!$('#chart_per_bulan').length) return;
+        $.get('<?= base_url('v_dashboard/chart_per_bulan') ?>', { tahun: tahun }, function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_per_bulan').length) return;
+                var values = Array(12).fill(0);
+                data.forEach(d => { values[parseInt(d.bulan) - 1] = parseInt(d.total); });
+                if (window.chartBulan) window.chartBulan.destroy();
+                var ctx = document.getElementById('chart_per_bulan');
+                if (ctx) {
+                    window.chartBulan = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: { labels: bulanLabel, datasets: [{ data: values, backgroundColor: [
+                            'rgba(13,110,253,0.8)','rgba(102,16,242,0.8)','rgba(13,202,240,0.8)',
+                            'rgba(25,135,84,0.8)','rgba(255,193,7,0.8)','rgba(220,53,69,0.8)',
+                            'rgba(214,51,132,0.8)','rgba(32,201,151,0.8)','rgba(111,66,193,0.8)',
+                            'rgba(20,108,67,0.8)','rgba(253,126,20,0.8)','rgba(108,117,125,0.8)'
+                        ], borderWidth: 2, borderColor: '#fff' }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10 } } }, cutout: '60%' }
+                    });
+                }
+            }, 50);
         });
-    });
-}
+    }
 
-loadChartTopEbook();
-loadChartTrenPembacaEbook();
+    function loadChartTopVideo() {
+        if (!$('#chart_top_video').length) return;
+        $.get('<?= base_url('v_dashboard/chart_top_video') ?>', function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_top_video').length) return;
+                var labels = data.map(d => d.judul_video.length > 25 ? d.judul_video.substring(0, 25) + '...' : d.judul_video);
+                var values = data.map(d => parseInt(d.jumlah_ditonton));
+                if (window.chartTopVideo) window.chartTopVideo.destroy();
+                var ctx = document.getElementById('chart_top_video');
+                if (ctx) {
+                    window.chartTopVideo = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: [{ label: 'Ditonton', data: values, backgroundColor: 'rgba(239,68,68,0.7)', borderRadius: 6, borderSkipped: false }] },
+                        options: {
+                            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { beginAtZero: true, min: 0, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#f1f5f9' } },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }, 50);
+        });
+    }
 
-$(document).ready(function() {
-    $('.yearpicker-dash').datepicker({ format: 'yyyy', viewMode: 'years', minViewMode: 'years', autoclose: true });
-    $('#start_year, #end_year').on('changeDate', function() { loadChartTahun(); });
-    $('#year_bulan').on('changeDate', function() { loadChartBulan(); });
-    $('#year_tren').on('changeDate', function() { loadChartTrenPenonton(); });
+    function loadChartTrenPenonton() {
+        var tahun = $('#year_tren').val();
+        var titles = { bulan: 'Tren Penonton Video per Bulan', minggu: 'Tren Penonton Video per Minggu', tahun: 'Tren Penonton Video per Tahun' };
+        $('#tren_title').text(titles[trenMode]);
+        $('#year_tren').toggle(trenMode !== 'tahun');
 
-    $('#tren_mode_select').on('change', function() {
-        trenMode = $(this).val();
-        loadChartTrenPenonton();
-    });
+        if (!$('#chart_tren_penonton').length) return;
+        $.get('<?= base_url('v_dashboard/chart_tren_penonton') ?>', { tahun: tahun, mode: trenMode }, function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_tren_penonton').length) return;
+                var labels, values;
+                if (trenMode === 'bulan') {
+                    labels = bulanLabel;
+                    values = Array(12).fill(0);
+                    data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
+                } else if (trenMode === 'minggu') {
+                    labels = data.map(d => 'Minggu ' + d.periode);
+                    values = data.map(d => parseInt(d.total));
+                } else {
+                    labels = data.map(d => d.periode);
+                    values = data.map(d => parseInt(d.total));
+                }
+                if (window.chartTrenPenonton) window.chartTrenPenonton.destroy();
+                var ctx = document.getElementById('chart_tren_penonton');
+                if (ctx) {
+                    window.chartTrenPenonton = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: labels, datasets: [{ label: 'Penonton', data: values, borderColor: 'rgba(13,110,253,0.9)', backgroundColor: 'rgba(13,110,253,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(13,110,253,0.9)', fill: true, tension: 0.4 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                    });
+                }
+            }, 50);
+        });
+    }
 
-    $('#tren_ebook_mode_select').on('change', function() {
-        trenEbookMode = $(this).val();
-        loadChartTrenPembacaEbook();
-    });
-    $('#year_tren_ebook').on('changeDate', function() { loadChartTrenPembacaEbook(); });
+    function loadChartTopEbook() {
+        if (!$('#chart_top_ebook').length) return;
+        $.get('<?= base_url('v_dashboard/chart_top_ebook') ?>', function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_top_ebook').length) return;
+                var labels = data.map(d => d.judul_ebook.length > 25 ? d.judul_ebook.substring(0, 25) + '...' : d.judul_ebook);
+                var values = data.map(d => parseInt(d.jumlah_dibaca || 0));
+                if (window.chartTopEbook) window.chartTopEbook.destroy();
+                var ctx = document.getElementById('chart_top_ebook');
+                if (ctx) {
+                    window.chartTopEbook = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: [{ label: 'Dibaca', data: values, backgroundColor: 'rgba(139,115,85,0.7)', borderRadius: 6, borderSkipped: false }] },
+                        options: {
+                            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { beginAtZero: true, min: 0, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#f1f5f9' } },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }, 50);
+        });
+    }
 
+    function loadChartTrenPembacaEbook() {
+        var tahun = $('#year_tren_ebook').val();
+        var titles = { bulan: 'Tren Pembaca Ebook per Bulan', minggu: 'Tren Pembaca Ebook per Minggu', tahun: 'Tren Pembaca Ebook per Tahun' };
+        $('#tren_ebook_title').text(titles[trenEbookMode]);
+        $('#year_tren_ebook').toggle(trenEbookMode !== 'tahun');
+
+        if (!$('#chart_tren_pembaca_ebook').length) return;
+        $.get('<?= base_url('v_dashboard/chart_tren_pembaca_ebook') ?>', { tahun: tahun, mode: trenEbookMode }, function(data) {
+            if (typeof data === 'string') { try { data = JSON.parse(data); } catch(e) { return; } }
+            setTimeout(function() {
+                if (!$('#chart_tren_pembaca_ebook').length) return;
+                var labels, values;
+                if (trenEbookMode === 'bulan') {
+                    labels = bulanLabel;
+                    values = Array(12).fill(0);
+                    data.forEach(d => { values[parseInt(d.periode) - 1] = parseInt(d.total); });
+                } else if (trenEbookMode === 'minggu') {
+                    labels = data.map(d => 'Minggu ' + d.periode);
+                    values = data.map(d => parseInt(d.total));
+                } else {
+                    labels = data.map(d => d.periode);
+                    values = data.map(d => parseInt(d.total));
+                }
+                if (window.chartTrenPembacaEbook) window.chartTrenPembacaEbook.destroy();
+                var ctx = document.getElementById('chart_tren_pembaca_ebook');
+                if (ctx) {
+                    window.chartTrenPembacaEbook = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: labels, datasets: [{ label: 'Pembaca', data: values, borderColor: 'rgba(139,115,85,0.9)', backgroundColor: 'rgba(139,115,85,0.1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(139,115,85,0.9)', fill: true, tension: 0.4 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                    });
+                }
+            }, 50);
+        });
+    }
+
+    // Panggil saat inisialisasi
+    loadChartTahun();
+    loadChartBulan();
+    loadChartTopVideo();
+    loadChartTrenPenonton();
+    loadChartTopEbook();
+    loadChartTrenPembacaEbook();
+
+    // 2. EVENT BINDING UNTUK FORMS & DATEPICKER
+    // Harus hancurkan dulu instance lama kalau ada (untuk keamanan SPA)
+    $('.yearpicker-dash').datepicker('destroy').datepicker({ format: 'yyyy', viewMode: 'years', minViewMode: 'years', autoclose: true });
+
+    $('#start_year, #end_year').off('changeDate').on('changeDate', loadChartTahun);
+    $('#year_bulan').off('changeDate').on('changeDate', loadChartBulan);
+    $('#year_tren').off('changeDate').on('changeDate', loadChartTrenPenonton);
+    $('#year_tren_ebook').off('changeDate').on('changeDate', loadChartTrenPembacaEbook);
+
+    $('#tren_mode_select').off('change').on('change', function() { trenMode = $(this).val(); loadChartTrenPenonton(); });
+    $('#tren_ebook_mode_select').off('change').on('change', function() { trenEbookMode = $(this).val(); loadChartTrenPembacaEbook(); });
+
+    // 3. DATATABLES FIX (Hapus pengecekan isDataTable yang menyesatkan di Turbo)
     var dtOptions = {
         pageLength: 10,
         ordering: false,
+        destroy: true, // Wajib di SPA
+        autoWidth: false,
         dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
         language: {
             lengthMenu: 'Show _MENU_ entries',
@@ -474,7 +543,6 @@ $(document).ready(function() {
     };
 
     var tableStartup = $('#datatable-startup').DataTable($.extend({}, dtOptions, {
-        autoWidth: false, destroy: true,
         columns: [
             { data: null, className: 'text-center', render: function(d, t, r, meta) { return meta.row + 1; } },
             { data: 'nama_perusahaan' },
@@ -484,11 +552,16 @@ $(document).ready(function() {
             { data: 'status_startup', className: 'text-center', render: function(d) {
                 var cls = d && d.toLowerCase() === 'aktif' ? 'bg-success' : 'bg-secondary';
                 return '<span class="badge ' + cls + '">' + d + '</span>';
+            }},
+            { data: 'status_ajuan', className: 'text-center', render: function(d) {
+                var map = { 'disetujui': 'bg-success', 'ditolak': 'bg-danger', 'pending': 'bg-warning text-dark' };
+                var cls = map[(d || '').toLowerCase()] || 'bg-secondary';
+                return '<span class="badge ' + cls + '">' + (d || '-') + '</span>';
             }}
         ]
     }));
 
-    $('#modalDetailStartup').on('shown.bs.modal', function() {
+    $('#modalDetailStartup').off('shown.bs.modal').on('shown.bs.modal', function() {
         tableStartup.clear().draw();
         $.ajax({
             url: "<?= base_url('v_dashboard/get_data_startup') ?>",
@@ -498,11 +571,11 @@ $(document).ready(function() {
             error: function() { alert('Gagal mengambil data dari server.'); }
         });
     });
-    $('#modalDetailProgram').on('shown.bs.modal', function() {
-        if ($.fn.DataTable.isDataTable('#dt-program')) return;
+
+    $('#modalDetailProgram').off('shown.bs.modal').on('shown.bs.modal', function() {
         $.get('<?= base_url('v_dashboard/get_data_program') ?>', function(res) {
             $('#dt-program').DataTable($.extend({}, dtOptions, {
-                data: res, destroy: true, autoWidth: false,
+                data: typeof res === 'string' ? JSON.parse(res) : res,
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'nama_program' },
@@ -513,12 +586,10 @@ $(document).ready(function() {
         });
     });
 
-    // Modal Buku
-    $('#modalDetailBuku').on('shown.bs.modal', function() {
-        if ($.fn.DataTable.isDataTable('#dt-buku')) return;
+    $('#modalDetailBuku').off('shown.bs.modal').on('shown.bs.modal', function() {
         $.get('<?= base_url('v_dashboard/get_data_buku') ?>', function(res) {
             $('#dt-buku').DataTable($.extend({}, dtOptions, {
-                data: res, destroy: true, autoWidth: false,
+                data: typeof res === 'string' ? JSON.parse(res) : res,
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'judul_ebook' },
@@ -530,12 +601,10 @@ $(document).ready(function() {
         });
     });
 
-    // Modal Video
-    $('#modalDetailVideo').on('shown.bs.modal', function() {
-        if ($.fn.DataTable.isDataTable('#dt-video')) return;
+    $('#modalDetailVideo').off('shown.bs.modal').on('shown.bs.modal', function() {
         $.get('<?= base_url('v_dashboard/get_data_video') ?>', function(res) {
             $('#dt-video').DataTable($.extend({}, dtOptions, {
-                data: res, destroy: true, autoWidth: false,
+                data: typeof res === 'string' ? JSON.parse(res) : res,
                 columns: [
                     { data: null, render: (d,t,r,m) => m.row+1 },
                     { data: 'judul_video' },
@@ -546,5 +615,10 @@ $(document).ready(function() {
             }));
         });
     });
+}
+
+// Jalankan saat DOM siap
+$(document).ready(function() {
+    initDependenciesDashboard();
 });
 </script>

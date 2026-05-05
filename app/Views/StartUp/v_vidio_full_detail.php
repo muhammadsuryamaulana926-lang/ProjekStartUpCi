@@ -84,6 +84,10 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
     gap: 16px;
 }
 
+.yt-meta-row {
+    display: none;
+}
+
 .yt-channel-info {
     display: flex;
     align-items: center;
@@ -449,12 +453,16 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
         <!-- Left Sidebar / Main Content -->
         <div class="yt-main">
             <!-- Player -->
-            <div class="yt-player-container">
-                <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="<?= esc($video->youtube_id) ?>"></div>
+            <div class="yt-player-container" id="yt-player-placeholder" data-yt-id="<?= esc($video->youtube_id) ?>" data-vid-id="<?= $video->id_konten_video ?>" data-uuid="<?= esc($video->uuid_konten_video) ?>">
             </div>
 
             <!-- Title -->
             <h1 class="yt-title"><?= esc($video->judul_video) ?></h1>
+
+            <!-- View Count -->
+            <div class="mb-2" style="font-size:14px;color:#64748b;">
+                <i class="mdi mdi-eye-outline"></i> <?= number_format($video->jumlah_ditonton ?? 0) ?> kali ditonton
+            </div>
 
             <!-- Actions Row -->
             <div class="yt-meta-row">
@@ -544,67 +552,7 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 
 </div>
 
-<!-- Load Plyr JS -->
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the main Plyr player
-    const player = new Plyr('#player', {
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen'],
-        youtube: {
-            noCookie: true,
-            rel: 0,
-            showinfo: 0,
-            ivory: 1,
-            modestbranding: 1
-        }
-    });
-
-    // Auto play setup based on history tracking if needed
-    let hasTracked = false;
-    const vidId = <?= $video->id_konten_video ?>;
-    
-    player.on('playing', () => {
-        // Option to track play if not yet
-    });
-
-    player.on('timeupdate', event => {
-        const currentTime = Math.floor(player.currentTime);
-        // Track progress every 10 seconds
-        if (currentTime > 0 && currentTime % 10 === 0 && player.playing) {
-            trackProgress(vidId, currentTime);
-        }
-    });
-
-    function trackProgress(id, time) {
-        $.post('<?= base_url('riwayat/update_video') ?>', {
-            id_video: id,
-            durasi: time,
-            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-        });
-    }
-
-    // Tonton Setelah Ini: redirect ke video berikutnya saat video selesai
-    const WATCH_LATER_KEY = 'tonton_setelah_ini';
-    const rekomendasi = <?= json_encode(array_map(fn($r) => ['uuid' => $r->uuid_konten_video, 'judul' => $r->judul_video], $rekomendasi)) ?>;
-
-    // Cek apakah ada antrian, langsung putar
-    const antrian = JSON.parse(localStorage.getItem(WATCH_LATER_KEY) || '[]');
-    if (antrian.length > 0 && antrian[0].uuid === '<?= $video->uuid_konten_video ?>') {
-        antrian.shift();
-        localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(antrian));
-    }
-
-    player.on('ended', () => {
-        const queue = JSON.parse(localStorage.getItem(WATCH_LATER_KEY) || '[]');
-        if (queue.length > 0) {
-            const next = queue.shift();
-            localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(queue));
-            window.location.href = '<?= base_url('perpustakaan/full_vidio/') ?>' + next.uuid;
-        }
-    });
-});
-
 function toggleDropdown() {
     document.getElementById('moreDropdown').classList.toggle('show');
 }

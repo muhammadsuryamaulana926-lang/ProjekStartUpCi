@@ -122,7 +122,7 @@ body { background-color: #f5f5f5 !important; }
                 </div>
 
                 <!-- Multi Video Sesi -->
-                <div class="mb-4">
+                <div class="mb-4" id="seksi_video_rekaman">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <label class="form-label mb-0">Video Rekaman Sesi</label>
                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="tambah_sesi()">
@@ -151,10 +151,14 @@ body { background-color: #f5f5f5 !important; }
                                 </button>
                             </div>
 
-                            <!-- Judul + Link -->
+                            <!-- Judul + Deskripsi + Link -->
                             <div class="mb-2">
                                 <input type="text" class="form-control form-control-sm" name="judul_sesi[]"
                                        placeholder="Judul sesi" value="<?= esc($v['judul_sesi'] ?? '') ?>" required>
+                            </div>
+                            <div class="mb-2">
+                                <textarea class="form-control form-control-sm" name="deskripsi_sesi[]" rows="2"
+                                       placeholder="Deskripsi sesi (opsional)"><?= esc($v['deskripsi'] ?? '') ?></textarea>
                             </div>
                             <div class="row g-2 mb-3">
                                 <div class="col-md-12">
@@ -274,7 +278,8 @@ function tambah_sesi() {
             '<span class="fw-semibold small text-muted">Sesi ' + (idx+1) + '</span>' +
             '<button type="button" class="btn btn-sm btn-outline-danger" onclick="hapus_sesi(this)"><i class="mdi mdi-close"></i></button>' +
         '</div>' +
-        '<div class="mb-2"><input type="text" class="form-control form-control-sm" name="judul_sesi[]" placeholder="Judul sesi" required></div>';
+        '<div class="mb-2"><input type="text" class="form-control form-control-sm" name="judul_sesi[]" placeholder="Judul sesi" required></div>' +
+        '<div class="mb-2"><textarea class="form-control form-control-sm" name="deskripsi_sesi[]" rows="2" placeholder="Deskripsi sesi (opsional)"></textarea></div>';
     if (isOnline) {
         html +=
             '<div class="row g-2 mb-3">' +
@@ -518,8 +523,10 @@ function update_label_meeting() {
 }
 function toggle_tipe_kelas() {
     var tipe = document.querySelector('input[name="tipe_kelas"]:checked');
-    document.getElementById('seksi_online').style.display  = (tipe && tipe.value === 'online')  ? 'block' : 'none';
-    document.getElementById('seksi_offline').style.display = (tipe && tipe.value === 'offline') ? 'block' : 'none';
+    var isOnline = tipe && tipe.value === 'online';
+    document.getElementById('seksi_online').style.display  = isOnline ? 'block' : 'none';
+    document.getElementById('seksi_offline').style.display = !isOnline ? 'block' : 'none';
+    document.getElementById('seksi_video_rekaman').style.display = isOnline ? 'block' : 'none';
 }
 // Inisialisasi saat halaman load
 toggle_tipe_kelas();

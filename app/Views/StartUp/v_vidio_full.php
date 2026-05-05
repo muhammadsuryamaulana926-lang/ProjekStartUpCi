@@ -92,14 +92,16 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
 .yt-rel-views { font-size:12px; color:#64748b; }
 </style>
 
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css"/>
-
 <div class="app-content">
     <div class="yt-layout">
 
         <div class="yt-main">
             <div class="yt-player-container">
-                <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="<?= esc($video->youtube_id) ?>"></div>
+                <div id="yt-player-placeholder"
+                     data-yt-id="<?= esc($video->youtube_id) ?>"
+                     data-vid-id="<?= esc($video->id_konten_video) ?>"
+                     data-uuid="<?= esc($video->uuid_konten_video) ?>"
+                     style="width:100%;height:100%;"></div>
                 <div id="overlay_hitung_mundur">
                     <div class="teks">Video dimulai dalam</div>
                     <div class="angka" id="angka_mundur">5</div>
@@ -176,48 +178,9 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
     </div>
 </div>
 
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-let player;
 document.addEventListener('DOMContentLoaded', () => {
-    player = new Plyr('#player', {
-        controls: ['play-large','play','progress','current-time','mute','volume','captions','settings','fullscreen'],
-        youtube: { noCookie: true, rel: 0, showinfo: 0, ivory: 1, modestbranding: 1 }
-    });
-
-    const vidId = <?= $video->id_konten_video ?>;
-
-    player.on('timeupdate', event => {
-        const currentTime = Math.floor(player.currentTime);
-        if (currentTime > 0 && currentTime % 10 === 0 && player.playing) {
-            $.post('<?= base_url('riwayat/update_video') ?>', {
-                id_video: vidId,
-                durasi: currentTime,
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-            });
-        }
-    });
-
-    const WATCH_LATER_KEY = 'tonton_setelah_ini';
-
-    // Hapus video ini dari antrian jika ada
-    const antrian = JSON.parse(localStorage.getItem(WATCH_LATER_KEY) || '[]');
-    if (antrian.length > 0 && antrian[0].uuid === '<?= $video->uuid_konten_video ?>') {
-        antrian.shift();
-        localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(antrian));
-    }
-
-    player.on('ended', () => {
-        const queue = JSON.parse(localStorage.getItem(WATCH_LATER_KEY) || '[]');
-        if (queue.length > 0) {
-            const next = queue.shift();
-            localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(queue));
-            sessionStorage.setItem('auto_play', '1');
-            window.location.href = '<?= base_url('perpustakaan/full_vidio/') ?>' + next.uuid;
-        }
-    });
-
-    // Jika halaman ini dibuka dari antrian, tampilkan hitung mundur sebelum mulai
+    // Hitung mundur auto-play dari antrian
     if (sessionStorage.getItem('auto_play') === '1') {
         sessionStorage.removeItem('auto_play');
         var overlay = document.getElementById('overlay_hitung_mundur');
@@ -230,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sisa <= 0) {
                 clearInterval(timer);
                 overlay.classList.remove('tampil');
-                player.play();
+                if (window.globalPlayerInstance) window.globalPlayerInstance.play();
             }
         }, 1000);
         window.batal_putar = function() {

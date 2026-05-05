@@ -14,7 +14,6 @@
                                     <th class="text-center" style="width:50px;">No</th>
                                     <th>Nama User</th>
                                     <th>Role</th>
-                                    <th>Aksi</th>
                                     <th>Halaman Terakhir Dibuka</th>
                                     <th>IP Address</th>
                                     <th>Browser / Device</th>
@@ -24,7 +23,7 @@
                             <tbody>
                                 <?php if (empty($logs)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data log aktivitas.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data log aktivitas.</td>
                                 </tr>
                                 <?php else: ?>
                                 <?php $no = 1; foreach ($logs as $log): ?>
@@ -41,7 +40,6 @@
                                         ?>
                                         <span class="badge <?= $badge ?>"><?= esc($log['role'] ?? '-') ?></span>
                                     </td>
-                                    <td><?= esc($log['aksi']) ?></td>
                                     <td><small class="text-muted"><?= esc($log['halaman'] ?? '-') ?></small></td>
                                     <td><code><?= in_array($log['ip_address'], ['::1', '127.0.0.1']) ? 'localhost' : esc($log['ip_address'] ?? '-') ?></code></td>
                                     <td><small class="text-muted"><?= esc(substr($log['user_agent'] ?? '-', 0, 60)) ?>...</small></td>

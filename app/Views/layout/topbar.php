@@ -560,11 +560,11 @@ if (in_array($role, ['admin', 'pemilik_startup', 'pemateri'])) {
 </div>
 
 <script>
-    const IDLE_LIMIT   = 10 * 60;
-    const WARNING_SECS = 2  * 60;
+    var IDLE_LIMIT   = 10 * 60;
+    var WARNING_SECS = 2  * 60;
 
-    let idleTimer, countdownTimer, secondsLeft;
-    let lastActivity = Date.now();
+    var idleTimer, countdownTimer, secondsLeft;
+    var lastActivity = Date.now();
 
     ['mousemove','keydown','click','scroll','touchstart'].forEach(e =>
         document.addEventListener(e, resetIdle)

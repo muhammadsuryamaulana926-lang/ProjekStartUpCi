@@ -57,10 +57,10 @@ body {
         <div class="col-12 col-xl-10">
             
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -223,9 +223,15 @@ body {
                 <?php if (in_array(session()->get('user_role'), ['admin', 'superadmin'])): ?>
                 <div class="tab-pane fade" id="tab-peserta">
                 <div class="d-flex justify-content-end mb-3">
+                    <?php if (empty($kelas)): ?>
+                    <button type="button" class="btn btn-success btn-sm" onclick="Swal.fire({icon:'warning',title:'Belum Ada Kelas',text:'Silakan tambah kelas terlebih dahulu sebelum menambahkan peserta program.',confirmButtonText:'Mengerti'})">
+                        <i class="mdi mdi-plus"></i> Tambah Peserta
+                    </button>
+                    <?php else: ?>
                     <a href="<?= base_url('program/tambah_peserta_program/' . $program['id_program']) ?>" class="btn btn-success btn-sm">
                         <i class="mdi mdi-plus"></i> Tambah Peserta
                     </a>
+                    <?php endif; ?>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered mb-0 align-middle">

@@ -43,15 +43,13 @@ body { background-color: #f5f5f5 !important; }
             <div class="paper-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="m-0 font-weight-bold text-dark">Kalender Jadwal Kelas</h4>
-                    <div class="d-flex gap-2 align-items-center">
-                        <select id="kalender-view" class="form-select form-select-sm" style="width:120px;">
-                            <option value="dayGridMonth">Bulan</option>
-                            <option value="timeGridWeek">Minggu</option>
-                            <option value="listWeek">Daftar</option>
-                        </select>
-                        <span class="badge" style="background:#3b82f6;">Aktif</span>
-                        <span class="badge" style="background:#22c55e;">Selesai</span>
-                        <span class="badge" style="background:#ef4444;">Dibatalkan</span>
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <div class="d-flex gap-2">
+                            <span class="badge" style="background:#3b82f6;">Aktif</span>
+                            <span class="badge" style="background:#22c55e;">Selesai</span>
+                            <span class="badge" style="background:#ef4444;">Dibatalkan</span>
+                        </div>
+                        <div id="kalender-view-wrap"></div>
                     </div>
                 </div>
                 <div id="kalender"></div>
@@ -110,13 +108,16 @@ body { background-color: #f5f5f5 !important; }
     </div>
 </div>
 
-<!-- FullCalendar -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendar = new FullCalendar.Calendar(document.getElementById('kalender'), {
+function startKalender() {
+    if (window.jadwalKelasCalendar) {
+        window.jadwalKelasCalendar.destroy();
+    }
+
+    var kalenderEl = document.getElementById('kalender');
+    if (!kalenderEl) return;
+
+    var calendar = new FullCalendar.Calendar(kalenderEl, {
         initialView: 'dayGridMonth',
         locale: 'id',
         headerToolbar: {
@@ -125,9 +126,11 @@ document.addEventListener('DOMContentLoaded', function() {
             right: false
         },
         buttonText: { today: 'Hari Ini' },
+
         events: '<?= base_url('jadwal_kelas/get_events') ?>',
         eventClick: function(info) {
-            window.location.href = '<?= base_url('presensi_kelas/detail_kelas/') ?>' + info.event.extendedProps.id_kelas + '?from=kalender';
+            var url = '<?= base_url('presensi_kelas/detail_kelas/') ?>' + info.event.extendedProps.id_kelas + '?from=kalender';
+            window.location.href = url;
         },
         eventDidMount: function(info) {
             info.el.title = info.event.title + ' — ' + info.event.extendedProps.nama_program;
@@ -135,9 +138,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     calendar.render();
+    window.jadwalKelasCalendar = calendar;
 
-    document.getElementById('kalender-view').addEventListener('change', function() {
-        calendar.changeView(this.value);
-    });
-});
+    // Inject select ke sebelah kanan toolbar kalender
+    var toolbar = document.querySelector('.fc-header-toolbar');
+    if (toolbar) {
+        var rightSection = toolbar.querySelector('.fc-toolbar-chunk:last-child');
+        if (rightSection) {
+            var oldSel = document.getElementById('kalender-view');
+            if (oldSel) oldSel.remove();
+            
+            var sel = document.createElement('select');
+            sel.id = 'kalender-view';
+            sel.className = 'form-select form-select-sm';
+            sel.style.width = '120px';
+            sel.innerHTML = '<option value="dayGridMonth">Bulan</option><option value="timeGridWeek">Minggu</option><option value="listWeek">Daftar</option>';
+            sel.addEventListener('change', function() { calendar.changeView(this.value); });
+            rightSection.appendChild(sel);
+        }
+    }
+}
+
+function initDependenciesKalender() {
+    if (typeof FullCalendar === 'undefined') {
+        if (!document.getElementById('fullcalendar-css')) {
+            document.head.insertAdjacentHTML('beforeend', '<link id="fullcalendar-css" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">');
+        }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js';
+        s.onload = startKalender;
+        document.head.appendChild(s);
+    } else {
+        startKalender();
+    }
+}
+
+initDependenciesKalender();
+
+
 </script>

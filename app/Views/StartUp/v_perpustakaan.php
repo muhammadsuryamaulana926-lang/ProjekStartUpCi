@@ -14,6 +14,9 @@
        BOOKSHELF STYLES (EBOOK)
        ============================ */
    
+    .app-content {
+        overflow: visible !important; /* Biar buku bisa keluar dari container */
+    }
     
     .library-header h2 {
         font-size: 28px;
@@ -93,6 +96,7 @@
     /* Shelf Section */
     .shelf-section {
         margin-bottom: 12px;
+        overflow: visible; /* Biar buku gak kepotong */
     }
     .shelf-section-header {
         display: flex;
@@ -120,6 +124,7 @@
         padding: 24px 20px 0 20px;
         min-height: 220px;
         padding-bottom: 20px;
+        overflow: visible; /* Biar buku gak kepotong */
     }
     .bookshelf::after {
         content: '';
@@ -131,6 +136,7 @@
         background: linear-gradient(180deg, #D4C4A8 0%, #C2B08E 40%, #B09E7E 100%);
         border-radius: 0 0 6px 6px;
         box-shadow: 0 6px 16px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+        z-index: 1;
     }
     .bookshelf::before {
         content: '';
@@ -140,16 +146,20 @@
         right: 10px;
         height: 12px;
         background: radial-gradient(ellipse at center, rgba(0,0,0,0.08) 0%, transparent 70%);
+        z-index: 0;
     }
 
     /* Books container */
     .books-row {
         display: flex;
         align-items: flex-end;
-        gap: 12px;
+        gap: 28px;
         padding-bottom: 28px;
         overflow-x: auto;
+        overflow-y: visible; /* Biar buku bisa keluar ke atas */
         scrollbar-width: none;
+        position: relative;
+        z-index: 2;
     }
     .books-row::-webkit-scrollbar { display: none; }
 
@@ -162,9 +172,26 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        z-index: 1;
     }
     .book-item:hover {
+        z-index: 999; /* Super tinggi biar di atas semua */
+    }
+    
+    /* Disable animasi untuk tombol tambah buku */
+    .book-item.no-animation:hover {
         z-index: 5;
+    }
+    .book-item.no-animation .book-cover {
+        animation: none !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .book-item.no-animation:hover .book-cover {
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 4px 12px 24px rgba(0,0,0,0.12);
+    }
+    .book-item.no-animation .book-pages {
+        display: none !important;
     }
 
     .book-title-label {
@@ -257,10 +284,257 @@
         padding: 10px;
         z-index: 3;
         border-radius: 4px 10px 10px 4px;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        transform: translateZ(2px);
     }
     .book-item:hover .book-overlay {
         opacity: 1;
     }
+
+    /* ── Book Hover: Teleport / FLIP CSS ── */
+    .book-item .book-cover,
+    .book-clone .book-cover {
+        transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
+        transform-style: preserve-3d;
+        position: relative;
+        transform-origin: left center; /* Pivot di kiri seperti buku asli */
+    }
+    /* Buku di rak tidak perlu preserve-3d, supaya overflow:hidden bisa meng-clip krem */
+    .book-item .book-cover {
+        transform-style: flat;
+    }
+    .book-item .book-cover::after {
+        display: none;
+    }
+    .book-item .book-cover,
+    .book-clone .book-cover {
+        z-index: 5; /* Jaga sampul depan tetap di atas saat di rak dan saat di-zoom */
+    }
+    
+    /* Sampul Depan */
+    .book-cover img,
+    .book-cover-default {
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        position: relative;
+        z-index: 2;
+        transform: translateZ(1px);
+    }
+    /* Bagian Dalam Sampul Depan (Kertas) */
+    .book-cover::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: #F5F0E8;
+        border-radius: 4px 10px 10px 4px;
+        transform: translateZ(-1px);
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+    }
+    /* CLASS SAAT BUKU ASLI DI-HOVER (DISALIN KE TENGAH) */
+    .book-item.is-lifted > *:not(.book-title-label) {
+        opacity: 0 !important;
+        visibility: hidden;
+    }
+    .book-item.is-lifted {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    /* BUKU CLONE YANG MELAYANG DI TENGAH LAYAR */
+    .book-clone {
+        position: fixed;
+        z-index: 99999; /* Pastikan di atas segalanya */
+        border-radius: 0;
+        box-shadow: 0 0 50px rgba(0,0,0,0.3), 0 0 15px rgba(0,0,0,0.1);
+        pointer-events: auto; /* Bisa diklik */
+        transform-origin: center center;
+        will-change: transform, box-shadow;
+        transform-style: preserve-3d;
+        perspective: 1500px;
+    }
+    
+    /* Sembunyikan label judul pada clone agar tidak ikut ke tengah */
+    .book-clone .book-title-label {
+        display: none !important;
+    }
+    /* Sembunyikan lapisan krem (inside cover) pada clone - bocor karena preserve-3d */
+    .book-clone .book-cover::after {
+        display: none !important;
+    }
+    /* Hilangkan border halaman yang merembes keluar di clone */
+    .book-clone .book-page {
+        border: none !important;
+    }
+    .book-clone .book-pages::after {
+        border: none !important;
+        box-sizing: border-box;
+    }
+    /* Paskan kontainer halaman tepat dengan sampul depan */
+    .book-clone .book-pages {
+        top: 0;
+        bottom: 0;
+        height: auto;
+    }
+
+    /* State 1: Animasi Buka-Tutup Buku (clone di tengah layar) */
+    .book-clone.is-zoomed .book-cover {
+        animation: coverOpenFlip 7s ease-in-out forwards;
+        transform-origin: left center !important;
+    }
+    
+    @keyframes coverOpenFlip {
+        0%, 5% { transform: translateZ(15px) rotateY(0deg); opacity: 1; }
+        12% { transform: translateZ(15px) rotateY(-89deg); opacity: 1; }
+        13% { transform: translateZ(15px) rotateY(-90deg); opacity: 0; }
+        88% { transform: translateZ(15px) rotateY(-90deg); opacity: 0; }
+        89% { transform: translateZ(15px) rotateY(-45deg); opacity: 0; }
+        92% { transform: translateZ(15px) rotateY(-20deg); opacity: 1; }
+        95%, 100% { transform: translateZ(15px) rotateY(0deg); opacity: 1; }
+    }
+    
+    .book-clone .book-overlay {
+        opacity: 1; /* Selalu tampilkan tombol saat di-zoom */
+    }
+
+    /* OVERLAY GELAP DI BACKGROUND */
+    #bookshelf-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 99990;
+        opacity: 0;
+        pointer-events: none; /* Jangan blokir scroll rak buku */
+        transition: opacity 0.4s ease;
+    }
+    #bookshelf-overlay.is-active {
+        opacity: 1;
+    }
+
+    /* Halaman Buku REAL - Terlihat seperti halaman fisik yang terbuka */
+    .book-pages {
+        position: absolute;
+        top: 0;
+        right: -5px;
+        width: 220px;
+        height: 300px;
+        pointer-events: none;
+        transform-style: preserve-3d;
+        opacity: 1; /* Selalu tampil, disembunyikan oleh sampul */
+        z-index: 1; /* Di bawah sampul saat di rak */
+    }
+
+    /* Sampul Belakang - CUSTOM DESIGN BERBEDA (Terlihat di sisi kanan setelah halaman dibalik) */
+    .book-pages::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: 
+            linear-gradient(135deg, #4A3F2E 0%, #2C2416 100%),
+            repeating-linear-gradient(
+                45deg,
+                rgba(0,0,0,0.05),
+                rgba(0,0,0,0.05) 5px,
+                transparent 5px,
+                transparent 10px
+            );
+        border-radius: 0 8px 8px 0;
+        box-shadow: inset 5px 0 20px rgba(0,0,0,0.5);
+        transform: translateZ(-20px);
+        border: 2px solid #8B7355;
+    }
+    
+    .book-clone.is-zoomed .book-pages::after {
+        /* Sampul belakang tetap diam di tempat sebagai cover dalam (kanan) */
+        animation: none;
+        transform-origin: left center;
+    }
+    
+    .book-page {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            rgba(245,240,232,0.95) 0%, 
+            rgba(255,255,255,0.98) 15%, 
+            rgba(255,255,255,1) 50%, 
+            rgba(250,248,245,0.98) 85%, 
+            rgba(240,235,225,0.95) 100%);
+        border: 1px solid rgba(220,210,195,0.4);
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        transform-origin: left center;
+        transform-style: preserve-3d;
+        transform: rotateY(0deg);
+        box-shadow: 
+            -2px 0 8px rgba(0,0,0,0.1),
+            inset 3px 0 6px rgba(0,0,0,0.05),
+            inset -3px 0 6px rgba(255,255,255,0.5);
+    }
+    
+    /* Garis-garis halaman untuk efek lebih realistis */
+    .book-page::before {
+        content: '';
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        top: 40px;
+        bottom: 40px;
+        background: repeating-linear-gradient(
+            transparent,
+            transparent 22px,
+            rgba(200,190,180,0.15) 22px,
+            rgba(200,190,180,0.15) 23px
+        );
+        pointer-events: none;
+    }
+    
+    /* Shadow halaman di tepi kiri */
+    .book-page::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(90deg, 
+            rgba(0,0,0,0.08) 0%, 
+            rgba(0,0,0,0.03) 50%, 
+            transparent 100%);
+        pointer-events: none;
+    }
+
+    /* Animasi halaman: buka pelan satu-satu, tutup cepat seperti menutup buku asli */
+    .book-clone.is-zoomed .book-page:nth-child(1)  { animation: pageFlip1  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(2)  { animation: pageFlip2  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(3)  { animation: pageFlip3  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(4)  { animation: pageFlip4  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(5)  { animation: pageFlip5  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(6)  { animation: pageFlip6  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(7)  { animation: pageFlip7  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(8)  { animation: pageFlip8  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(9)  { animation: pageFlip9  7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(10) { animation: pageFlip10 7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(11) { animation: pageFlip11 7s ease-in-out forwards; }
+    .book-clone.is-zoomed .book-page:nth-child(12) { animation: pageFlip12 7s ease-in-out forwards; }
+    
+    @keyframes pageFlip1  { 0%,8%  { transform: translateZ(14px) rotateY(0deg); } 16%,83% { transform: translateZ(14px) rotateY(-180deg); } 88%,100% { transform: translateZ(14px) rotateY(0deg); } }
+    @keyframes pageFlip2  { 0%,12% { transform: translateZ(13px) rotateY(0deg); } 20%,82% { transform: translateZ(13px) rotateY(-180deg); } 87%,100% { transform: translateZ(13px) rotateY(0deg); } }
+    @keyframes pageFlip3  { 0%,16% { transform: translateZ(12px) rotateY(0deg); } 24%,81% { transform: translateZ(12px) rotateY(-180deg); } 86%,100% { transform: translateZ(12px) rotateY(0deg); } }
+    @keyframes pageFlip4  { 0%,20% { transform: translateZ(11px) rotateY(0deg); } 28%,80% { transform: translateZ(11px) rotateY(-180deg); } 85%,100% { transform: translateZ(11px) rotateY(0deg); } }
+    @keyframes pageFlip5  { 0%,24% { transform: translateZ(10px) rotateY(0deg); } 32%,79% { transform: translateZ(10px) rotateY(-180deg); } 84%,100% { transform: translateZ(10px) rotateY(0deg); } }
+    @keyframes pageFlip6  { 0%,28% { transform: translateZ(9px) rotateY(0deg); }  36%,78% { transform: translateZ(9px) rotateY(-180deg); }  83%,100% { transform: translateZ(9px) rotateY(0deg); } }
+    @keyframes pageFlip7  { 0%,32% { transform: translateZ(8px) rotateY(0deg); }  40%,77% { transform: translateZ(8px) rotateY(-180deg); }  82%,100% { transform: translateZ(8px) rotateY(0deg); } }
+    @keyframes pageFlip8  { 0%,36% { transform: translateZ(7px) rotateY(0deg); }  44%,76% { transform: translateZ(7px) rotateY(-180deg); }  81%,100% { transform: translateZ(7px) rotateY(0deg); } }
+    @keyframes pageFlip9  { 0%,40% { transform: translateZ(6px) rotateY(0deg); }  48%,75% { transform: translateZ(6px) rotateY(-180deg); }  80%,100% { transform: translateZ(6px) rotateY(0deg); } }
+    @keyframes pageFlip10 { 0%,44% { transform: translateZ(5px) rotateY(0deg); }  52%,74% { transform: translateZ(5px) rotateY(-180deg); }  79%,100% { transform: translateZ(5px) rotateY(0deg); } }
+    @keyframes pageFlip11 { 0%,48% { transform: translateZ(4px) rotateY(0deg); }  56%,73% { transform: translateZ(4px) rotateY(-180deg); }  78%,100% { transform: translateZ(4px) rotateY(0deg); } }
+    @keyframes pageFlip12 { 0%,52% { transform: translateZ(3px) rotateY(0deg); }  60%,72% { transform: translateZ(3px) rotateY(-180deg); }  77%,100% { transform: translateZ(3px) rotateY(0deg); } }
+
     .book-overlay-title {
         font-size: 11px;
         font-weight: 700;
@@ -1078,10 +1352,11 @@
                                     </div>
                                 </div>
                                 <div class="book-title-label"><?= strtolower(esc($e->judul_ebook)) ?></div>
+                                <div class="book-pages"><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div><div class="book-page"></div></div>
                             </div>
                         <?php endforeach; ?>
                         <?php if (session()->get('user_role') === 'admin'): ?>
-                        <div class="book-item" onclick="window.location.href='<?= base_url('perpustakaan/tambah_buku') ?>'" style="cursor:pointer;">
+                        <div class="book-item no-animation" onclick="window.location.href='<?= base_url('perpustakaan/tambah_buku') ?>'" style="cursor:pointer;">
                             <div class="book-add-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -1343,6 +1618,171 @@
 
 <script>
     // ═══════════════════════════════════════════════
+    // JS: TELEPORT HOVER EFFECT UNTUK BUKU
+    // ═══════════════════════════════════════════════
+    function initBookshelfAnimation() {
+        // Cek apakah sudah diinit untuk menghindari duplikasi
+        if (window.bookshelfAnimationInitialized) return;
+        window.bookshelfAnimationInitialized = true;
+        
+        const books = document.querySelectorAll('.book-item:not(.no-animation)');
+        let activeClone = null;
+        let activeBook = null;
+        let hoverIntentTimeout = null;
+        let mouseLeaveTimeout = null;
+        
+        // Buat overlay
+        let overlay = document.getElementById('bookshelf-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'bookshelf-overlay';
+            document.body.appendChild(overlay);
+        }
+
+        const SCALE_FACTOR = 1.8; // Skala zoom (1.8x lebih besar)
+
+        // Helper check mouse in rect
+        function isMouseInRect(e, rect, padding = 15) {
+            return e.clientX >= rect.left - padding &&
+                   e.clientX <= rect.right + padding &&
+                   e.clientY >= rect.top - padding &&
+                   e.clientY <= rect.bottom + padding;
+        }
+
+        // Fungsi un-zoom / kembalikan buku ke rak
+        function closeZoom() {
+            if (!activeClone || !activeBook) return;
+
+            const cloneToRemove = activeClone;
+            const originalBook = activeBook;
+            
+            // Hentikan putaran seketika agar landing di rak dalam keadaan lurus
+            cloneToRemove.classList.remove('is-zoomed');
+            
+            // Dapatkan posisi terbaru buku di rak (mungkin terscroll)
+            const currentRect = originalBook.getBoundingClientRect();
+            const initialLeft = parseFloat(cloneToRemove.style.left);
+            const initialTop = parseFloat(cloneToRemove.style.top);
+
+            const backTranslateX = currentRect.left - initialLeft;
+            const backTranslateY = currentRect.top - initialTop;
+
+            cloneToRemove.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease';
+            cloneToRemove.style.transform = `translate3d(${backTranslateX}px, ${backTranslateY}px, 0) scale(1)`;
+            cloneToRemove.style.boxShadow = 'none';
+
+            overlay.classList.remove('is-active');
+
+            const onTransitionEnd = (e) => {
+                if (e.propertyName !== 'transform') return;
+                cloneToRemove.removeEventListener('transitionend', onTransitionEnd);
+                if (cloneToRemove.parentNode) cloneToRemove.parentNode.removeChild(cloneToRemove);
+                originalBook.classList.remove('is-lifted');
+            };
+            cloneToRemove.addEventListener('transitionend', onTransitionEnd);
+            setTimeout(() => { if (cloneToRemove.parentNode) onTransitionEnd({ propertyName: 'transform' }); }, 450);
+
+            activeClone = null;
+            activeBook = null;
+            document.removeEventListener('mousemove', handleMouseMove);
+        }
+
+        // Tracking pergerakan mouse agar clone tidak tertutup saat pindah ke clone
+        function handleMouseMove(e) {
+            if (!activeClone || !activeBook) return;
+            
+            const origRect = activeBook.getBoundingClientRect();
+            const cloneRect = activeClone.getBoundingClientRect();
+            
+            const inOrig = isMouseInRect(e, origRect, 20);
+            const inClone = isMouseInRect(e, cloneRect, 20);
+            
+            if (!inOrig && !inClone) {
+                if (!mouseLeaveTimeout) {
+                    mouseLeaveTimeout = setTimeout(() => {
+                        closeZoom();
+                    }, 200); // 200ms grace period untuk menyeberang
+                }
+            } else {
+                if (mouseLeaveTimeout) {
+                    clearTimeout(mouseLeaveTimeout);
+                    mouseLeaveTimeout = null;
+                }
+            }
+        }
+
+        books.forEach(book => {
+            book.addEventListener('mouseenter', () => {
+                if (hoverIntentTimeout) clearTimeout(hoverIntentTimeout);
+                
+                hoverIntentTimeout = setTimeout(() => {
+                    // Jika ada buku lain yang sedang zoom, tutup dulu
+                    if (activeClone && activeBook !== book) {
+                        closeZoom();
+                    }
+                    if (activeClone) return;
+
+                    activeBook = book;
+                    const rect = book.getBoundingClientRect();
+
+                    activeClone = book.cloneNode(true);
+                    activeClone.classList.add('book-clone');
+                    activeClone.classList.remove('book-item');
+
+                    activeClone.style.left = `${rect.left}px`;
+                    activeClone.style.top = `${rect.top}px`;
+                    const coverEl = book.querySelector('.book-cover');
+                    const coverRect = coverEl ? coverEl.getBoundingClientRect() : rect;
+                    activeClone.style.width = `${coverRect.width}px`;
+                    activeClone.style.height = `${coverRect.height}px`;
+                    activeClone.style.margin = '0';
+                    activeClone.style.transform = 'translate3d(0, 0, 0) scale(1)';
+                    activeClone.style.transition = 'none';
+
+                    document.body.appendChild(activeClone);
+                    book.classList.add('is-lifted');
+                    overlay.classList.add('is-active');
+
+                    // Force reflow
+                    activeClone.getBoundingClientRect();
+
+                    // Hitung translasi ke tengah layar
+                    const viewportCenterX = window.innerWidth / 2;
+                    const viewportCenterY = window.innerHeight / 2;
+                    const originalCenterX = rect.left + rect.width / 2;
+                    const originalCenterY = rect.top + rect.height / 2;
+
+                    const translateX = viewportCenterX - originalCenterX;
+                    // Sedikit dinaikkan (-30px) agar lebih pas di mata
+                    const translateY = viewportCenterY - originalCenterY - 30;
+
+                    activeClone.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease';
+                    activeClone.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${SCALE_FACTOR})`;
+
+                    // Tambahkan class is-zoomed untuk memicu animasi 3D flip halaman di clone
+                    activeClone.classList.add('is-zoomed');
+
+                    // Mulai lacak mouse
+                    document.addEventListener('mousemove', handleMouseMove);
+                }, 150); // Intent delay
+            });
+
+            book.addEventListener('mouseleave', () => {
+                if (hoverIntentTimeout) clearTimeout(hoverIntentTimeout);
+            });
+        });
+    }
+    
+    // Init animasi bookshelf
+    // Panggil langsung jika DOM sudah ready, atau tunggu DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initBookshelfAnimation);
+    } else {
+        // DOM sudah ready, langsung init
+        initBookshelfAnimation();
+    }
+
+    // ═══════════════════════════════════════════════
     // SECTION SWITCHER — Perpustakaan Filter Tabs
     // ═══════════════════════════════════════════════
     function switchSection(section) {
@@ -1494,9 +1934,10 @@
     // ═══════════════════════════════════════════════
     // VIDEO FUNCTIONS (WITH TRACKING)
     // ═══════════════════════════════════════════════
-    const CSRF_NAME = '<?= csrf_token() ?>';
-    const CSRF_HASH = '<?= csrf_hash() ?>';
-    var plyrPlayers = {}; // Menyimpan instance Plyr
+    // Gunakan variabel CSRF yang sudah dideklarasikan di topbar atau di atas
+    window.CSRF_NAME = window.CSRF_NAME || '<?= csrf_token() ?>';
+    window.CSRF_HASH = window.CSRF_HASH || '<?= csrf_hash() ?>';
+    window.plyrPlayers = window.plyrPlayers || {}; // Menyimpan instance Plyr
 
     function putarVideo(id, ytId) {
         if (!ytId) return;
@@ -1554,7 +1995,7 @@
         $.post('<?= base_url('riwayat/update_video') ?>', {
             id_video: id,
             durasi: time,
-            [CSRF_NAME]: CSRF_HASH
+            [window.CSRF_NAME]: window.CSRF_HASH
         });
     }
 
@@ -1615,6 +2056,10 @@
     var IS_VIDEO_PAGE = <?= $isVideoPage ? 'true' : 'false' ?>;
     if (IS_VIDEO_PAGE) {
         initVideoHoverListeners();
+        // Render Lucide icons untuk video page
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     // Backward compatibility for old link pattern: /v_perpustakaan?tab=video
@@ -1623,7 +2068,6 @@
         window.location.href = '<?= base_url('perpustakaan/video') ?>';
     }
 
-    // Buka halaman baca video (tab penuh ala YouTube)
     function bacaVideo(uuid) {
         window.location.href = '<?= base_url('perpustakaan/full_vidio/') ?>' + uuid;
     }
@@ -1632,6 +2076,10 @@
     // ADMIN CRUD (Ebook & Video)
     // ═══════════════════════════════════════════════
     <?php if (session()->get('user_role') === 'admin'): ?>
+
+    // Gunakan variabel CSRF yang sudah dideklarasikan di topbar
+    var CSRF_NAME = CSRF_NAME || '<?= csrf_token() ?>';
+    var CSRF_HASH = CSRF_HASH || '<?= csrf_hash() ?>';
 
     // ── Ebook CRUD ──
     function bukaModalTambahEbook() {
@@ -1650,7 +2098,7 @@
         $.ajax({
             url: '<?= base_url('perpustakaan/ambil_ebook') ?>',
             type: 'POST',
-            data: { id_konten_ebook: id, [CSRF_NAME]: CSRF_HASH },
+            data: { id_konten_ebook: id, [window.CSRF_NAME]: window.CSRF_HASH },
             success: function(res) {
                 var d = typeof res === 'string' ? JSON.parse(res) : res;
                 document.getElementById('id_konten_ebook').value  = d.id_konten_ebook;
@@ -1730,7 +2178,7 @@
             document.getElementById(hasilId).innerHTML = '';
             return;
         }
-        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [CSRF_NAME]: CSRF_HASH }, function(res) {
+        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [window.CSRF_NAME]: window.CSRF_HASH }, function(res) {
             var d = typeof res === 'string' ? JSON.parse(res) : res;
             if (d.status) {
                 muatListAksesInline(tipe, id_konten, listId);
@@ -1743,14 +2191,14 @@
     function hapusAksesInline(id, tipe, id_konten) {
         var listId = tipe === 'ebook' ? 'listAksesEbook' : 'listAksesVideo';
         var cariId = tipe === 'ebook' ? 'cari_user_ebook' : 'cari_user_video';
-        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [CSRF_NAME]: CSRF_HASH }, function() {
+        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [window.CSRF_NAME]: window.CSRF_HASH }, function() {
             muatListAksesInline(tipe, id_konten, listId);
             cariUserInline(tipe, document.getElementById(cariId).value);
         });
     }
 
     function muatListAksesInline(tipe, id_konten, listId) {
-        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [CSRF_NAME]: CSRF_HASH }, function(res) {
+        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [window.CSRF_NAME]: window.CSRF_HASH }, function(res) {
             var list = typeof res === 'string' ? JSON.parse(res) : res;
             var html = !list.length ? '<p style="font-size:12px;color:#9C8E7A;">Belum ada user.</p>' :
                 list.map(u =>
@@ -1779,10 +2227,10 @@
         document.getElementById(listId).innerHTML = html;
     }
 
-    $('#formEbook').submit(function(e) {
+    $('#formEbook').off('submit').on('submit', function(e) {
         e.preventDefault();
         var formData = new FormData(this);
-        formData.append(CSRF_NAME, CSRF_HASH);
+        formData.append(window.CSRF_NAME, window.CSRF_HASH);
         var isEdit = document.getElementById('id_konten_ebook').value !== '';
         var url = isEdit ? '<?= base_url('perpustakaan/ubah_ebook') ?>' : '<?= base_url('perpustakaan/simpan_ebook') ?>';
         $.ajax({
@@ -1793,11 +2241,11 @@
                     var id_konten = d.id_konten || document.getElementById('id_konten_ebook').value;
                     var pending = _pendingAkses.slice();
                     _pendingAkses = [];
-                    var tasks = pending.map(p => $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: 'ebook', id_konten: id_konten, id_user: p.id_user, [CSRF_NAME]: CSRF_HASH }));
+                    var tasks = pending.map(p => $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: 'ebook', id_konten: id_konten, id_user: p.id_user, [window.CSRF_NAME]: window.CSRF_HASH }));
                     $.when.apply($, tasks.length ? tasks : [$.when()]).then(function() {
                         bootstrap.Modal.getInstance(document.getElementById('modalEbook')).hide();
                         Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Ebook berhasil disimpan', showConfirmButton: false, timer: 1500 })
-                            .then(() => location.reload());
+                            .then(() => { location.reload(); });
                     });
                 } else {
                     Swal.fire('Gagal!', d.msg || 'Terjadi kesalahan', 'error');
@@ -1812,7 +2260,7 @@
             if (r.isConfirmed) {
                 $.ajax({
                     url: '<?= base_url('perpustakaan/hapus_ebook') ?>', type: 'POST',
-                    data: { id_konten_ebook: id, [CSRF_NAME]: CSRF_HASH },
+                    data: { id_konten_ebook: id, [window.CSRF_NAME]: window.CSRF_HASH },
                     success: function(res) {
                         var d = typeof res === 'string' ? JSON.parse(res) : res;
                         Swal.fire({ icon: d.status ? 'success' : 'error', title: d.status ? 'Berhasil!' : 'Gagal!', text: d.status ? 'Ebook berhasil dihapus' : 'Terjadi kesalahan', showConfirmButton: false, timer: 1500 })
@@ -1824,16 +2272,35 @@
     }
 
     function hapusVideo(id) {
-        Swal.fire({ title: 'Hapus Video?', text: 'Data tidak dapat dikembalikan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal' })
-        .then((r) => {
+        Swal.fire({ 
+            title: 'Hapus Video?', 
+            text: 'Data video akan dihapus permanen dan tidak dapat dikembalikan.', 
+            icon: 'warning', 
+            showCancelButton: true, 
+            confirmButtonColor: '#d33', 
+            cancelButtonColor: '#6c757d', 
+            confirmButtonText: 'Ya, Hapus!', 
+            cancelButtonText: 'Batal' 
+        }).then((r) => {
             if (r.isConfirmed) {
                 $.ajax({
-                    url: '<?= base_url('perpustakaan/hapus_video') ?>', type: 'POST',
-                    data: { id_konten_video: id, [CSRF_NAME]: CSRF_HASH },
+                    url: '<?= base_url('perpustakaan/hapus_video') ?>', 
+                    type: 'POST',
+                    data: { id_konten_video: id, [window.CSRF_NAME]: window.CSRF_HASH },
                     success: function(res) {
                         var d = typeof res === 'string' ? JSON.parse(res) : res;
-                        Swal.fire({ icon: d.status ? 'success' : 'error', title: d.status ? 'Berhasil!' : 'Gagal!', text: d.status ? 'Video berhasil dihapus' : 'Terjadi kesalahan', showConfirmButton: false, timer: 1500 })
-                            .then(() => { if (d.status) location.reload(); });
+                        Swal.fire({ 
+                            icon: d.status ? 'success' : 'error', 
+                            title: d.status ? 'Berhasil!' : 'Gagal!', 
+                            text: d.status ? 'Video berhasil dihapus' : 'Terjadi kesalahan', 
+                            showConfirmButton: false, 
+                            timer: 1500 
+                        }).then(() => { 
+                            if (d.status) location.reload(); 
+                        });
+                    },
+                    error: function() {
+                        Swal.fire('Error!', 'Terjadi kesalahan saat menghapus video', 'error');
                     }
                 });
             }
@@ -1895,7 +2362,7 @@
     function muatListAkses() {
         var tipe      = document.getElementById('akses_tipe').value;
         var id_konten = document.getElementById('akses_id_konten').value;
-        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [CSRF_NAME]: CSRF_HASH }, function(res) {
+        $.post('<?= base_url('perpustakaan/get_akses') ?>', { tipe: tipe, id_konten: id_konten, [window.CSRF_NAME]: window.CSRF_HASH }, function(res) {
             var list = typeof res === 'string' ? JSON.parse(res) : res;
             var html = '';
             if (!list.length) {
@@ -1916,7 +2383,7 @@
     function tambahAkses(id_user) {
         var tipe      = document.getElementById('akses_tipe').value;
         var id_konten = document.getElementById('akses_id_konten').value;
-        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [CSRF_NAME]: CSRF_HASH }, function(res) {
+        $.post('<?= base_url('perpustakaan/tambah_akses') ?>', { tipe: tipe, id_konten: id_konten, id_user: id_user, [window.CSRF_NAME]: window.CSRF_HASH }, function(res) {
             var d = typeof res === 'string' ? JSON.parse(res) : res;
             if (d.status) {
                 muatListAkses();
@@ -1927,7 +2394,7 @@
     }
 
     function hapusAkses(id) {
-        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [CSRF_NAME]: CSRF_HASH }, function() {
+        $.post('<?= base_url('perpustakaan/hapus_akses') ?>', { id: id, [window.CSRF_NAME]: window.CSRF_HASH }, function() {
             muatListAkses();
             cariUser(document.getElementById('cari_user').value);
         });
@@ -1944,5 +2411,12 @@
             confirmButtonColor: '#6366f1'
         });
     }
+
+    // Render Lucide icons setelah DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 

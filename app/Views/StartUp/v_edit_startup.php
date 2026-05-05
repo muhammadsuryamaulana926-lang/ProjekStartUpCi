@@ -207,20 +207,21 @@ body { background-color: #f5f5f5 !important; }
 </div>
 
 <script>
-$(document).ready(function () {
+function initEditStartup() {
     $('select[name="tahun_berdiri"]').val('<?= $data[0]['tahun_berdiri'] ?>');
     $('select[name="id_dosen_pembina"]').val('<?= $data[0]['id_dosen_pembina'] ?>');
     $('select[name="status_startup"]').val('<?= $data[0]['status_startup'] ?>');
     $('select[name="id_program_kewirausahaan_startup"]').val('<?= $data[0]['id_program_kewirausahaan_startup'] ?>');
     $('select[name="tahun_daftar"]').val('<?= $data[0]['tahun_daftar'] ?>');
 
-    try { $('.select2_tahun_berdiri').select2(); $('.select2_tahun_daftar').select2(); } catch(e) {}
-    $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true });
-    $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true });
+    try { $('.select2_tahun_berdiri').select2(); } catch(e) {}
+    try { $('.select2_tahun_daftar').select2(); } catch(e) {}
+    try { $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true }); } catch(e) {}
+    try { $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true }); } catch(e) {}
 
-    $('#form_ubah').submit(function (e) {
+    $('#form_ubah').off('submit').on('submit', function (e) {
         e.preventDefault();
-        var forms = $('#form_ubah');
+        var forms = $(this);
         var formData = new FormData(this);
 
         $('.submit').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Menyimpan...');
@@ -236,10 +237,11 @@ $(document).ready(function () {
             processData: false,
             success: function (data) {
                 if (data.status) {
-                    Toast.fire({ icon: 'success', title: 'Perubahan berhasil disimpan' });
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Perubahan berhasil disimpan', timer: 1500, showConfirmButton: false });
                     setTimeout(function(){
                         <?php $redirect_url = ($role === 'pemilik_startup') ? base_url('v_detail/' . $user_uuid) : base_url('v_data_startup'); ?>
-                        window.location.href = "<?= $redirect_url ?>";
+                        var targetUrl = "<?= $redirect_url ?>";
+                        window.location.href = targetUrl;
                     }, 1000);
                 } else {
                     forms.addClass('was-validated');
@@ -262,7 +264,9 @@ $(document).ready(function () {
         });
         return false;
     });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initEditStartup);
 
 function cek_nama_perusahaan() {
     var val = $('input[name="nama_perusahaan"]').val().replace(/^\s+|\s+$/gm, '');
@@ -286,6 +290,15 @@ function cek_deskripsi() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+function initMapEdit() {
+    if (!document.getElementById('map-edit')) return;
+    
+    // Cegah error Leaflet pada Turbo reload
+    if (window.mapEditInstance) {
+        window.mapEditInstance.remove();
+        window.mapEditInstance = null;
+    }
+
     var existingLat = <?= !empty($data[0]['latitude'])  ? $data[0]['latitude']  : 'null' ?>;
     var existingLng = <?= !empty($data[0]['longitude']) ? $data[0]['longitude'] : 'null' ?>;
 
@@ -293,29 +306,31 @@ function cek_deskripsi() {
     var centerLng = existingLng || 107.6191;
     var zoomLevel = existingLat ? 15 : 13;
 
-    var mapEdit = L.map('map-edit').setView([centerLat, centerLng], zoomLevel);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapEdit);
+    window.mapEditInstance = L.map('map-edit').setView([centerLat, centerLng], zoomLevel);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(window.mapEditInstance);
+    setTimeout(function() { window.mapEditInstance.invalidateSize(); }, 100);
 
     if (!existingLat && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
-            mapEdit.setView([pos.coords.latitude, pos.coords.longitude], 15);
+            window.mapEditInstance.setView([pos.coords.latitude, pos.coords.longitude], 15);
         });
     }
 
-    var marker = null;
+    window.mapEditMarker = null;
     if (existingLat && existingLng) {
-        marker = L.marker([existingLat, existingLng]).addTo(mapEdit);
+        window.mapEditMarker = L.marker([existingLat, existingLng]).addTo(window.mapEditInstance);
     }
 
-    mapEdit.on('click', function(e) {
+    window.mapEditInstance.on('click', function(e) {
         var lat = e.latlng.lat.toFixed(7);
         var lng = e.latlng.lng.toFixed(7);
-        if (marker) marker.setLatLng(e.latlng);
-        else marker = L.marker(e.latlng).addTo(mapEdit);
+        if (window.mapEditMarker) window.mapEditMarker.setLatLng(e.latlng);
+        else window.mapEditMarker = L.marker(e.latlng).addTo(window.mapEditInstance);
         document.getElementById('input_lat').value = lat;
         document.getElementById('input_lng').value = lng;
         document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> Lat: ' + lat + ', Lng: ' + lng;
     });
+}
 
     function cariLokasi() {
         var q = document.getElementById('search-lokasi').value.trim();
@@ -334,9 +349,9 @@ function cek_deskripsi() {
 
     function pilihLokasi(lat, lng, nama) {
         var latlng = L.latLng(lat, lng);
-        if (marker) marker.setLatLng(latlng);
-        else marker = L.marker(latlng).addTo(mapEdit);
-        mapEdit.setView(latlng, 16);
+        if (window.mapEditMarker) window.mapEditMarker.setLatLng(latlng);
+        else window.mapEditMarker = L.marker(latlng).addTo(window.mapEditInstance);
+        window.mapEditInstance.setView(latlng, 16);
         document.getElementById('input_lat').value = parseFloat(lat).toFixed(7);
         document.getElementById('input_lng').value = parseFloat(lng).toFixed(7);
         document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> ' + nama;
@@ -345,16 +360,25 @@ function cek_deskripsi() {
     }
 
     var debounceTimer;
-    document.getElementById('search-lokasi').addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        var q = this.value.trim();
-        if (!q) { document.getElementById('search-result').style.display = 'none'; return; }
-        debounceTimer = setTimeout(cariLokasi, 400);
-    });
+    var searchLokasi = document.getElementById('search-lokasi');
+    if (searchLokasi) {
+        searchLokasi.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            var q = this.value.trim();
+            if (!q) { document.getElementById('search-result').style.display = 'none'; return; }
+            debounceTimer = setTimeout(cariLokasi, 400);
+        });
+    }
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#search-result') && e.target.id !== 'search-lokasi') {
-            document.getElementById('search-result').style.display = 'none';
-        }
-    });
+    if (!window.mapEditDocClickBound) {
+        document.addEventListener('click', function(e) {
+            var searchResult = document.getElementById('search-result');
+            if (searchResult && !e.target.closest('#search-result') && e.target.id !== 'search-lokasi') {
+                searchResult.style.display = 'none';
+            }
+        });
+        window.mapEditDocClickBound = true;
+    }
+
+    initMapEdit();
 </script>

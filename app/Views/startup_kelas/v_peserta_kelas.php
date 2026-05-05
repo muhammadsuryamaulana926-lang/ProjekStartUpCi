@@ -20,10 +20,10 @@ body { background-color: #f5f5f5 !important; }
         <div class="col-12 col-xl-9">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="mb-4">

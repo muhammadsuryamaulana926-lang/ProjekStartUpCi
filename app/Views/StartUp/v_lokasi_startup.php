@@ -310,13 +310,16 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script>
+function startMapLokasi() {
+    if (window.mapLokasiAll) {
+        try { window.mapLokasiAll.remove(); } catch(e) {}
+        window.mapLokasiAll = null;
+    }
+
     var map = L.map('map-lokasi-all').setView([-2.5, 118.0], 5);
+    window.mapLokasiAll = map;
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
@@ -361,119 +364,153 @@
             });
         }, 300);
     }
+    window.startupsData = data;
+    window.mapLokasiMain = map;
+}
 
-    // Fungsi utilitas untuk memformat teks (misal: "DAJA@GMAIL.COM" jadi lowercase)
-    function sanitizeData(val, mode) {
-        if(!val) return '';
-        if(mode === 'email' || mode === 'web') return val.toLowerCase();
-        if(mode === 'name') return val.toLowerCase().replace(/\\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
-        return val;
-    }
+// Fungsi utilitas untuk memformat teks (misal: "DAJA@GMAIL.COM" jadi lowercase)
+function sanitizeData(val, mode) {
+    if(!val) return '';
+    if(mode === 'email' || mode === 'web') return val.toLowerCase();
+    if(mode === 'name') return val.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase(); });
+    return val;
+}
 
-    function bukaPanel(s) {
-        document.getElementById('panel-logo').src = s.logo_perusahaan ? baseLogoUrl + s.logo_perusahaan : defaultLogo;
-        document.getElementById('panel-nama').textContent = s.nama_perusahaan;
+window.bukaPanel = function(s) {
+    document.getElementById('panel-logo').src = s.logo_perusahaan ? window.baseLogoUrl + s.logo_perusahaan : window.defaultLogo;
+    document.getElementById('panel-nama').textContent = s.nama_perusahaan;
 
-        let bgAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#ecfdf5' : '#fef2f2';
-        let colorAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#059669' : '#dc2626';
-        let borderAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#a7f3d0' : '#fecaca';
-        
-        let ajuanVal = (s.status_ajuan || '').toLowerCase();
-        let bgAjuan = (ajuanVal === 'verified') ? '#eff6ff' : (ajuanVal === 'rejected' ? '#fef2f2' : '#fffbeb');
-        let colorAjuan = (ajuanVal === 'verified') ? '#2563eb' : (ajuanVal === 'rejected' ? '#dc2626' : '#d97706');
-        let borderAjuan = (ajuanVal === 'verified') ? '#bfdbfe' : (ajuanVal === 'rejected' ? '#fecaca' : '#fde68a');
+    let bgAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#ecfdf5' : '#fef2f2';
+    let colorAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#059669' : '#dc2626';
+    let borderAktif = (s.status_startup && s.status_startup.toLowerCase() === 'aktif') ? '#a7f3d0' : '#fecaca';
+    
+    let ajuanVal = (s.status_ajuan || '').toLowerCase();
+    let bgAjuan = (ajuanVal === 'verified') ? '#eff6ff' : (ajuanVal === 'rejected' ? '#fef2f2' : '#fffbeb');
+    let colorAjuan = (ajuanVal === 'verified') ? '#2563eb' : (ajuanVal === 'rejected' ? '#dc2626' : '#d97706');
+    let borderAjuan = (ajuanVal === 'verified') ? '#bfdbfe' : (ajuanVal === 'rejected' ? '#fecaca' : '#fde68a');
 
-        document.getElementById('panel-badges').innerHTML =
-            `<span class="panel-badge" style="background:${bgAktif}; color:${colorAktif}; border-color:${borderAktif};">${s.status_startup}</span>` +
-            `<span class="panel-badge" style="background:${bgAjuan}; color:${colorAjuan}; border-color:${borderAjuan};">${s.status_ajuan}</span>`;
+    document.getElementById('panel-badges').innerHTML =
+        `<span class="panel-badge" style="background:${bgAktif}; color:${colorAktif}; border-color:${borderAktif};">${s.status_startup}</span>` +
+        `<span class="panel-badge" style="background:${bgAjuan}; color:${colorAjuan}; border-color:${borderAjuan};">${s.status_ajuan}</span>`;
 
-        let contentHtml = '';
+    let contentHtml = '';
 
-        // Tentang Profile
-        if(s.deskripsi_bidang_usaha) {
-            contentHtml += `
-                <div class="panel-section" style="background:transparent; padding:0; border:none; box-shadow:none;">
-                    <p class="panel-desc" style="font-weight:400;">${s.deskripsi_bidang_usaha}</p>
-                </div>
-            `;
-        }
-
-        // Timeline Grid
-        if(s.tahun_berdiri || s.tahun_daftar) {
-            contentHtml += `<div class="panel-grid-box mb-3">`;
-            if(s.tahun_berdiri) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_berdiri}</div><div class="grid-box-lbl">Tahun Berdiri</div></div>`;
-            if(s.tahun_daftar) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_daftar}</div><div class="grid-box-lbl">Tahun Daftar</div></div>`;
-            contentHtml += `</div>`;
-        }
-
-        // Informasi Umum
-        contentHtml += `<div class="panel-section">`;
-        contentHtml += `<span class="panel-section-title">Informasi Umum</span>`;
-        if (s.nama_program) contentHtml += infoRow('graduation-cap', 'Program', sanitizeData(s.nama_program, 'name'));
-        if (s.nama_dosen) contentHtml += infoRow('user', 'Pembina', sanitizeData(s.nama_dosen, 'name'));
-        if (s.alamat) contentHtml += infoRow('map-pin', 'Alamat', `<span style="text-transform:capitalize;">${s.alamat.toLowerCase()}</span>`);
-        contentHtml += `</div>`;
-
-        // Kontak Section
-        if(s.email_perusahaan || s.nomor_whatsapp || s.website_perusahaan || s.instagram_perusahaan) {
-            contentHtml += `<div class="panel-section">`;
-            contentHtml += `<span class="panel-section-title">Kontak & Tautan</span>`;
-            
-            if (s.email_perusahaan) contentHtml += infoRow('mail', 'Email', `<a href="mailto:${s.email_perusahaan}">${sanitizeData(s.email_perusahaan, 'email')}</a>`);
-            if (s.website_perusahaan) contentHtml += infoRow('globe', 'Website', `<a href="${s.website_perusahaan}" target="_blank">${sanitizeData(s.website_perusahaan, 'web')}</a>`);
-            
-            // Social icons
-            let socHtml = `<div class="d-flex gap-2 mt-3 pt-3" style="border-top:1px solid #f1f5f9;">`;
-            if (s.nomor_whatsapp) socHtml += `<a href="https://wa.me/${s.nomor_whatsapp}" target="_blank" class="panel-social-link" style="background:#ecfdf5; color:#10b981;"><i class="mdi mdi-whatsapp" style="font-size:18px;"></i></a>`;
-            if (s.instagram_perusahaan) socHtml += `<a href="#" class="panel-social-link" style="background:#fdf4ff; color:#d946ef;"><i class="mdi mdi-instagram" style="font-size:18px;"></i></a>`;
-            socHtml += `</div>`;
-            
-            contentHtml += socHtml;
-            contentHtml += `</div>`;
-        }
-
-        document.getElementById('panel-content-wrapper').innerHTML = contentHtml;
-        document.getElementById('panel-link').href = baseDetailUrl + s.uuid_startup;
-        document.getElementById('panel-detail').classList.add('show');
-        
-        lucide.createIcons(); // render all lucide icons
-        map.panTo([s.latitude, s.longitude]);
-    }
-
-    function infoRow(icon, label, value) {
-        return `
-            <div class="panel-info-row">
-                <div class="panel-info-icon"><i data-lucide="${icon}" style="width:14px;"></i></div>
-                <div class="panel-info-content">
-                    <div class="panel-info-label">${label}</div>
-                    <div class="panel-info-value">${value}</div>
-                </div>
+    // Tentang Profile
+    if(s.deskripsi_bidang_usaha) {
+        contentHtml += `
+            <div class="panel-section" style="background:transparent; padding:0; border:none; box-shadow:none;">
+                <p class="panel-desc" style="font-weight:400;">${s.deskripsi_bidang_usaha}</p>
             </div>
         `;
     }
 
-    function tutupPanel() {
-        document.getElementById('panel-detail').classList.remove('show');
-    }
-    
-    function fokusMarker(lat, lng) {
-        map.setView([lat, lng], 17);
-        document.getElementById('ddTerpetakan').style.display = 'none';
-        var s = data.find(function(d) {
-            return Math.abs(d.latitude - lat) < 0.0001 && Math.abs(d.longitude - lng) < 0.0001;
-        });
-        if (s) bukaPanel(s);
+    // Timeline Grid
+    if(s.tahun_berdiri || s.tahun_daftar) {
+        contentHtml += `<div class="panel-grid-box mb-3">`;
+        if(s.tahun_berdiri) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_berdiri}</div><div class="grid-box-lbl">Tahun Berdiri</div></div>`;
+        if(s.tahun_daftar) contentHtml += `<div class="grid-box-item"><div class="grid-box-val">${s.tahun_daftar}</div><div class="grid-box-lbl">Tahun Daftar</div></div>`;
+        contentHtml += `</div>`;
     }
 
-    function toggleMapDropdown(id) {
-        var all = ['ddTerpetakan', 'ddBelumLokasi'];
-        all.forEach(function(d) {
-            if (d !== id) { var el = document.getElementById(d); if (el) el.style.display = 'none'; }
-        });
-        var el = document.getElementById(id);
-        if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    // Informasi Umum
+    contentHtml += `<div class="panel-section">`;
+    contentHtml += `<span class="panel-section-title">Informasi Umum</span>`;
+    if (s.nama_program) contentHtml += infoRow('graduation-cap', 'Program', sanitizeData(s.nama_program, 'name'));
+    if (s.nama_dosen) contentHtml += infoRow('user', 'Pembina', sanitizeData(s.nama_dosen, 'name'));
+    if (s.alamat) contentHtml += infoRow('map-pin', 'Alamat', `<span style="text-transform:capitalize;">${s.alamat.toLowerCase()}</span>`);
+    contentHtml += `</div>`;
+
+    // Kontak Section
+    if(s.email_perusahaan || s.nomor_whatsapp || s.website_perusahaan || s.instagram_perusahaan) {
+        contentHtml += `<div class="panel-section">`;
+        contentHtml += `<span class="panel-section-title">Kontak & Tautan</span>`;
+        
+        if (s.email_perusahaan) contentHtml += infoRow('mail', 'Email', `<a href="mailto:${s.email_perusahaan}">${sanitizeData(s.email_perusahaan, 'email')}</a>`);
+        if (s.website_perusahaan) contentHtml += infoRow('globe', 'Website', `<a href="${s.website_perusahaan}" target="_blank">${sanitizeData(s.website_perusahaan, 'web')}</a>`);
+        
+        // Social icons
+        let socHtml = `<div class="d-flex gap-2 mt-3 pt-3" style="border-top:1px solid #f1f5f9;">`;
+        if (s.nomor_whatsapp) socHtml += `<a href="https://wa.me/${s.nomor_whatsapp}" target="_blank" class="panel-social-link" style="background:#ecfdf5; color:#10b981;"><i class="mdi mdi-whatsapp" style="font-size:18px;"></i></a>`;
+        if (s.instagram_perusahaan) socHtml += `<a href="#" class="panel-social-link" style="background:#fdf4ff; color:#d946ef;"><i class="mdi mdi-instagram" style="font-size:18px;"></i></a>`;
+        socHtml += `</div>`;
+        
+        contentHtml += socHtml;
+        contentHtml += `</div>`;
     }
+
+    document.getElementById('panel-content-wrapper').innerHTML = contentHtml;
+    document.getElementById('panel-link').href = window.baseDetailUrl + s.uuid_startup;
+    document.getElementById('panel-detail').classList.add('show');
     
+    lucide.createIcons(); // render all lucide icons
+    if (window.mapLokasiMain) window.mapLokasiMain.panTo([s.latitude, s.longitude]);
+}
+
+window.infoRow = function(icon, label, value) {
+    return `
+        <div class="panel-info-row">
+            <div class="panel-info-icon"><i data-lucide="${icon}" style="width:14px;"></i></div>
+            <div class="panel-info-content">
+                <div class="panel-info-label">${label}</div>
+                <div class="panel-info-value">${value}</div>
+            </div>
+        </div>
+    `;
+}
+
+window.tutupPanel = function() {
+    var p = document.getElementById('panel-detail');
+    if (p) p.classList.remove('show');
+}
+
+window.fokusMarker = function(lat, lng) {
+    if (window.mapLokasiMain) window.mapLokasiMain.setView([lat, lng], 17);
+    var d = document.getElementById('ddTerpetakan');
+    if (d) d.style.display = 'none';
+    if (window.startupsData) {
+        var s = window.startupsData.find(function(d) {
+            return Math.abs(d.latitude - lat) < 0.0001 && Math.abs(d.longitude - lng) < 0.0001;
+        });
+        if (s) window.bukaPanel(s);
+    }
+}
+
+window.toggleMapDropdown = function(id) {
+    var all = ['ddTerpetakan', 'ddBelumLokasi'];
+    all.forEach(function(d) {
+        if (d !== id) { var el = document.getElementById(d); if (el) el.style.display = 'none'; }
+    });
+    var el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function initDependenciesLokasi() {
+    if (typeof L === 'undefined') {
+        if (!document.getElementById('leaflet-css')) {
+            document.head.insertAdjacentHTML('beforeend', '<link id="leaflet-css" rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>');
+            document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>');
+            document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>');
+        }
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.onload = function() {
+            var sc = document.createElement('script');
+            sc.src = 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
+            sc.onload = startMapLokasi;
+            document.head.appendChild(sc);
+        };
+        document.head.appendChild(s);
+    } else if (typeof L.markerClusterGroup === 'undefined') {
+        var sc = document.createElement('script');
+        sc.src = 'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
+        sc.onload = startMapLokasi;
+        document.head.appendChild(sc);
+    } else {
+        startMapLokasi();
+    }
+}
+
+initDependenciesLokasi();
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.map-stat-card') && !e.target.closest('.map-dropdown')) {
             ['ddTerpetakan', 'ddBelumLokasi'].forEach(function(id) {
@@ -482,4 +519,14 @@
             });
         }
     });
+
+    if (!window.lokasiStartupCleanupBound) {
+        document.addEventListener('turbo:before-cache', function() {
+            if (window.mapLokasiAll) {
+                try { window.mapLokasiAll.remove(); } catch(e) {}
+                window.mapLokasiAll = null;
+            }
+        });
+        window.lokasiStartupCleanupBound = true;
+    }
 </script>

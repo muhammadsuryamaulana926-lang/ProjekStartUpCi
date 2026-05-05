@@ -86,13 +86,17 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    const CSRF_NAME = '<?= csrf_token() ?>';
-    const CSRF_HASH = '<?= csrf_hash() ?>';
+    // Gunakan var untuk mencegah SyntaxError saat dirender ulang oleh Turbo
+    var CSRF_NAME = '<?= csrf_token() ?>';
+    var CSRF_HASH = '<?= csrf_hash() ?>';
 
-    $(document).ready(function() {
+    function initDataStartup() {
+        // Hancurkan instance DataTables lama jika ada
         $('#tabel_startup').DataTable({
             pageLength: 10,
             ordering: false,
+            destroy: true, // Penting untuk Turbo SPA
+            autoWidth: false,
             dom: '<"d-flex align-items-center justify-content-between px-3 py-2"l>rt<"d-flex align-items-center justify-content-between px-3 py-2"ip>',
             language: {
                 lengthMenu: 'Show _MENU_ entries',
@@ -118,11 +122,20 @@
             sessionStorage.removeItem('swal_msg');
             Swal.fire({ icon: _sd.icon, title: _sd.title, text: _sd.text, showConfirmButton: false, timer: 2000, timerProgressBar: true });
         }
-    });
+    }
+
+    // Eksekusi fungsi inisialisasi pada event Turbo dan DOM
+    document.addEventListener('DOMContentLoaded', initDataStartup);
 
     function proses_edit(id_startup) {
+        // Ambil CSRF token terbaru
+        var csrf = getCsrfToken();
+        
+        // Update CSRF token di form
         document.getElementById('post-id-startup').value = id_startup;
-        document.getElementById('post-edit-csrf').value = CSRF_HASH;
+        var csrfInput = document.getElementById('post-edit-csrf');
+        csrfInput.name = csrf.name;
+        csrfInput.value = csrf.hash;
         document.getElementById('post-edit-form').submit();
     }
 
@@ -146,7 +159,14 @@
                         var data = typeof res === 'string' ? JSON.parse(res) : res;
                         if (data.status) {
                             Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Startup berhasil dihapus', showConfirmButton: false, timer: 1500 })
-                                .then(() => location.reload());
+                                .then(() => {
+                                    // Refresh tanpa memecah SPA Turbo
+                                    if (window.Turbo) {
+                                        window.location.href = window.location.href;
+                                    } else {
+                                        location.reload();
+                                    }
+                                });
                         } else {
                             Swal.fire('Gagal!', 'Terjadi kesalahan sistem', 'error');
                         }

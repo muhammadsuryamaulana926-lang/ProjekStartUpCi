@@ -3,10 +3,10 @@
         <div class="col-12 col-xl-11">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <div class="card border">
@@ -114,6 +114,11 @@
 
 <script>
 $(document).ready(function() {
+    // Destroy DataTable jika sudah ada
+    if ($.fn.DataTable.isDataTable('#tabelUser')) {
+        $('#tabelUser').DataTable().destroy();
+    }
+    
     var table = $('#tabelUser').DataTable({
         pageLength: 10,
         ordering: false,

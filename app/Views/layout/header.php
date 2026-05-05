@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="<?= csrf_token() ?>" content="<?= csrf_hash() ?>">
     <title><?= (isset($title) ? $title . ' | ' : '') ?>SIMIK StartUp</title>
     <!-- Import Font Inter & Lucide Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +30,7 @@
     <!-- Plyr.io — Modern Video Player for YouTube without branding -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
 
     <style>
         /* Global Font Override */

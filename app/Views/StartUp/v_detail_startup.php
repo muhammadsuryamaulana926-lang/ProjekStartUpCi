@@ -226,6 +226,7 @@ body { background-color: #f5f5f5 !important; }
                                                 .addTo(window.mapDetail)
                                                 .bindPopup('<b><?= esc($data[0]['nama_perusahaan']) ?></b><br><?= esc($data[0]['alamat'] ?? '') ?>')
                                                 .openPopup();
+                                            setTimeout(function() { window.mapDetail.invalidateSize(); }, 100);
                                         });
                                     </script>
                                 <?php else: ?>
@@ -420,35 +421,70 @@ body { background-color: #f5f5f5 !important; }
 </div>
 
 <script>
-$(document).ready(function() {
+function initDetailStartup() {
 
-    function verifikasi_startup(id, idp) {
+    window.verifikasi_startup = function(id, idp) {
         if(confirm('Verifikasi startup ini?')) {
             $.ajax({ url: "<?= base_url('startup/proses_verifikasi_startup') ?>", type: 'post', data: { id_startup: id, id_pengguna: idp },
-                success: function() { location.reload(); }
+                success: function() { 
+                    location.reload(); 
+                }
             });
         }
     }
 
-    function tolak_startup(id, idp) { $('#tolak_id_s').val(id); $('#tolak_id_p').val(idp); $('#modal_tolak').modal('show'); }
+    window.tolak_startup = function(id, idp) { 
+        $('#tolak_id_s').val(id); 
+        $('#tolak_id_p').val(idp); 
+        var modalEl = document.getElementById('modal_tolak');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
 
-    $('#form_tolak').submit(function() {
+    $('#form_tolak').off('submit').on('submit', function(e) {
+        e.preventDefault();
         var formData = new FormData(this);
         if(this.checkValidity()) {
             $.ajax({ url: "<?= base_url('startup/proses_tolak_startup') ?>", type: 'post', data: formData, cache: false, contentType: false, processData: false,
-                success: function(msg) { var d = jQuery.parseJSON(msg); if(d.status) { $('#modal_tolak').modal('hide'); setTimeout(() => location.reload(), 1000); } }
+                success: function(msg) { 
+                    var d = typeof msg === 'string' ? JSON.parse(msg) : msg; 
+                    if(d.status) { 
+                        var modalEl = document.getElementById('modal_tolak');
+                        if (modalEl) {
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+                        }
+                        setTimeout(() => { location.reload(); }, 1000); 
+                    } 
+                }
             });
         } else { $(this).addClass('was-validated'); }
         return false;
     });
 
-    function tambah_informasi_tim() { $('#form_tim')[0].reset(); $('#id_startup_tim').val(''); $('#modal_tim .modal-title').html('<i class="mdi mdi-account-plus me-1"></i> Tambah Anggota Tim'); $('#modal_tim').modal('show'); }
+    window.tambah_informasi_tim = function() { 
+        $('#form_tim')[0].reset(); 
+        $('#id_startup_tim').val(''); 
+        $('#modal_tim .modal-title').html('<i class="mdi mdi-account-plus me-1"></i> Tambah Anggota Tim'); 
+        var modalEl = document.getElementById('modal_tim');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
 
-    function ubah_informasi_tim(id) {
+    window.ubah_informasi_tim = function(id) {
         $('#modal_tim .modal-title').html('<i class="mdi mdi-account-edit me-1"></i> Edit Anggota Tim');
-        $('#modal_tim').modal('show');
+        var modalEl = document.getElementById('modal_tim');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.show();
+        }
         $.ajax({ url: "<?= base_url('startup/get_startup_tim') ?>", type: 'post', data: { id_startup_tim: id },
-            success: function(msg) { var d = jQuery.parseJSON(msg);
+            success: function(msg) { 
+                var d = typeof msg === 'string' ? JSON.parse(msg) : msg;
                 $('#id_startup_tim').val(d[0].id_startup_tim); $('#nama_lengkap').val(d[0].nama_lengkap);
                 $('#jabatan_tim').val(d[0].jabatan_tim); $('#jenis_kelamin').val(d[0].jenis_kelamin);
                 $('#no_whatsapp').val(d[0].no_whatsapp); $('#email').val(d[0].email);
@@ -457,7 +493,8 @@ $(document).ready(function() {
         });
     }
 
-    $('#form_tim').submit(function() {
+    $('#form_tim').off('submit').on('submit', function(e) {
+        e.preventDefault();
         var formData = new FormData(this);
         $('.btn-simpan-tim').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Loading...');
         var url = $('#id_startup_tim').val() == '' ? "<?= base_url('startup/proses_tambah_informasi_tim') ?>" : "<?= base_url('startup/proses_ubah_informasi_tim') ?>";
@@ -465,10 +502,16 @@ $(document).ready(function() {
             $.ajax({ url: url, type: 'post', data: formData, cache: false, contentType: false, processData: false,
                 success: function(msg) { 
                     try {
-                        var d = jQuery.parseJSON(msg);
+                        var d = typeof msg === 'string' ? JSON.parse(msg) : msg;
                         if(d.status) { 
-                            $('#modal_tim').modal('hide'); 
-                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tim berhasil disimpan', showConfirmButton: false, timer: 1500 }).then(() => location.reload()); 
+                            var modalEl = document.getElementById('modal_tim');
+                            if (modalEl) {
+                                var modal = bootstrap.Modal.getInstance(modalEl);
+                                if (modal) modal.hide();
+                            }
+                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data tim berhasil disimpan', showConfirmButton: false, timer: 1500 }).then(() => {
+                                location.reload();
+                            }); 
                         } else { 
                             $('.btn-simpan-tim').prop('disabled', false).html('<i class="mdi mdi-content-save me-1"></i> Simpan'); 
                             Swal.fire('Gagal!', 'Data gagal disimpan.', 'error');
@@ -488,21 +531,20 @@ $(document).ready(function() {
         return false;
     });
 
-    function hapus_informasi_tim(id) {
+    window.hapus_informasi_tim = function(id) {
         Swal.fire({ title: 'Hapus Anggota Tim?', text: 'Data tidak dapat dikembalikan.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal' })
         .then((r) => { if(r.isConfirmed) {
             $.ajax({ url: "<?= base_url('startup/proses_hapus_informasi_tim') ?>", type: 'post', data: { id_startup_tim: id },
-                success: function(msg) { var d = jQuery.parseJSON(msg);
-                    Swal.fire({ icon: d.status ? 'success' : 'error', title: d.status ? 'Berhasil!' : 'Gagal!', showConfirmButton: false, timer: 1500 }).then(() => { if(d.status) location.reload(); });
+                success: function(msg) { 
+                    var d = typeof msg === 'string' ? JSON.parse(msg) : msg;
+                    Swal.fire({ icon: d.status ? 'success' : 'error', title: d.status ? 'Berhasil!' : 'Gagal!', showConfirmButton: false, timer: 1500 }).then(() => { 
+                        if(d.status) { location.reload(); }
+                    });
                 }
             });
         }});
     }
+}
 
-    window.verifikasi_startup = verifikasi_startup;
-    window.tolak_startup = tolak_startup;
-    window.tambah_informasi_tim = tambah_informasi_tim;
-    window.ubah_informasi_tim = ubah_informasi_tim;
-    window.hapus_informasi_tim = hapus_informasi_tim;
-});
+document.addEventListener('DOMContentLoaded', initDetailStartup);
 </script>

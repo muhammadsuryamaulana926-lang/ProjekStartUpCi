@@ -182,15 +182,17 @@ body { background-color: #f5f5f5 !important; }
 </div>
 
 <script>
-$(document).ready(function () {
-    $('.select2_tahun_berdiri').select2();
-    $('.select2_tahun_daftar').select2();
-    $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true });
-    $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true });
+function initTambahStartup() {
+    try { $('.select2_tahun_berdiri').select2(); } catch(e) {}
+    try { $('.select2_tahun_daftar').select2(); } catch(e) {}
+    try { $('.select2-dosen').select2({ placeholder: '-- Pilih Dosen Pembina --', allowClear: true }); } catch(e) {}
+    try { $('.select2-program').select2({ placeholder: '-- Pilih Program --', allowClear: true }); } catch(e) {}
 
-    $('#form_tambah').submit(function () {
-        var forms = $('#form_tambah');
-        var formData = new FormData($('#form_tambah')[0]);
+    $('#form_tambah').off('submit').on('submit', function (e) {
+        e.preventDefault();
+        var forms = $(this);
+        var formData = new FormData(this);
+        
         $('.submit').prop('disabled', true).html('<i class="mdi mdi-spin mdi-loading"></i> Loading...');
         $('body').css('cursor', 'wait');
 
@@ -202,7 +204,7 @@ $(document).ready(function () {
         $('textarea[name="deskripsi_bidang_usaha"]').val(desk);
         cek_deskripsi();
 
-        if (forms[0].checkValidity()) {
+        if (this.checkValidity()) {
             $.ajax({
                 url: "<?= base_url('v_simpan_startup') ?>",
                 type: 'post',
@@ -213,7 +215,8 @@ $(document).ready(function () {
                 processData: false,
                 success: function (data) {
                     if (data.status) {
-                        window.location.href = "<?= base_url('v_data_startup') ?>";
+                        var targetUrl = "<?= base_url('v_data_startup') ?>";
+                        window.location.href = targetUrl;
                     } else {
                         forms.addClass('was-validated');
                         if (data.status_nama_perusahaan) {
@@ -241,7 +244,9 @@ $(document).ready(function () {
 
         return false;
     });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initTambahStartup);
 
 function cek_nama_perusahaan() {
     var val = $('input[name="nama_perusahaan"]').val().replace(/^\s+|\s+$/gm, '');
@@ -265,25 +270,36 @@ function cek_deskripsi() {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    var map = L.map('map-tambah').setView([-6.9175, 107.6191], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+function initMapTambah() {
+    if (!document.getElementById('map-tambah')) return;
+    
+    // Cegah error "Map container is already initialized" pada Turbo reload
+    if (window.mapTambahInstance) {
+        window.mapTambahInstance.remove();
+        window.mapTambahInstance = null;
+    }
+
+    window.mapTambahInstance = L.map('map-tambah').setView([-6.9175, 107.6191], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(window.mapTambahInstance);
+    setTimeout(function() { window.mapTambahInstance.invalidateSize(); }, 100);
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(pos) {
-            map.setView([pos.coords.latitude, pos.coords.longitude], 15);
+            window.mapTambahInstance.setView([pos.coords.latitude, pos.coords.longitude], 15);
         });
     }
 
-    var marker = null;
-    map.on('click', function(e) {
+    window.mapTambahMarker = null;
+    window.mapTambahInstance.on('click', function(e) {
         var lat = e.latlng.lat.toFixed(7);
         var lng = e.latlng.lng.toFixed(7);
-        if (marker) marker.setLatLng(e.latlng);
-        else marker = L.marker(e.latlng).addTo(map);
+        if (window.mapTambahMarker) window.mapTambahMarker.setLatLng(e.latlng);
+        else window.mapTambahMarker = L.marker(e.latlng).addTo(window.mapTambahInstance);
         document.getElementById('input_lat').value = lat;
         document.getElementById('input_lng').value = lng;
         document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> Lat: ' + lat + ', Lng: ' + lng;
     });
+}
 
     function cariLokasi() {
         var q = document.getElementById('search-lokasi').value.trim();
@@ -302,9 +318,9 @@ function cek_deskripsi() {
 
     function pilihLokasi(lat, lng, nama) {
         var latlng = L.latLng(lat, lng);
-        if (marker) marker.setLatLng(latlng);
-        else marker = L.marker(latlng).addTo(map);
-        map.setView(latlng, 16);
+        if (window.mapTambahMarker) window.mapTambahMarker.setLatLng(latlng);
+        else window.mapTambahMarker = L.marker(latlng).addTo(window.mapTambahInstance);
+        window.mapTambahInstance.setView(latlng, 16);
         document.getElementById('input_lat').value = parseFloat(lat).toFixed(7);
         document.getElementById('input_lng').value = parseFloat(lng).toFixed(7);
         document.getElementById('koordinat-info').innerHTML = '<i class="mdi mdi-map-marker"></i> ' + nama;
@@ -313,16 +329,28 @@ function cek_deskripsi() {
     }
 
     var debounceTimer;
-    document.getElementById('search-lokasi').addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        var q = this.value.trim();
-        if (!q) { document.getElementById('search-result').style.display = 'none'; return; }
-        debounceTimer = setTimeout(cariLokasi, 400);
-    });
+    // Gunakan event delegation atau pastikan elemen ada
+    var searchLokasi = document.getElementById('search-lokasi');
+    if (searchLokasi) {
+        searchLokasi.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            var q = this.value.trim();
+            if (!q) { document.getElementById('search-result').style.display = 'none'; return; }
+            debounceTimer = setTimeout(cariLokasi, 400);
+        });
+    }
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#search-result') && e.target.id !== 'search-lokasi') {
-            document.getElementById('search-result').style.display = 'none';
-        }
-    });
+    // Pastikan document click binding tidak double
+    if (!window.mapTambahDocClickBound) {
+        document.addEventListener('click', function(e) {
+            var searchResult = document.getElementById('search-result');
+            if (searchResult && !e.target.closest('#search-result') && e.target.id !== 'search-lokasi') {
+                searchResult.style.display = 'none';
+            }
+        });
+        window.mapTambahDocClickBound = true;
+    }
+    
+    // Inisialisasi peta langsung
+    initMapTambah();
 </script>

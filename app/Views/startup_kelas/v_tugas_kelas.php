@@ -51,10 +51,10 @@ body { background-color: #f5f5f5 !important; }
         <div class="col-12 col-xl-9">
 
             <?php if (session()->getFlashdata('success')): ?>
-            <script>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
+            <script data-flashdata>Swal.fire({ icon: 'success', title: 'Berhasil!', text: '<?= session()->getFlashdata('success') ?>', timer: 2500, showConfirmButton: false });</script>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
-            <script>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
+            <script data-flashdata>Swal.fire({ icon: 'error', title: 'Gagal!', text: '<?= session()->getFlashdata('error') ?>' });</script>
             <?php endif; ?>
 
             <!-- Header -->
@@ -187,17 +187,62 @@ body { background-color: #f5f5f5 !important; }
                                     $belum_kirim = array_diff($peserta_kelas, $sudah_kirim);
                                 ?>
                                 <div class="mt-3 border-top pt-3">
-                                    <div class="fw-semibold small text-muted mb-2">Sudah Mengumpulkan <span class="badge bg-success"><?= count($semua) ?></span></div>
+                                    <div class="fw-semibold text-dark mb-3">Sudah Mengumpulkan <span class="badge bg-success"><?= count($semua) ?></span></div>
                                     <?php if (empty($semua)): ?>
                                         <div class="text-muted small">Belum ada yang mengumpulkan.</div>
                                     <?php else: ?>
                                         <?php foreach ($semua as $j): ?>
-                                        <div class="d-flex align-items-center gap-2 py-2 border-bottom">
-                                            <div class="avatar-kecil"><?= strtoupper(substr($j['nama_peserta'], 0, 1)) ?></div>
-                                            <div>
-                                                <div class="small fw-semibold text-dark"><?= esc($j['nama_peserta']) ?></div>
-                                                <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($j['dibuat_pada'])) ?></div>
+                                        <div class="jawaban-item">
+                                            <div class="d-flex align-items-start gap-3 mb-2">
+                                                <div class="avatar-kecil"><?= strtoupper(substr($j['nama_peserta'], 0, 1)) ?></div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold text-dark"><?= esc($j['nama_peserta']) ?></div>
+                                                    <div class="text-muted" style="font-size:11px;"><?= date('d M Y, H:i', strtotime($j['dibuat_pada'])) ?></div>
+                                                </div>
                                             </div>
+                                            
+                                            <?php if (!empty($j['jawaban_teks'])): ?>
+                                                <div class="bg-white rounded p-3 mb-2 border" style="font-size:14px;">
+                                                    <strong class="text-muted small d-block mb-1">Jawaban:</strong>
+                                                    <?= nl2br(esc($j['jawaban_teks'])) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($j['nama_file'])): ?>
+                                                <?php $tp = strtolower($j['tipe_file'] ?? ''); ?>
+                                                <div class="mb-2">
+                                                    <?php if (in_array($tp, ['pdf','png','jpg','jpeg','gif','doc','docx','ppt','pptx','xls','xlsx'])): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-info rounded me-2"
+                                                        onclick="buka_preview_tugas('<?= base_url('tugas_kelas/preview/jawaban/' . $j['id_jawaban']) ?>', 'Jawaban <?= esc($j['nama_peserta']) ?>', '<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>')">
+                                                        <i class="mdi mdi-eye"></i> Lihat File
+                                                    </button>
+                                                    <?php endif; ?>
+                                                    <a href="<?= base_url('tugas_kelas/download/jawaban/' . $j['id_jawaban']) ?>" class="btn btn-sm btn-outline-success rounded">
+                                                        <i class="mdi mdi-download"></i> Unduh File
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($j['komentar'])): ?>
+                                                <div class="komentar-box">
+                                                    <strong><i class="mdi mdi-comment-text me-1"></i>Komentar Pemateri:</strong>
+                                                    <div class="mt-1"><?= nl2br(esc($j['komentar'])) ?></div>
+                                                </div>
+                                            <?php endif; ?>
+                                            
+                                            <!-- Form Tambah/Edit Komentar -->
+                                            <form action="<?= base_url('tugas_kelas/simpan_komentar') ?>" method="POST" class="mt-3">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="id_jawaban" value="<?= $j['id_jawaban'] ?>">
+                                                <input type="hidden" name="id_kelas" value="<?= $kelas['id_kelas'] ?>">
+                                                <div class="mb-2">
+                                                    <label class="form-label small fw-semibold">Komentar / Catatan Pemateri:</label>
+                                                    <textarea class="form-control form-control-sm" name="komentar" rows="2" placeholder="Berikan komentar atau catatan untuk peserta..."><?= esc($j['komentar'] ?? '') ?></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-sm btn-primary btn-modern">
+                                                    <i class="mdi mdi-content-save"></i> <?= !empty($j['komentar']) ? 'Perbarui' : 'Simpan' ?> Komentar
+                                                </button>
+                                            </form>
                                         </div>
                                         <?php endforeach; ?>
                                     <?php endif; ?>

@@ -56,6 +56,18 @@ class Riwayat extends BaseController
         return $this->response->setJSON(['status' => 'success']);
     }
 
+    // Mengambil durasi terakhir video yang ditonton user
+    public function get_durasi_video()
+    {
+        $id_user  = session()->get('user_id');
+        $id_video = $this->request->getPost('id_video');
+        $row = $this->db->query(
+            "SELECT durasi FROM riwayat WHERE id_user = ? AND id_item = ? AND jenis_item = 'video' LIMIT 1",
+            [$id_user, $id_video]
+        )->getRowArray();
+        return $this->response->setJSON(['durasi' => $row['durasi'] ?? 0]);
+    }
+
     // Menyimpan atau memperbarui riwayat baca ebook via AJAX
     public function simpan_riwayat_ebook()
     {

@@ -61,7 +61,12 @@ class Tugas_kelas extends BaseController
         $nama_file = null;
         $tipe_file = null;
 
+        // Cek field file_soal atau file_tugas
         $file = $this->request->getFile('file_soal');
+        if (!$file || !$file->isValid()) {
+            $file = $this->request->getFile('file_tugas');
+        }
+        
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $nama_acak = $file->getRandomName();
             $file->move(ROOTPATH . 'public/uploads/tugas', $nama_acak);
@@ -73,6 +78,7 @@ class Tugas_kelas extends BaseController
             'id_kelas'    => $id_kelas,
             'judul'       => $this->request->getPost('judul'),
             'instruksi'   => $this->request->getPost('instruksi'),
+            'link_file'   => $this->request->getPost('link_file'),
             'nama_file'   => $nama_file,
             'tipe_file'   => $tipe_file,
             'dibuat_oleh' => session()->get('user_name') ?? 'Admin',
@@ -89,14 +95,14 @@ class Tugas_kelas extends BaseController
                     'judul'      => 'Tugas Baru: ' . $data['judul'],
                     'pesan'      => ($data['dibuat_oleh']) . ' menambahkan tugas baru di kelas ini.',
                     'untuk_nama' => $pk['nama_peserta'],
-                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                    'url'        => base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'),
                 ]);
             }
         } else {
             session()->setFlashdata('error', 'Gagal menambahkan tugas.');
         }
 
-        return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'));
     }
 
     // Menghapus tugas oleh pemateri/admin
@@ -117,7 +123,7 @@ class Tugas_kelas extends BaseController
             session()->setFlashdata('error', 'Gagal menghapus tugas.');
         }
 
-        return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'));
     }
 
     // Menyimpan jawaban peserta
@@ -163,7 +169,7 @@ class Tugas_kelas extends BaseController
                     'judul'      => 'Jawaban Tugas Masuk',
                     'pesan'      => $nama_peserta . ' mengumpulkan jawaban tugas "' . ($tugas['judul'] ?? '') . '"',
                     'untuk_role' => 'pemateri',
-                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                    'url'        => base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'),
                 ]);
             }
         } else {
@@ -191,14 +197,14 @@ class Tugas_kelas extends BaseController
                     'judul'      => 'Komentar Pemateri',
                     'pesan'      => 'Pemateri memberikan catatan pada jawaban tugas "' . ($tugas['judul'] ?? '') . '"',
                     'untuk_nama' => $jawaban['nama_peserta'],
-                    'url'        => base_url('tugas_kelas/' . $id_kelas),
+                    'url'        => base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'),
                 ]);
             }
         } else {
             session()->setFlashdata('error', 'Gagal menyimpan komentar.');
         }
 
-        return redirect()->to(base_url('tugas_kelas/' . $id_kelas));
+        return redirect()->to(base_url('presensi_kelas/detail_kelas/' . $id_kelas . '?tab=tab-tugas'));
     }
 
     // Preview file tugas atau jawaban (stream ke browser)

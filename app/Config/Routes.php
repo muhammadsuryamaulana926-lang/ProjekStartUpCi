@@ -93,17 +93,26 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/v_dashboard/get_data_program',       'Dashboard_startup::get_data_program');
     $routes->get('/v_dashboard/get_data_buku',          'Dashboard_startup::get_data_buku');
     $routes->get('/v_dashboard/get_data_video',         'Dashboard_startup::get_data_video');
+    $routes->get('/v_dashboard/chart_top_video',        'Dashboard_startup::chart_top_video');
+    $routes->get('/v_dashboard/chart_top_ebook',        'Dashboard_startup::chart_top_ebook');
+    $routes->get('/v_dashboard/chart_tren_penonton',    'Dashboard_startup::chart_tren_penonton');
+    $routes->get('/v_dashboard/chart_tren_pembaca_ebook', 'Dashboard_startup::chart_tren_pembaca_ebook');
 
-    // Data Startup
+    // Data Startup - PENTING: Route tanpa parameter harus di atas route dengan wildcard
     $routes->get('/v_data_startup',                     'Startup::index');
     $routes->get('/v_tambah_startup',                   'Startup::tambah_startup');
     $routes->post('/v_simpan_startup',                  'Startup::simpan_startup');
     $routes->post('/v_hapus_startup',                   'Startup::hapus_startup');
-    $routes->get('/v_edit_startup/(:any)',               'Startup::edit_startup/$1');
+    
+    // Route POST edit - terima id_startup dari form
     $routes->post('/v_edit_startup',                    'Startup::edit_startup');
+    $routes->post('/v_edit_startup/(:segment)',         'Startup::edit_startup/$1');
     $routes->post('/v_update_startup',                  'Startup::proses_ubah_startup');
-    $routes->get('/v_detail_startup/(:any)',             'Startup::detail/$1');
-    $routes->get('/v_detail/(:any)',                    'Startup::detail/$1');
+    
+    // Route GET dengan parameter UUID - harus paling akhir
+    $routes->get('/v_edit_startup/(:segment)',          'Startup::edit_startup/$1');
+    $routes->get('/v_detail_startup/(:segment)',        'Startup::detail/$1');
+    $routes->get('/v_detail/(:segment)',                'Startup::detail/$1');
 
     // Lokasi Startup
     $routes->get('/v_lokasi_startup',                   'Startup::detail_lokasi_startup');
@@ -142,6 +151,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/v_riwayat_aktivitas',                'Riwayat::index');
     $routes->post('/riwayat/update_video',              'Riwayat::simpan_riwayat_video');
     $routes->post('/riwayat/update_ebook',              'Riwayat::simpan_riwayat_ebook');
+    $routes->post('/riwayat/get_durasi_video',          'Riwayat::get_durasi_video');
 
     // Tim
     $routes->post('/get_startup_tim',                   'Startup::get_startup_tim');

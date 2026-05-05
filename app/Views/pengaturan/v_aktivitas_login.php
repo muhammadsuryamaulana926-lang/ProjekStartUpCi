@@ -91,6 +91,11 @@
 
 <script>
 $(document).ready(function() {
+    // Destroy DataTable jika sudah ada
+    if ($.fn.DataTable.isDataTable('#tabelLogin')) {
+        $('#tabelLogin').DataTable().destroy();
+    }
+    
     var table = $('#tabelLogin').DataTable({
         pageLength: 10,
         ordering: false,

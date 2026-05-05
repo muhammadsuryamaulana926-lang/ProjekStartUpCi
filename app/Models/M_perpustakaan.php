@@ -110,19 +110,25 @@ class M_perpustakaan extends Model
 
     public function catat_view_unik($id_konten_video, $id_user)
     {
-        if ($this->cek_sudah_nonton($id_konten_video, $id_user)) return false;
-        $this->db->table('video_views')->insert([
-            'id_konten_video' => $id_konten_video,
-            'id_user'         => $id_user,
-            'viewed_at'       => date('Y-m-d H:i:s'),
-        ]);
+        // Catat view unik (1 user = 1 view per video)
+        $sudah_nonton = $this->cek_sudah_nonton($id_konten_video, $id_user);
+        
+        if (!$sudah_nonton) {
+            $this->db->table('video_views')->insert([
+                'id_konten_video' => $id_konten_video,
+                'id_user'         => $id_user,
+                'viewed_at'       => date('Y-m-d H:i:s'),
+            ]);
+        }
+        
+        // Selalu increment jumlah_ditonton (untuk total views, bukan unique)
         return $this->tambah_tontonan($id_konten_video);
     }
 
     public function top_video_ditonton($limit = 10)
     {
         return $this->db->query("
-            SELECT judul_video, jumlah_ditonton
+            SELECT judul_video, COALESCE(jumlah_ditonton, 0) as jumlah_ditonton
             FROM konten_video
             ORDER BY jumlah_ditonton DESC
             LIMIT " . (int)$limit)->getResultArray();
@@ -161,19 +167,27 @@ class M_perpustakaan extends Model
 
     public function catat_view_unik_ebook($id_konten_ebook, $id_user)
     {
-        if ($this->db->table('ebook_views')->where(['id_konten_ebook' => $id_konten_ebook, 'id_user' => $id_user])->countAllResults() > 0) return false;
-        $this->db->table('ebook_views')->insert([
-            'id_konten_ebook' => $id_konten_ebook,
-            'id_user'         => $id_user,
-            'viewed_at'       => date('Y-m-d H:i:s'),
-        ]);
+        // Catat view unik (1 user = 1 view per ebook)
+        $sudah_baca = $this->db->table('ebook_views')
+            ->where(['id_konten_ebook' => $id_konten_ebook, 'id_user' => $id_user])
+            ->countAllResults() > 0;
+        
+        if (!$sudah_baca) {
+            $this->db->table('ebook_views')->insert([
+                'id_konten_ebook' => $id_konten_ebook,
+                'id_user'         => $id_user,
+                'viewed_at'       => date('Y-m-d H:i:s'),
+            ]);
+        }
+        
+        // Selalu increment jumlah_dibaca (untuk total views, bukan unique)
         return $this->db->query("UPDATE konten_ebook SET jumlah_dibaca = jumlah_dibaca + 1 WHERE id_konten_ebook = " . (int)$id_konten_ebook);
     }
 
     public function top_ebook_dibaca($limit = 10)
     {
         return $this->db->query("
-            SELECT judul_ebook, jumlah_dibaca
+            SELECT judul_ebook, COALESCE(jumlah_dibaca, 0) as jumlah_dibaca
             FROM konten_ebook
             ORDER BY jumlah_dibaca DESC
             LIMIT " . (int)$limit)->getResultArray();

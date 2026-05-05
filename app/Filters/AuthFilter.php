@@ -70,12 +70,24 @@ class AuthFilter implements FilterInterface
         $nama_modul = $this->peta_modul[$segment1];
         $izin       = (new M_izin_akses())->izin_by_role_modul($role, $nama_modul);
 
-        // Jika tidak ada data izin atau tidak boleh lihat, cek apakah user adalah peserta program
+        // Jika tidak ada data izin atau tidak boleh lihat
         if (!$izin || !$izin['bisa_lihat']) {
             $id_user      = $session->get('user_id');
             $nama_peserta = $session->get('user_name');
-            // Hanya role selain pemilik_startup yang perlu cek peserta program
-            if ($role !== 'pemilik_startup' && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
+
+            // Modul yang boleh diakses peserta_program_kelas dan pemilik_startup (perpustakaan, kelas, program, riwayat)
+            $modul_konten = ['perpustakaan', 'kelas', 'program', 'riwayat'];
+
+            if ($role === 'peserta_program_kelas' && in_array($nama_modul, $modul_konten)) {
+                return;
+            }
+
+            if ($role === 'pemilik_startup' && in_array($nama_modul, $modul_konten)) {
+                return;
+            }
+
+            // Role lain: cek apakah terdaftar sebagai peserta program
+            if (!in_array($role, ['pemilik_startup', 'peserta_program_kelas']) && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
                 $m_peserta = new M_peserta_program();
                 $peserta = [];
                 if ($id_user) {

@@ -113,7 +113,7 @@ class Perpustakaan extends BaseController
 
         $this->m_perpus->tambah_video($data);
         session()->setFlashdata('success', 'Video berhasil ditambahkan.');
-        (new \App\Models\M_notifikasi())->tambah([
+        (new \App\Models\M_notifikasi())->tambah_notifikasi([
             'judul'      => 'Video Pembelajaran Baru',
             'pesan'      => 'Admin menambahkan video baru: "' . $data['judul_video'] . '"',
             'url'        => base_url('perpustakaan/video'),
@@ -546,10 +546,9 @@ class Perpustakaan extends BaseController
             }
         }
 
-                return view('layout/header', ['title' => 'Nonton Video'])
-
+        return view('layout/header', ['title' => 'Nonton Video'])
             . view('layout/topbar')
-            . view('startup/v_vidio_full', ['video' => $video, 'rekomendasi' => $rekomendasi])
+            . view('startup/v_vidio_full_detail', ['video' => $video, 'rekomendasi' => $rekomendasi])
             . view('layout/footer');
     }
 
