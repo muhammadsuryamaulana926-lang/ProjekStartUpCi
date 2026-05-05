@@ -529,11 +529,11 @@ body, #content-wrapper, #content, .container-fluid, .app-content {
                         <?php endif; ?>
                     </div>
                     <div class="yt-more-wrap" style="flex-shrink:0; align-self:flex-start;">
-                        <button class="yt-btn" onclick="event.preventDefault(); toggleRelDropdown('rel_<?= $rel->uuid_konten_video ?>')" style="padding:4px; background:transparent;">
+                        <button class="yt-btn" onclick="event.preventDefault(); event.stopPropagation(); toggleRelDropdown('rel_<?= $rel->uuid_konten_video ?>')" style="padding:4px; background:transparent;">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5h.01M12 12h.01M12 19h.01M12 6a1 1 0 11-2 0 1 1 0 012 0zm0 7a1 1 0 11-2 0 1 1 0 012 0zm0 7a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
                         </button>
                         <div class="yt-dropdown" id="rel_<?= $rel->uuid_konten_video ?>">
-                            <button class="yt-dropdown-item" onclick="event.preventDefault(); addToQueue('<?= $rel->uuid_konten_video ?>', '<?= esc($rel->judul_video) ?>', '<?= esc($rel->youtube_id) ?>', '<?= esc(mb_substr($rel->deskripsi_video ?? '', 0, 100)) ?>')">
+                            <button class="yt-dropdown-item" onclick="event.preventDefault(); event.stopPropagation(); addToQueue('<?= $rel->uuid_konten_video ?>', '<?= esc($rel->judul_video) ?>', '<?= esc($rel->youtube_id) ?>', '<?= esc(mb_substr($rel->deskripsi_video ?? '', 0, 100)) ?>')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" /></svg>
                                 Tonton Setelah Ini
                             </button>

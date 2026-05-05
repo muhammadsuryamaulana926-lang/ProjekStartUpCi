@@ -110,19 +110,15 @@ class M_perpustakaan extends Model
 
     public function catat_view_unik($id_konten_video, $id_user)
     {
-        // Catat view unik (1 user = 1 view per video)
-        $sudah_nonton = $this->cek_sudah_nonton($id_konten_video, $id_user);
-        
-        if (!$sudah_nonton) {
+        // Hanya increment jika user belum pernah nonton video ini
+        if (!$this->cek_sudah_nonton($id_konten_video, $id_user)) {
             $this->db->table('video_views')->insert([
                 'id_konten_video' => $id_konten_video,
                 'id_user'         => $id_user,
                 'viewed_at'       => date('Y-m-d H:i:s'),
             ]);
+            return $this->tambah_tontonan($id_konten_video);
         }
-        
-        // Selalu increment jumlah_ditonton (untuk total views, bukan unique)
-        return $this->tambah_tontonan($id_konten_video);
     }
 
     public function top_video_ditonton($limit = 10)

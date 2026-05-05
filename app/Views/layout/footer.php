@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', initGlobalPlayer);
 // ═══════════════════════════════════════════════════════════════
 // AJAX NAVIGATION - Intercept internal links untuk SPA behavior
 // ═══════════════════════════════════════════════════════════════
-$(document).on('click', 'a[href]:not([target="_blank"]):not([href^="mailto"]):not([href^="tel"]):not([href^="#"]):not([href*="download"]):not([href*="logout"]):not([href*="v_dashboard"])', function(e) {
+$(document).on('click', 'a[href]:not([target="_blank"]):not([href^="mailto"]):not([href^="tel"]):not([href^="#"]):not([href*="download"]):not([href*="logout"])', function(e) {
     const href = $(this).attr('href');
     
     // Skip jika link eksternal

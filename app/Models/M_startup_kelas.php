@@ -89,7 +89,7 @@ class M_startup_kelas extends Model
             ->select('ks.*, ps.nama_program')
             ->join('program_startup ps', 'ps.id_program = ks.id_program')
             ->where('ks.id_pemateri', $id_pemateri)
-            ->orderBy('ks.tanggal ASC, ks.jam_mulai ASC')
+            ->orderBy('ks.tanggal DESC, ks.jam_mulai DESC')
             ->get()->getResultArray();
     }
 }

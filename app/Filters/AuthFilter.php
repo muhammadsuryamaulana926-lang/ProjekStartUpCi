@@ -72,10 +72,9 @@ class AuthFilter implements FilterInterface
 
         // Jika tidak ada data izin atau tidak boleh lihat
         if (!$izin || !$izin['bisa_lihat']) {
-            $id_user      = $session->get('user_id');
-            $nama_peserta = $session->get('user_name');
+            $id_user = $session->get('user_id');
 
-            // Modul yang boleh diakses peserta_program_kelas dan pemilik_startup (perpustakaan, kelas, program, riwayat)
+            // Modul konten yang boleh diakses oleh peserta/pemilik startup
             $modul_konten = ['perpustakaan', 'kelas', 'program', 'riwayat'];
 
             if ($role === 'peserta_program_kelas' && in_array($nama_modul, $modul_konten)) {
@@ -86,25 +85,43 @@ class AuthFilter implements FilterInterface
                 return;
             }
 
-            // Role lain: cek apakah terdaftar sebagai peserta program
-            if (!in_array($role, ['pemilik_startup', 'peserta_program_kelas']) && in_array($nama_modul, ['program', 'kelas', 'perpustakaan'])) {
-                $m_peserta = new M_peserta_program();
-                $peserta = [];
-                if ($id_user) {
-                    $peserta = $m_peserta->program_by_user($id_user);
-                }
-                if (empty($peserta) && $nama_peserta) {
-                    $peserta = $this->db_table_peserta_by_nama($nama_peserta);
-                }
+            // Role lain yang terdaftar sebagai peserta program boleh akses modul konten
+            if (!in_array($role, ['pemilik_startup', 'peserta_program_kelas']) && in_array($nama_modul, $modul_konten)) {
+                $peserta = $id_user ? (new M_peserta_program())->program_by_user($id_user) : [];
                 if (!empty($peserta)) {
                     return;
                 }
             }
 
-            if ($role === 'pemilik_startup') {
-                return redirect()->to(base_url('v_detail/' . $session->get('user_startup_uuid')));
-            }
-            return redirect()->to(base_url('v_dashboard'))->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
+            // Redirect ke halaman yang sesuai per role (hindari infinite loop)
+            return $this->redirect_by_role($session, $role);
+        }
+    }
+
+    // Redirect ke halaman home yang sesuai per role (tidak pernah infinite loop)
+    private function redirect_by_role($session, $role)
+    {
+        $pesan = 'Anda tidak memiliki akses ke halaman tersebut.';
+        switch ($role) {
+            case 'pemilik_startup':
+                return redirect()->to(base_url('v_detail/' . $session->get('user_startup_uuid')))->with('error', $pesan);
+            case 'peserta_program_kelas':
+                return redirect()->to(base_url('program'))->with('error', $pesan);
+            case 'pemateri':
+                return redirect()->to(base_url('v_dashboard'))->with('error', $pesan);
+            default:
+                // Role lain yang is_peserta_program → program, selainnya → dashboard
+                if ($session->get('is_peserta_program')) {
+                    return redirect()->to(base_url('program'))->with('error', $pesan);
+                }
+                // Cek apakah role ini punya izin dashboard sebelum redirect ke sana
+                $izin_dashboard = (new M_izin_akses())->izin_by_role_modul($role, 'dashboard');
+                if ($izin_dashboard && $izin_dashboard['bisa_lihat']) {
+                    return redirect()->to(base_url('v_dashboard'))->with('error', $pesan);
+                }
+                // Tidak punya akses dashboard sama sekali → logout paksa
+                $session->destroy();
+                return redirect()->to(base_url('login'))->with('error', $pesan);
         }
     }
 

@@ -27,6 +27,12 @@ class Dashboard_startup extends BaseController
     {
         $role = session()->get('user_role');
 
+        // Blokir role yang tidak boleh akses dashboard
+        $role_terlarang = ['peserta_program_kelas', 'pemilik_startup'];
+        if (in_array($role, $role_terlarang) || session()->get('is_peserta_program')) {
+            return redirect()->to(base_url('program'))->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
+        }
+
         // Dashboard khusus pemateri: tampilkan jadwal kelas yang dia materikan
         if ($role === 'pemateri') {
             $id_user        = session()->get('user_id');
